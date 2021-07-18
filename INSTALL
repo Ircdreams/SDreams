@@ -1,0 +1,144 @@
+
+			-- [ -> SDREAMS <- ] --
+				
+		--< INSTALL >--
+
+Bienvenue dans le fichier d'aide à l'installation du projet SDreams.
+
+Sommaire :
+1) téléchargement
+2) ./configure
+3) make
+4) sdreams.conf
+5) link
+6) lancement
+
+1) téléchargement
+=================
+Tapez ça dans votre shell :
+$ cvs -d:pserver:anonymous@ircdreams.org:/cvsroot co SDreams
+Vous pouvez maintenant vous déplacer dans le dossier SDreams avec :
+$ cd SDreams/
+
+2) ./configure
+==============
+Comme tout programme linuxien qui se respecte, l'installation de sdreams nécessite
+la démarche habituelle du ./configure;make;make install.
+À ceci près que, n'étant installé que sur un compte unique du système, il est nécessaire
+d'indiquer manuellement le chemin de destination. Pour ce faire, tapez :
+$ ./configure --prefix=<path>
+Par exemple
+$ ./configure --prefix=/home/user/services/
+Il est à noter qu'il y a un certain nombres d'options paramétrables par cette commande.
+Vous pouvez les voir avec :
+$ ./configure --help
+En voici une liste pas forcément à jour :
+  --enable-debug          enable debug
+
+  --with-dbdir            name of database directory in path [database]
+  --with-parseslog        parseslog file's name [logs/parses.log]
+  --with-fauthlog         failed auth log file's name [logs/failed_auth.log]
+  --with-chanslog         channels commands log file's name [logs/chans.log]
+  --with-cmdslog          commands log file's name [logs/cmds.log]
+  --with-errorslog        errors log file's name [logs/erreurs.log]
+  --with-confname         configuration file's name [sdreams.conf]
+                          person [5]
+  --with-memolen          maximum length of memos [250]
+
+Il est juste à noter que pour paramétrer un "with" il faut mettre un "=" puis la valeur assignée,
+par exemple :
+$ ./configure --with-parseslog="parsing.log" --with-memolen=512
+
+Vous pouvez alors taper votre commande complète.
+Rassurez-vous, lors d'une éventuelle mise à jour de SDreams (si vous avez la version CVS), il ne sera
+pas requis de redonner ces paramètres ni de taper ./configure. Il suffira de passer à l'étape
+"make" (compilation).
+
+Si vous avez un quelquonque problème, n'hesitez pas à nous contacter.
+
+3) make
+=======
+Une fois la configuration du script effectuée, vous devez compiler SDreams. Pour se faire, tapez:
+$ make
+En cas d'erreurs de compilation, veuillez vérifier que vous avez un system compatible avec SDreams,
+que vous avez pris une version STABLE d'SDreams (voir "1. téléchargement") et que possédez bien
+les programmes requis (gcc, les libs, etc). Si tout ceci est bon, vous pouvez nous contacter pour
+signaler la présence d'erreurs de compilation. Nous serons ravi de passer toute notre nuit pour
+vous satisfaire.
+Après quoi vous pouvez taper :
+$ make install
+
+4) sdreams.conf
+===============
+La compilation terminée, vous devez paramétrer le fichier de configuration, nommé par défaut sdreams.conf.
+En effet, dans le make config, vous avez pu le nommer autrement.
+Comme vous l'aurez constaté, il n'existe pas encore, mais un fichier exemple.conf, lui, est présent. Veuillez
+le renommer en le nom que vous avez paramétré dans make config (par défaut sdreams.conf) avec:
+$ cp exemple.conf <conf>
+par exemple, par default :
+$ cp exemple.conf sdreams.conf
+
+Maintenant vous pouvez le configurer. Si vous avez besoin d'aide, n'hésitez pas à nous contacter.
+
+5) link
+=======
+Vous devez configurer sur votre/vos serveur(s) l'acceptation de la connexion d'sdreams. Pour se faire, il faut
+utiliser les paramètres que vous avez mis dans l'sdreams.conf. Prenons par exemple que vous avez mis
+ceci :
+uplink {
+	ip = 127.0.0.1
+	port = 4400
+	pass = prout
+}
+myserver {
+	server = services.ircdreams.org
+	..
+}
+
+Vous devez mettre dans l'ircd.conf du serveur qui recevra la connexion, c'est à dire le hub d'sdreams :
+C:<ip sur laquelle se trouve sdreams par rapport au serveur>:prout:services.ircdreams.org::50
+U:services.ircdreams.org::*
+
+ATTENTION ! Si les mots de pass sont paramétrés comme cryptés dans l'ircd.conf, vous devez utiliser l'outil
+mkpasswd pour crypter les pass. Vous devrez mettre le pass crypté dans l'ircd.conf, et si c'est IrcDreams
+uniquement, vous devrez aussi mettre le pass crypté dans sdreams.conf.
+
+Par exemple:
+$ mkpasswd
+Password: prout
+7yX/8r1if.PzI
+
+En outre, <ip sur laquelle se trouve sdreams par rapport au serveur> doit bien entendu être remplacé par
+l'ip sur laquelle se trouve sdreams par rapport au serveur.
+
+Maintenant, sur TOUS les autres serveurs du réseau auquel fait partit le hub sur lequel vous allez connecté
+sdreams, vous devez mettre cette ligne:
+U:services.ircdreams.org::*
+
+Pour finir, vérifier que le nombre que vous avez donné au paramètre NUMERIC n'est utilisé dans AUCUNE
+des M:Lines de tous les serveurs du réseau.
+Tapez /rehash sur tous les serveurs du réseau.
+
+6) lancement
+============
+Theoriquement, maintenant c'est bon, vous allez enfin pouvoir lancer votre service.
+Pour ce faire, tapez:
+$ ./SDreams
+
+Sur votre réseau, tapez :
+/<robot> register <login> <email> <pass>
+Par exemple:
+/x register BuGs bugs@ircdreams.org grospet
+
+Vous vous retrouvez administrateur du service niveau 10. Les users pourront s'enregistrer, vous pourrez
+en nommer Admin avec la commande ADMINLVL 
+Syntaxe: adminlvl <username> <niveau>
+Action: Change le niveau d'un Admin en un autre, compris entre 3 et 7,
+        inférieur au votre, sauf si vous êtes Admin niveau 7.
+        Pour supprimer un admin mettez 1 comme niveau.
+	Pour ajouter un helpeur mettez 2 comme niveau.
+        Pour ajouter un admin mettez son nouveau niveau.
+        
+Les programmeurs de SDreams vous souhaitent une bonne utilisation de leur programme.
+
+BuGs

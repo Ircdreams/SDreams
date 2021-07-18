@@ -1,0 +1,533 @@
+#DNRCHAN
+!%s <ADD|DEL|LIST> [<mask>|[-from <user> -match <mask>] [raison]]
+Action:  Modifie les listes des masks interdisant l'enregistrement
+         des salons.
+#DNRUSER
+!%s <ADD|DEL|LIST> [<mask>|[-from <user> -match <mask>] [raison]]
+Action:  Modifie les listes des masks interdisant l'enregistrement
+         des usernames.
+#ACCESS
+!%s <#salon> <*|pseudo|[<|>|=]<niveau>> [-autoop] [-autovoice] [-suspend] [-protect]
+Action: Permet de lister les accès d'un salon.
+        Le <mask> ne listera que les accès contenant le mask (wildcards autorisées)
+        Les <, > et = listeront les accès de niveau respectivement
+          de moins de, de plus de ou égaux au niveau spécifié.
+        Les arguments sont :
+         -autoop    : ne liste que les access avec AUTOOP = ON
+         -autovoice : ne liste que les access avec AUTOVOICE = ON
+         -autohop   : ne liste que les access avec AUTOHOP = ON 
+         -protect   : ne liste que les access avec PROTECT = ON
+         -suspend   : ne liste que les access suspendus
+#ADDUSER
+!%s <salon> <Pseudo|%%UserName> <level>
+Action: Propose un accès dans un salon enregistré à un user ENREGISTRÉ sur SDreams.
+        Le niveau va de 1 à 499. 
+        (Si vous mettez %nick plutot que l'username, le bot cherchera l'username sur lequel est logué le nick)
+#ADMIN
+Action: Montre les pseudos des Administrateurs des Services
+#HELPEUR
+Action: Montre les pseudos aptes à vous aider.
+#LEVEL
+!%s <username> <niveau>
+Action: Change le niveau d'un user en un autre, compris entre 2 et 7,
+        inférieur au votre, sauf si vous êtes Admin niveau 7.
+        Pour supprimer un Admin ou un Helpeur mettez 1 comme niveau.
+        Pour ajouter un Admin mettez son nouveau niveau.
+        Pour ajouter un Helpeur mettez le niveau 2
+#ADMINMOTD
+!%s <ADMIN/USER/LIST> [<message>|none]
+|ADMIN       Modifie le motd affiché au login des admins.
+|USER        Modifie le motd affiché au login des users.
+|LIST        Liste les motds des Admins et des Users.
+#AIDE
+Action: Permet d'avoir de l'aide à propos d'une commande.
+Si aucune commande n'est spécifiée, toutes les commandes disponibles seront listées (comme showcommands)
+#ALIST
+!%s <salon>
+Action: Liste les users ayant un accès sur le salon actuellement logués.
+#AUTOHOP
+!%s <#salon>
+Action: (des)active l'autohalfop de votre access sur un salon
+#AUTOOP
+!%s <#salon>
+Action: (des)active l'autoop de votre access dans un salon
+#AUTOVOICE
+!%s <#salon>
+Action: (des)active l'autovoice de votre access sur un salon
+#BAN
+!%s <chan> [niveau] <mask|%%nick> [%%XjXhXm] [raison]
+Action: Banni un mask d'un salon.
+        [niveau] est le niveau minimum requis pour supprimer ce ban.
+        [%XjXhXm] est le temps d'expiration du ban (Ex: %2j5m banni 2jours et 5 minutes)
+                  Si il y a un bantime au salon, %0 permet un ban sans expiration
+        [raison] par défault : "Aucune"
+        <mask> doit etre sous forme nick!user@host (WildCards autorisées)
+        si un %nick est fourni, le mask correspondant au bantype est banni.
+#BANLEVEL
+!%s <#salon> <niveau>
+Action: Paramètre le niveau minimum requis pour pouvoir poser un ban.
+#BANLIST
+!%s <#salon>
+Action: Avoir la liste des bans du salon.
+      (Si un mask est spécifié, seuls les bans le couvrant sont listés)
+#BANTYPE
+!%s <#salon> <type(1-4)>
+Action: Définit le type de mask par défaut lors d'un kickban.
+        Voici les différents types de bans :
+          1 = Ban sur *!*ident@*.host
+          2 = Ban sur *!*ident@*
+          3 = Ban sur *nick*!*@*
+          4 = Ban sur *!*@host
+#CHAN
+!%s <option> <salons - args>
+Action: Pour les admins, faire des manipulations ou avoir des
+        informations sur des salons.
+|LIST [mask|args..]                  Lister les salons enregistrés
+arguments: -description -modes -topic -url -defmodes -count -users
+|SUSPEND      <salon> [[%XjXhXm] <raison>]
+(De)Suspendre un salon.
+Vous pouvez modifier la raison ou la durée d'un suspend déjà actif.
+L'argument '-nolog' permet de supprimer la trace du suspend.
+|SUSPENDLIST [mask][-from <username>]              Lister les salons suspendus
+-from <username> ne liste que les salons suspendus par cet username
+|DEL          <salon> [raison]   Supprimer un salon
+|REG          <salon> <username> Enregistrer un salon à quelqu'un
+|SETOWNER <salon> <nouvel owner> [futur level de l'ancien owner] Change l'owner d'un salon
+|JOIN         <salon> [-force]   Fait joindre un salon déjà enregistré. (-force peut résoudre une désynchronisation)
+|PART         <salon> [raison]   Fait partir d'un salon enregistré temporairement.
+#CHANINFO
+!%s <#salon>
+Action: Voir les informations sur un salon.
+#CHANOPT
+!%s <salon> <option> <arguments>
+Action: Paramètre les options d'un salon.
+|DEFTOPIC    <topic>      Paramètre le topic par défaut
+|DEFMODES    <modes>      Paramètre les modes par défaut
+|STRICTOP    <on/off>     Seuls les Users ayant un accès peuvent être Op
+|SETWELCOME  <on/off>     Active/desactive le message de bienvenue
+|WELCOME     <message>    Paramètre le message de bienvenue
+|THEME       <thème>      Paramètre le thème du salon
+|BANLEVEL    <niveau>     Paramètre le niveau minimum par defaut pour debanir
+|NOBANS      <on/off>     Interdit les bans
+|NOOPS       <on/off>     Interdit les ops
+|NOHALFOPS   <on/off>     Interdit les halfops
+|NOVOICES    <on/off>     Interdit les voices
+|NOINFO      <on/off>     Empêche l'affichage des infolines
+|AUTOVOICE   <on/off>     Active/desactive l'autovoice à l'arrivé du salon
+|LOCKTOPIC   <on/off>     Empêche de modifier le topic
+|BANTYPE     <n° du type> Paramètre le type de ban (1=*!*ident@*.host, 2=*!*ident@*, 3=*nick*!*@*, 4=*!*@host)
+|MOTD        <message>    Paramètre le message du jour. Mettez none pour le supprimer.
+|AUTOINVITE  <on/off>     Si ON, invite au login les users ayant un accès sur le salon lorsque celui-ci est en mode +i
+|BANTIME     <duree>      Si supérieur à 0, mets cette durée par défaut au ban
+|CHMODESLEVEL <level>     Paramètre le niveau minimum pour changer les modes
+|AUTOLIMIT [ON|OFF] [-limit_inc <nombre>] [-limit_min <nombre>] active ou configure l'auto limite
+La limite sera périodiquement mise à jour telle qu'elle soit à <nombre actuel> + limit_inc
+La limite ne sera changée que si la différence entre la nouvelle limite théorique 
+et l'actuelle est supérieure ou égale à limit_min. (afin d'éviter le flood)
+|NOPUBCMD    <on/off>     Interdit les commandes publiques sur le salon.
+Seuls les commandes privées vers le robot sont autorisées
+#CHANURL
+!%s <#salon> <url>
+Action: Définit l'url du site du salon
+#CHANMEMO
+!%s <#salon> [-min level] [-max level] <message>
+Envoie un mémo aux accès du salon.
+         -min <niveau>: niveau minimum que les users doivent avoir (de 1 à 500) pour recevoir le memo
+         -max <niveau>: niveau maximum que les users doivent avoir (de 1 à 500) pour recevoir le memo
+#CHCOMNAME
+!%s <commande> <nouveau nom>
+Action: Change le nom d'une commande
+#CHLEVEL
+!%s <commande> <niveau>
+Action: Change le niveau nécessaire pour executer une commande.
+(Si l'argument -admin est precise, la commande passe admin (toggle), Meme principe avec -helpeur)
+#CLEARBANS
+!%s <#salon> <(-from <user> -minlevel <level> -maxlevel <level>)>
+Action: Supprime tous les bans d'un salon correspondant aux critères spécifiés (sinon tous).
+#CLEARMODES
+!%s <#salon>
+Action: Supprime tous les modes d'un salon. (Permet de résoudre un TakeOver)
+#COUNTRY
+!%s <code ISO pays>
+Action: Donne le pays d'apres son code ISO
+#DEAUTH
+Action: Permet de se déloguer.
+#DEFMODES
+!%s <#salon> <modes>
+Action: Définit les modes par défaut
+#DEFTOPIC
+!%s <#salon> <topic>
+Action: Définit le topic par défaut.
+#DEHOP
+!%s <#salon> [pseudos..]
+Action: DéHalfopé la liste des nick(s) sur un salon.
+       Si aucun nick n'est spécifié, vous serez déhalfopé.
+#DEHOPALL
+!%s <#salon>
+Action: DeHalfop tous les users d'un salon.
+#DELUSER
+!%s <salon> <Pseudo|%%UserName>
+Action: Supprime un accès d'un salon.
+#DEOP
+!%s <#salon> [pseudos]
+Action: Deop la liste de nick(s) d'un salon.
+       Si aucun nick n'est spécifé, vous êtes deopé.
+#DEOPALL
+!%s <#salon>
+Action: Deop tous les users d'un salon.
+#THEME
+!%s <#salon> <thème>
+Action: Définit le thème d'un salon.
+#DEVOICE
+!%s <#salon> [pseudos..]
+Action: Devoice la liste de nick(s) d'un salon.
+       Si aucun nick n'est spécifé, vous serez devoicé.
+#DEVOICEALL
+!%s <#salon>
+Action: Devoice tous les users d'un salon.
+#DIE
+Action: Clos les Services SDreams
+#DISABLE
+!%s [option] <commande> <ON/OFF>
+Action: Si ON, la commande est desactivée
+        Si OFF, la commande est activée
+|-LIST : Permet de lister les commandes désactivées.
+#DO
+!%s <#salon> :<message>
+Action: Fait envoyer une action sur le salon via le CS.
+#DROP
+!%s <mot de passe> CONFIRME
+Action: Supprime votre username, ainsi que tous vos mémos, vos
+        access et votre salon.
+        ATTENTION: Cette suppression est irréversible.
+#GLOBAL
+!Syntaxe: %s <MSG|MEMO|CMEMO> <message>
+|MSG : Envoie un message sur tout les salons
+|MEMO [-min <niveau minimum>] [-max <niveau maximum>] <message>
+Envoie un memo à tous les users respectant les paramètres définis (si définis)
+         -min <niveau>: niveau minimum que les users doivent avoir (de 1 à 7) pour recevoir le memo
+         -max <niveau>: niveau maximum que les users doivent avoir (de 1 à 7) pour recevoir le memo
+|CMEMO [-level level] #salon <message>
+Envoie un mémo aux accès du salon.
+         -level <niveau>: permet de spécifier le niveau à partir duquel le mémo est délivré
+#GLOBWELCOME
+!Syntaxe: %s <Sous Commande ADD|DEL|LIST|SET>
+        Action sur les welcomes globaux envoyés à la connexion. Sous commandes ADD, DEL, LIST, SET.
+        Voir l'aide de chacun d'eux
+|ADD <message>
+        Ajoute un welcome global à la liste.
+|DEL <ID>
+        Supprime un welcome global en utilisant son ID (voir LIST)
+|LIST
+        Affiche la liste des welcome globaux (ID, Niveau et Message)
+|SET [ON|OFF]
+        Active ou désactive le welcome global à la connexion d'un user
+#HOP
+!%s <#salon> [nicks..]
+Action: Halfopé la liste des nick(s) sur un salon.
+        Si aucun nick n'est spécifié, vous serez halfopé.
+#HOPALL
+!%s <#salon>
+Action: halfop tous les users d'un salon.
+#IGNORELIST
+Action: Montre la liste des hosts actuellement ignorées.
+#INFO
+!%s <#salon> <infoline>
+Action: Modifie l'infoline qui est envoyée lors de votre join sur le salon.
+        Le mot-clé 'none' la supprime.
+#INVITE
+!Syntaxe: %s <#salon>
+Action: Permet de vous inviter sur un salon.
+L'invitation passe outre tous les modes bloquants: +iklrO et les bans
+Note: Pour des raisons d'abus, il n'est plus possible d'inviter d'autres personnes que vous.
+#INVITEME
+Action: Invite dans le salon d'informations.
+#KICK
+!%s <#salon> <pseudo|mask> [raison]
+Action: Éjecte le pseudo du salon. Cette personne pourra néanmoins revenir.
+Si un mask est donné, tous les pseudos du salon couverts seront kickés. (match sur nick!user@host)
+#KICKBAN
+Syntaxe: %s <#salon> [niveau] <user> [%%XjXhXm] [raison]
+Action: Banni puis éjecte un user d'un salon.
+        [niveau] est le niveau minimum requis pour supprimer ce ban.
+        [%XjXhXm] est le temps d'expiration du ban (Ex: %2j5m banni 2jours et 5 minutes)
+        Si il y a un bantime au salon, %0 permet un ban sans expiration
+#LOCKTOPIC
+!%s <salon> [on|off]
+Action: Active/Désactive protection du topic.
+#LOGIN
+!%s <username> <pass>
+Action: Permet de s'identifier sur son username.
+        Vous serez identifié sur tous les salons où vous avez accès,
+	et vous aurez la possibilité d'envoyer et de lire vos memos.
+        Vous pourrez aussi enregistrer un salon.
+#MEMO
+!%s [<SUPPR|LIRE> <NEW|ALL|Nø DU MEMO>] [SEND <Pseudo|%%UserName> <message>]
+Action: Permet de lire ou de supprimer un/tous les memos.
+        Vous pouvez soit spécifier un memo spécial,
+        soit utiliser ALL pour faire l'action sur tous les memos.
+        Permet aussi d'envoyer un memo à un user.
+#MODE
+!%s <salons> <modes>
+Action: Modifie les modes d'un salon.
+#MODUSER
+!%s <salon> <options> <Pseudo|%%UserName> <arguments>
+Action: Modifie les options d'un accès.
+|AUTOOP     <username> <on/off>   CServ vous op lors de votre arrivée sur le salon
+|AUTOHOP    <username> <on/off>   CServ vous halfop lors de votre arrivée sur le salon
+|AUTOVOICE  <username> <on/off>   CServ vous voice lors de votre arrivée sur le salon
+|SUSPEND    <username> <on/off>   (De)suspend un accès
+|INFO       <username> <infoline> Paramètre une ligne envoyée lors de votre entrée sur le salon
+|LEVEL      <username> <1-499>    Paramètre votre niveau d'accès au salon
+|PROTECT    <username> <on/off>   Active/Désactive votre protection
+#MOTD
+!%s <#salon> <msg>
+Action: Paramètre le message du jour du salon (envoyé en
+        notice aux users qui ont access dessus lorsqu'ils
+        s'identifiront avec LOGIN).
+Note  : Mettez none si vous voulez le supprimer.
+#MYACCESS
+!%s <option> <salon>
+Action: Manipulation sur les accès que l'on possède
+        Si aucune option n'est spécifiée, vos accès seront listés.
+|ACCEPT accepte un accès proposé sur #salon
+|REFUSE refuse une proposition d'acces sur #salon
+|DROP Supprime un acces que vous possediez sur #salon
+|arg -chan <mask> : vérifie le nom du salon dans chaque accès avec ce mask
+#MYINFO
+Action: Montre les informations sur son compte
+#NOBANS
+!%s <salon> [on|off]
+Action: Active/Desactive l'interdiction de bannir.
+#NOOPS
+!%s <salon> [on|off]
+Action: Active/desactive l'interdiction d'op.
+#OP
+!%s <#salon> [pseudos]
+Action: Op la liste de nick(s) d'un salon.
+        Si aucun nick n'est spécifé, vous êtes opé.
+#OPALL
+!%s <#salon>
+Action: Op tous les users d'un salon.
+#OUBLI
+!%s <username> <email>
+Action: Permet d'obtenir un nouveau pass par l'email lié à l'username
+        en cas d'oubli.
+#PROTECT
+!%s <#salon>
+Action: (des)active votre protection
+#RECOVER
+!Syntaxe: %s <username> <pass>
+Action: Permet de récuperer son username comme nick,
+        et de s'identifier même si quelqu'un est actuellement 
+        logué sur cet username.
+#RDEFMODES
+!%s <#salon>
+Action: Remet les modes par défaut.
+#RDEFTOPIC
+!%s <#salon>
+Action: Remet le topic par défaut.
+#REGCHAN
+!%s <salon> <Thème du salon>
+Action: Permet d'enregistrer votre salon que vous
+        pourrez contrôler avec les différentes
+        commandes et options disponibles.
+        Vous êtes limité à un seul salon.
+#REGISTER
+!%s <username> <mail> <mail>
+Action: Enregistre votre pseudo.
+        Ce sera votre compte où seront enregistrés tous
+        vos accès aux salons et memos. Lors de la suppression
+        de cet username, vos accès seront détruits.
+        Par la suite, vous n'aurez pas besoin d'utiliser ce pseudo pour vous
+        identifier. (il sera spécifié comme username dans la commande login).
+#REHASH
+!%s [args]
+Liste des args:
+        -AIDE      Recharge l'aide
+        -TEMPLATE  Recharge les templates des mails
+        -PURGE     Purges les users/chans
+Aucun args actualisera le fichier de configuration
+#RENCHAN
+!%s <#salon> <#nouveau_salon>
+Action: Changer le nom d'un salon
+#RESTART
+!%s [raison]
+Action: Effectue un redemarrage du programme des services, ce qui permet d'effectuer une mise à Jour.
+#RESULTS
+Action: Voir les résultats du votes après qu'il ait été clos.
+#SAY
+!%s <#salon> :<message>
+Action: Permet d'envoyer un message à un salon via le CS.
+#SEEN
+!%s <username>
+Action: Donne le temps ecoulé depuis le dernier login de l'username.
+#SET
+!%s <options> [args (on/off/args)]
+Action:  Permet de définir les options de votre compte
+|MAIL <mail>                 Permet de changer son email
+|PASS <mot de passe>         Permet de changer son mot de passe
+|PROTECT <0/1/2>             Défini le niveau de protection du pseudo issu de l'username.
+0 = aucune protection, 1 = changement de pseudo, 2 = kill
+|USERNAME <nouveau username> Permet de changer son username.
+Attention: cette opération est irréversible.
+|MYHOST <0/1/2/3>            Permet de choisir son hostname au login
+0 Annulation
+1 Activation du mode x
+2 Activation du vhost personalisé
+3 Activation du Host non crypté
+Aucune option donnée = affiche le status
+|ACCESS <0/1/2>              Permet de configurer la réaction à une proposition d'accès
+0 Refuse toute proposition d'accès
+1 Requiert la confirmation/refus
+2 Accepte toute proposition d'accès
+|NOMEMO <on/off>             Permet de refuser les mémos.
+|NOVOTE <on/off>             Permet de ne pas participer aux votes.
+|NOMAIL <on/off>             Permet de ne pas recevoir les confirmations par mail des memos et accès
+|SWHOIS <type 0/1>
+Permet d'activer ou désactiver sa swhois
+0 = Désactiver, 1 = Activer
+|ALIAS <ADD|DEL|LIST> <alias>     Permet de gérer les alias sur son login
+|REPLYMSG <on/off>           Active les réponses par message plutôt que par notice.
+|SEXE <0/1/2>                Permet de définir son sexe
+0 = indéfini, 1 = Homme, 2 = Femme
+|LANG <lang>                 Permet de choisir le langage des réponses du robot
+#SETHOST
+!%s <user> <vhost>
+Action: Permet de configurer le Vhost d'un user
+Pour annuler un VHost, mettre none dans la section vhost
+#SETWELCOME
+!%s <salon> [on|off]
+Action: Active/désactive le message de bienvenue.
+#SHOWCOMMANDS
+Action:   Permet de voir la liste des commandes que vous pouvez utiliser.
+          L'option "all" permet de lister toutes les commandes.
+          (Si un salon est donné, ne liste que les commandes accessibles sur ce salon)
+#SHOWCONFIG
+Action: Permet de voir l'état des variables de configuration
+#STATS
+!%s <option>
+Action: Liste des différentes statistiques
+|ALL                         Statistiques complètes
+|MEM                         Statistiques de la mémoire utilisé
+|CMDS [comande]              Statistiques de la commande
+|TRAFFIC                     Statistiques sur le traffic de la connexion
+#STRICTOP
+!%s <salon> [on|off]
+Action: Active/desactive le STRICTOP.
+Lorsque le strictop est activé, seuls les users ayant un accès sur le salon peuvent être opés
+#SWHOIS
+!%s <Pseudo|%%UserName> <swhois>
+Action: Permet de configurer une ligne spéciale dans le /WHOIS de l'user
+Pour annuler un SWHOIS mettre none dans la section swhois
+#TOPIC
+!%s <salon> <topic>
+Action: Permet de changer le topic d'un salon.
+#TRACK
+!%s <option> <arg>
+Action: Ajoute/liste/supprime des users qui sont trackés. Chacunes de leurs
+        commandes vous seront envoyés en notice.
+|ADD <username> [expiration]  Ajoute un username a tracker
+|LIST [mask]                  Liste les trackés respectant le mask donné
+|DEL <username>               Suprime un tracké
+#UNBAN
+!%s <#salon> <mask|%%nick|banID>
+Action: Supprime un ban d'un salon.
+Si l'argument est au format %nick, tous les bans couvrant cette personne seront supprimés.
+#UNBANME
+!%s <#salon>
+Action: Enlève les bans qui vous touche
+#UNREG
+!%s <#salon> CONFIRME [raison]
+Action: Supprime votre salon.
+        ATTENTION: Vous ne pouvez pas revenir en arrière !
+#UPTIME
+Action: Voir depuis combien de temps les services sont lancés.
+#USER
+!%s <option> <Pseudo|%%UserName> <args>
+Action: Modifie ou affiche les paramètres d'un username.
+|INFO     <Pseudo|%UserName/*/*motclef*> <-arg1 -arg2..>
+          les arguments de recherche sont:
+          -auth: ne liste que les usernames sur lesquels quelqu'un est auth
+          -suspend: ne liste que les usernames suspendus
+          -count <nombre>: ne liste que <nombre> entrées
+          -seen <%XjXhXm> : borne supérieure de la durée de non login
+          -bseen <%XjXhXm>: borne inférieure de la duree de non login
+          -date <Tps Unix>: ne liste que les usernames dernierement logués avant cette date
+          -mail <mask-de-mail>: ne liste que les usernames dont le mail correspond
+          -vhost <mask-du-vhost>: ne liste que les usernames dont le vhost correspond
+          -alias <alias>: ne liste que les usernames dont l'alias correspond
+        Affiche les infos d'un/de plusieurs usernames (les options sont cumulables à souhait)
+|SUSPEND  <Pseudo|%UserName> [[%XjXhXm] <raison>]
+(De)Suspend un username. On peut définir un temps d'expiration.
+|DEL      <Pseudo|%UserName>    Supprime un username
+|MAIL     <Pseudo|%UserName> <e@mail>    Modifie le mail d'un username
+|NEWPASS  <Pseudo|%UserName> <pass>      Modifie le pass d'un username
+|NEWNICK  <Pseudo|%UserName> <nouveau>   Change l'username d'un user
+|MATCH [+|-][mnughcCas] [args...]
+Effectue une recherche sur les nicks connectés avec les critères spécifiés (Tous doivent être vérifiés)
+n(=nick) u(=userident) h(=host reelle) g(=real name) C(=host cryptee) c(=chan) a(=account) m(=modes) s(=serveur)
+|CANTREGCHAN <Pseudo|%UserName> [%XjXhXm]
+Si actif, l'user ne peut plus enregistrer de salon
+|NOPURGE <Pseudo|%UserName> active/désactive l'immunité la purge de l'username (par non-auth)
+|HOST <Pseudo|%UserName> <type 0/1/2/3>
+Permet de changer le type de hostname au login d'un username
+0 Annulation
+1 Activation du mode x
+2 Activation du vhost personalisé
+3 Activation du Host non crypté
+|SWHOIS <Pseudo|%UserName> <type 0/1>
+Permet d'activer ou désactiver le swhois d'un username
+0 = Désactiver, 1 = Activer
+|USERSET <Pseudo|%UserName> <temps unix>
+Permet de fixé la date d'enregistrement d'un username
+|ALIAS <Pseudo|%UserName> <ADD|DEL|LIST> <alias>
+Permet de gérer les alias d'un username 
+#VERIFY
+!%s <pseudo>
+Action: Vous permet de connaitre l'username utilisé par le pseudo.
+Cette commande vous permet aussi de savoir si cette personne est, ou non, Administrateur des Services
+#VERSION
+Action: Permet d'afficher la version courante de SDreams.
+#VOICE
+!%s <#salon> [nicks..]
+Action: Voice la liste des nick(s) sur un salon.
+        Si aucun nick n'est spécifié, vous serez voicé.
+#VOICEALL
+!%s <#salon>
+Action: Voice tous les users d'un salon.
+#VOTE
+!%s <(NEW|PROPOSITION|CLORE|CLEAR|RESULTS> [args]
+Action: Informations et paramétrages des votes
+        Syntaxe                          ACTION
+        ------                           ------
+        VOTE                             Voir l'etat du vote
+        VOTE NEW <nb de prop> <sujet>    Créer un nouveau vote
+        VOTE PROPOSITION <proposition>   Donner une proposition après avoir utilisé VOTE NEW
+        VOTE RESULTS                     Voir les résultats
+        VOTE CLEAR                       Efface les resultats du dernier vote
+        VOTE CLORE                       Clore le vote
+#VOTER
+Action: Voter au scrutin actuel. Vous devez donner le n°
+        de la proposition choisie. Si aucune n'est spécifiée, 
+        renvoye le statut du vote actuel si il y en a un.
+#WELCOME
+!%s <#salon> <message>
+Action: Paramètre le message de bienvenue du salon.
+#WHOIS
+!%s <nick>
+Action: Avoir des informations à propos d'un user.
+#WHOISON
+!%s <#salon>
+Action: Voir la liste des users d'un salon.
+        Légende:
+        * l'user est un ircop
+        ^ l'user est un admin
+        $ l'user est un helpeur
+        ! l'user est logué
+        @ l'user est opérateur
+        % l'user est halfop
+        + l'user est voice
+#WRITE
+Action: Permet d'écrire toutes les données dans la base de donnée fichiers.
+        (tous les usernames regs, salons regs, badnicks, badchans, welcome)

@@ -1,0 +1,94 @@
+ $Id: README,v 1.3 2004/10/14 16:04:18 bugs Exp $
+			-- [ -> SDREAMS <- ] --
+					version 1.ALPHA
+		--< BIN DIR >--
+
+Ce repertoire contient des scripts et outils vous permettant de mieux gérer SDreams au niveau du shell.
+
+Sommaire:
+1) save
+2) crontab
+3) check
+4) conclusion
+
+1) save
+=======
+	Ce script vous permet de faire des sauvegardes de votre base de données, de vos fichiers logs
+	et de votre configuration actuelle. Le script va créer un fichier nommé
+	save_<n°jour|n°mois|n°année>_<heure|minute|seconde>.tgz.
+	Par exemple :
+	'save_120303_203615.tgz'  pour le 12 mars 2003 à 20:36:15
+
+	Pour executer le script:
+	$ ./save
+
+	Le fichier save_*.tgz se retrouvera dans le répertoire sauvegardes.
+	Pour restaurer une configuration, tapez dans cette racine:
+	$ tar xfz sauvegardes/save_<njour|nmois|nannée>_<heure|minutes|secondes>.tgz
+	Par exemple:
+	$ tar xfz sauvegardes/save_120303_203615.tgz
+
+	Si vous voulez faire des sauvegardes automatiques, vous pouvez vous servire de crontab. Tapez:
+	$ crontab -e
+	ATTENTION: crontab peut avoir un autre nom. Si le shell vous renvoit que le programme n'existe pas
+	consultez votre administrateur.
+
+	Cela lancera l'éditeur vi. Tapez 'i' pour éditer et entrez ceci:
+	<minutes> <heures> <jour> <mois> <année> <chemin vers sdreams>/bin/save <chemin vers sdreams>
+
+	Par exemple:
+	* 0-24 * * * /home/bugs/SDreams/bin/save /home/bugs/SDreams
+	  Pour sauvegarder toutes les heures.
+	* * * * * /home/bugs/SDreams/bin/save /home/bugs/SDreams
+	  Pour sauvegarder toutes les minutes.
+	* 2 * * * /home/bugs/SDreams/bin/save /home/bugs/SDreams
+	  Pour sauvegarder tous les jours à 2 heures du matin
+	* * 1-31 * * /home/bugs/SDreams/bin/save /home/bugs/SDreams
+	  Pour sauvegarder tous les jours
+
+2) crontab
+==========
+	Une crontab est une table qui est executée à des moments définis. Nous allons nous en servir
+	ici pour relancer SDreams au cas où il planterait.
+	Vous devez d'abord taper :
+	$ crontab -e
+	ATTENTION: crontab peut avoir un autre nom. Si le shell vous renvoit que le programme n'existe pas
+	consultez votre administrateur.
+
+	Cela lancera l'éditeur vi. Tapez i pour éditer et entrez ceci:
+	<minutes> <heures> <jour> <mois> <année> <chemin vers sdreams>/bin/crontab <chemin vers sdreams>
+
+	Par exemple:
+	* 0-24 * * * /home/bugs/SDreams/bin/crontab /home/bugs/SDreams
+	  Pour vérifier le script toutes les heures.
+	0-59 * * * * /home/bugs/SDreams/bin/crontab /home/bugs/SDreams
+	  Pour vérifier le script toutes les minutes.
+	* 2 * * * /home/bugs/SDreams/bin/crontab /home/bugs/SDreams
+	  Pour vérifier tous les jours à 2 heures du matin
+	* * 1-31 * * /home/bugs/SDreams/bin/crontab /home/bugs/SDreams
+	  Pour vérifier tous les jours
+
+	Maintenant lorsque votre SDreams plantera, il se relancera automatiquement quand la crontab lancera
+	le script qui vérifie que SDreams est effectivement lancé.
+
+	NOTE: Lors d'un DIE, la crontab ne relancera pas automatiquement. Ceci ne marche que lors d'un
+	plantage (pour ne pas avoir à redie à chaque foi qu'il se relance par crontab ou à desactiver
+	la crontab)
+
+3) check
+========
+	Ce petit programme (compilable par 'make' ou 'make check') vous permet de lister
+	et/ou supprimer les fichiers de la base de données correspondant à des salons/usernames supprimés.
+	(ne devrait pas arriver)
+	
+	Syntaxe:
+	./check [-f /home/bugs/sdreams/database/] [-r]
+	
+	-f 	Path vers la base de données SDreams (Optionnel: ./database/ par défaut)
+	-r 	Supprime les vieux fichiers trouvés (Optionnel)
+	
+4) conclusion
+=============
+	Si vous avez des problèmes ou des questions par rapport à ces petits scripts n'hesitez pas.
+
+	-BuGs <BuGs@ircdreams.org>, programmeur de SDreams et chef du projet IrcDreams
