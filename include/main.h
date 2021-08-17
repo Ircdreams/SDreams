@@ -83,8 +83,9 @@
 #	define BASE64LEN 	6
 #endif
 
-#define MAXADMLVL 	4 /* level max des admins */
-#define ADMINLEVEL 	2 /* level min des admins, level entre USER&ADMIN LEVEL ~= Helpers? */
+#define MAXADMLVL 	7 /* level max des admins */
+#define ADMINLEVEL 	3 /* level min des admins, level entre USER&ADMIN LEVEL ~= Helpers? */
+#define HELPLEVEL	2
 
 #define OWNERLEVEL 500 /* Vous pouvez modifier ici le niveau du propriétaire des salons
 						* mais ne le changez plus une fois que vous avez une DB active,

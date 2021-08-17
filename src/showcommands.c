@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,13 +80,13 @@ int BuildCommandsTable(int rebuild)
 		{ 	/* preparons les buffers */
 			tmp->nb = 1;
 			tmp->buf = malloc(sizeof *tmp->buf);
-			tmp->level = snprintf(*tmp->buf, sizeof *tmp->buf, "\2Niveau %3d:\2", level);
+			tmp->level = snprintf(*tmp->buf, sizeof *tmp->buf, "\2\0033Niveau %3d:\2\3", level);
 		}
 		else if(tmp->level > SHWCMD_MAXLEN) /* ligne pleine, ajoutons une nouvelle */
 		{
 			tmp->buf = realloc(tmp->buf, sizeof *tmp->buf * ++tmp->nb);
-			strcpy(tmp->buf[tmp->nb-1], "          \2:\2");
-			tmp->level = 13;
+			strcpy(tmp->buf[tmp->nb-1], "           ");
+			tmp->level = 11;
 		}
 		/* ajout de la commande dans les buffers */
 		tmp->level += fastfmt(tmp->buf[tmp->nb-1] + tmp->level, " $", cmd->name);
@@ -120,13 +121,13 @@ int BuildCommandsTable(int rebuild)
 				tmp->level = level;
 				tmp->nb = 1;
 				tmp->buf = malloc(sizeof *tmp->buf);
-				size = snprintf(*tmp->buf, sizeof *tmp->buf, "\2Niveau %3d:\2", level);
+				size = snprintf(*tmp->buf, sizeof *tmp->buf, "\2\0033Niveau %3d:\2\3", level);
 			}
 			else if(size > SHWCMD_MAXLEN) /* ligne pleine, ajoutons une nouvelle */
 			{
 				tmp->buf = realloc(tmp->buf, sizeof *tmp->buf * ++tmp->nb);
-				strcpy(tmp->buf[tmp->nb-1], "          \2:\2");
-				size = 13;
+				strcpy(tmp->buf[tmp->nb-1], "           ");
+				size = 11;
 			}
 			/* ajout de la commande dans les buffers */
 			size += fastfmt(tmp->buf[tmp->nb-1] + size, " $", cmd->name);
@@ -155,6 +156,7 @@ int showcommands(aNick *nick, aChan *chan, int parc, char **parv)
 	csreply(nick, GetReply(nick, L_SHOWCMDUSER));
 	for(i = 0; i <= (nick->user ? nick->user->level : 0); ++i)
 	{
+		if(i == HELPLEVEL) csreply(nick, "Helper Commands:");
 		if(i == ADMINLEVEL) csreply(nick, GetReply(nick, L_SHOWCMDADMIN));
 		for(j = 0; j < scmd_user[i].nb; ++j)
     		csreply(nick, "%s", scmd_user[i].buf[j]);
