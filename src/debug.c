@@ -1,10 +1,12 @@
 /* src/debug.c
- * Copyright (C) 2004-2006 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://www.ircdreams.org
+ * Copyright (C) 2002-2006 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@ir3.org>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: debug.c,v 1.7 2006/03/11 22:23:35 bugs Exp $
+ * $Id: debug.c,v 1.13 2006/03/09 19:56:46 romexzf Exp $
  */
 
 #include "main.h"
@@ -43,6 +45,7 @@ int Debug(int flag, const char *format, ...)
 	va_start(va, format);
 	myvsnprintf(buf + i, sizeof buf - i, format, va);
 	va_end(va);
+
 	if(flag & W_WARN && bot.sock >= 0) cswallops("%s", buf); /* send to opers if connect */
 	if(flag & W_TTY && isatty(1)) puts(buf); /* display on console (if available) */
 	if(fp)

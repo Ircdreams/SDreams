@@ -1,10 +1,12 @@
 /* include/timers.h
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2007 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,30 +21,31 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: timers.h,v 1.9 2005/08/26 23:55:25 bugs Exp $
+ * $Id: timers.h,v 1.5 2007/01/02 19:44:30 romexzf Exp $
  */
 
 #ifndef HAVEINC_timers
 #define HAVEINC_timers
 
-Timer *timer_add(time_t, enum TimerType, int (*) (Timer *),     void *, void *);
+extern Timer *Timers;
 
-Timer *timer_enqueue(Timer *);
+extern Timer *timer_add(time_t, enum TimerType, int (*) (Timer *),	void *, void *);
+extern Timer *timer_enqueue(Timer *);
 
-void timer_free(Timer *);
-void timer_dequeue(Timer *);
-void timer_remove(Timer *);
-void timers_run(void);
+extern void timer_free(Timer *);
+extern void timer_dequeue(Timer *);
+extern void timer_remove(Timer *);
+extern void timer_clean(void);
+extern void timers_run(void);
 
-int callback_ban(Timer *);
-int callback_kill(Timer *);
-int callback_check_accounts(Timer *);
-int callback_check_chans(Timer *);
-int callback_write_dbs(Timer *);
-int callback_unsuspend(Timer *);
-int callback_fl_update(Timer *);
-    
-void check_chans(void); 
-void check_accounts(void); 
+extern int callback_ban(Timer *);
+extern int callback_kill(Timer *);
+extern int callback_check_accounts(Timer *);
+extern int callback_check_chans(Timer *);
+extern int callback_write_dbs(Timer *);
+extern int callback_fl_update(Timer *);
+
+extern void check_chans(void);
+extern void check_accounts(void);
 
 #endif /*HAVEINC_timers*/

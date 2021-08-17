@@ -1,10 +1,12 @@
 /* include/admin_cmds.h
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2007 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,14 +21,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: admin_cmds.h,v 1.8 2006/02/18 07:08:44 bugs Exp $
+ * $Id: admin_cmds.h,v 1.4 2007/01/02 19:44:30 romexzf Exp $
  */
 
 #ifndef HAVEINC_admincmds
 #define HAVEINC_admincmds
 
 extern int inviteme(aNick *, aChan *, int, char **);
-extern void CleanUp(void);
 extern int die(aNick *, aChan *, int, char **);
 extern int restart_bot(aNick *, aChan *, int, char **);
 extern int chcomname(aNick *, aChan *, int, char **);
@@ -36,10 +37,8 @@ extern int globals_cmds(aNick *, aChan *, int, char **);
 extern int rehash_conf(aNick *, aChan *, int, char **);
 extern int showconfig(aNick *, aChan *, int, char **);
 
-extern int dnrchan_manage(aNick *, aChan *, int, char **); 
-extern int dnruser_manage(aNick *, aChan *, int, char **); 
-extern int dnr_manage(aNick *, int, int, char **); 
-
+#ifdef USE_WELCOMESERV
 extern int set_motds(aNick *, aChan *, int, char **);
+#endif
 
 #endif /*admincmds*/

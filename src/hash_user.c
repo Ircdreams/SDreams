@@ -1,10 +1,13 @@
 /* src/hash_user.c - gestion des hash user
- * Copyright (C) 2004-2005 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2008 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
+ *
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,24 +22,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: hash_user.c,v 1.26 2006/01/28 12:35:07 bugs Exp $
+ * $Id: hash_user.c,v 1.27 2008/01/05 18:34:13 romexzf Exp $
  */
 
 #include "main.h"
 #include "hash.h"
 #include "debug.h"
 #include "outils.h"
+#include "mylog.h"
 #include "fichiers.h"
 #include "del_info.h"
 #include "cs_cmds.h"
 #include <ctype.h>
 #include "timers.h"
+#include "data.h"
+#ifdef HAVE_TRACK
 #include "track.h"
-#include "config.h"
+#endif
 
 static anUser *mail_tab[USERHASHSIZE];
-static anAlias *alias_tab[ALIASHASHSIZE];
-static anUser *vhost_tab[USERHASHSIZE];
+static anUser *userid_tab[USERHASHSIZE];
+
+unsigned long user_maxid = 0UL;
 
 static inline unsigned int do_hashu(const char *user)
 {
@@ -53,7 +60,7 @@ static int hash_deluser(anUser *user)
 	if(tmp == user) user_tab[hash] = user->next;
 	else
 	{
-		for(;tmp && tmp->next != user;tmp = tmp->next);
+		for(; tmp && tmp->next != user; tmp = tmp->next);
 		if(tmp) tmp->next = user->next;
 		else Debug(W_WARN|W_MAX, "H_del_user %s non trouvé à l'offset %u ?!", user->nick, hash);
 	}
@@ -62,14 +69,14 @@ static int hash_deluser(anUser *user)
 
 static int hash_adduser(anUser *user)
 {
-	unsigned int hash = do_hashu(user->nick); 
-        user->next = user_tab[hash]; 
-        user_tab[hash] = user; 
-        return 0; 
+	unsigned int hash = do_hashu(user->nick);
+	user->next = user_tab[hash];
+	user_tab[hash] = user;
+	return 0;
 }
 
-int switch_user(anUser *user, const char *newuser) 
-{ 
+int switch_user(anUser *user, const char *newuser)
+{
 	hash_deluser(user);
 	Strncpy(user->nick, newuser, NICKLEN);
 	hash_adduser(user);
@@ -77,151 +84,85 @@ int switch_user(anUser *user, const char *newuser)
 	return 0;
 }
 
-static inline unsigned int do_hasha(const char *alias)
+anUser *getuserinfo(const char *nick)
 {
-	unsigned int checksum = 0;
-	while(*alias) checksum += (checksum << 3) + tolower((unsigned char) *alias++);
-	return checksum & (ALIASHASHSIZE-1);
+	unsigned int hash = do_hashu(nick);
+	register anUser *tmp = user_tab[hash];
+	for(; tmp && strcasecmp(nick, tmp->nick); tmp = tmp->next);
+	return tmp;
 }
 
-int hash_delalias(anAlias *alias)
+static int hash_delmail(anUser *user)
 {
-	unsigned int hash = do_hashu(alias->name);
-	anAlias *tmp = alias_tab[hash];
+	unsigned int hash = do_hashu(user->mail);
+	anUser *tmp = mail_tab[hash];
 
-	if(tmp == alias) alias_tab[hash] = alias->hash_next;
+	if(tmp == user) mail_tab[hash] = user->mailnext;
 	else
 	{
-		for(;tmp && tmp->hash_next != alias;tmp = tmp->hash_next);
-		if(tmp) tmp->hash_next = alias->hash_next;
-		else Debug(W_WARN|W_MAX, "H_del_alias %s non trouvé à l'offset %u ?!", alias->name, hash);
+		for(; tmp && tmp->mailnext != user; tmp = tmp->mailnext);
+		if(tmp) tmp->mailnext = user->mailnext;
+		else Debug(W_WARN|W_MAX, "H_del_mail %s non trouvé à l'offset %u ?!", user->mail, hash);
 	}
 	return 0;
 }
 
-int hash_addalias(anAlias *alias)
+static int hash_addmail(anUser *user)
 {
-	unsigned int hash = do_hasha(alias->name); 
-        alias->hash_next = alias_tab[hash]; 
-        alias_tab[hash] = alias; 
-        return 0; 
+	unsigned int hash = do_hashu(user->mail);
+	user->mailnext = mail_tab[hash];
+	mail_tab[hash] = user;
+	return 0;
 }
 
-anUser *getuserinfo(const char *nick)
+int switch_mail(anUser *user, const char *newmail)
 {
-	unsigned int hashu = do_hashu(nick);
-	unsigned int hasha = do_hasha(nick);
-        register anUser *user = user_tab[hashu];
-	register anAlias *alias = alias_tab[hasha];
-        for(;user;user=user->next) if(!strcasecmp(nick, user->nick)) return user;
-	for(;alias;alias=alias->user_nextalias) if(!strcasecmp(nick, alias->name)) return alias->user;
-        return 0;
+	hash_delmail(user);
+	Strncpy(user->mail, newmail, MAILLEN);
+	hash_addmail(user);
+	return 0;
 }
 
-int checknickaliasbyuser(const char *nick, anUser *user) 
-{ 
-        anAlias *alias = NULL; 
-        for(alias = user->aliashead;alias;alias = alias->user_nextalias)
-        { 
-                if(alias && !strcasecmp(nick, alias->name)) 
-                        return 1; 
-        } 
-        return 0; 
-}
-    
-int checkmatchaliasbyuser(const char *check, anUser *user) 
-{ 
-        anAlias *alias = NULL; 
-        for(alias = user->aliashead;alias;alias = alias->user_nextalias) 
-        {
-                if(alias && !match(check, alias->name)) 
-                        return 1;
-        } 
-        return 0; 
-} 
-
-int hash_delvhost(anUser *user)
+anUser *GetUserIbyMail(const char *mail)
 {
-        unsigned int hash = do_hashu(user->vhost);
-        anUser *tmp = vhost_tab[hash];
-	
-	if(!strcasecmp(user->vhost, "none")) return 0;
-
-        if(tmp == user) vhost_tab[hash] = user->vhostnext;
-        else
-        {
-                for(;tmp && tmp->vhostnext != user;tmp = tmp->vhostnext);
-                if(tmp) tmp->vhostnext = user->vhostnext;
-                else Debug(W_WARN|W_MAX, "H_del_vhost %s non trouvé à l'offset %u ?!", user->vhost, hash);
-        }
-        return 0;
+	unsigned int hash = do_hashu(mail);
+	register anUser *tmp = mail_tab[hash];
+	for(; tmp && strcasecmp(mail, tmp->mail); tmp = tmp->mailnext);
+	return tmp;
 }
 
-int hash_addvhost(anUser *user)
+static int hash_addid(anUser *user)
 {
-        unsigned int hash = do_hashu(user->vhost);
-        user->vhostnext = vhost_tab[hash];
-        vhost_tab[hash] = user;
-        return 0;
+	unsigned int hash = user->userid & (USERHASHSIZE-1);
+	user->idnext = userid_tab[hash];
+	userid_tab[hash] = user;
+	return 0;
 }
 
-int switch_vhost(anUser *user, const char *newvhost)
+static int hash_delid(anUser *user)
 {
-        hash_delvhost(user);
-        Strncpy(user->vhost, newvhost, HOSTLEN);
-        hash_addvhost(user);
-        return 0;
+	unsigned int hash = user->userid & (USERHASHSIZE-1);
+	anUser *tmp = userid_tab[hash];
+
+	if(tmp == user) userid_tab[hash] = user->idnext;
+	else
+	{
+		for(; tmp && tmp->idnext != user; tmp = tmp->idnext);
+		if(tmp) tmp->idnext = user->idnext;
+		else Debug(W_WARN|W_MAX, "H_del_userid %s non trouvé à l'offset %u ?!", user->nick, hash);
+	}
+	return 0;
 }
 
-anUser *GetUserIbyVhost(const char *vhost)
+anUser *GetUserIbyID(unsigned long userid)
 {
-        unsigned int hash = do_hashu(vhost);
-        register anUser *tmp = vhost_tab[hash];
-        for(;tmp && strcasecmp(vhost, tmp->vhost);tmp = tmp->vhostnext);
-        return tmp;
+	register anUser *tmp = userid_tab[(userid & (USERHASHSIZE-1))];
+	for(; tmp && tmp->userid != userid; tmp = tmp->idnext);
+	return tmp;
 }
 
-static int hash_delmail(anUser *user) 
-{ 
-        unsigned int hash = do_hashu(user->mail); 
-        anUser *tmp = mail_tab[hash]; 
- 
-        if(tmp == user) mail_tab[hash] = user->mailnext; 
-        else 
-        { 
-                for(;tmp && tmp->mailnext != user;tmp = tmp->mailnext); 
-                if(tmp) tmp->mailnext = user->mailnext; 
-                else Debug(W_WARN|W_MAX, "H_del_mail %s non trouvé à l'offset %u ?!", user->mail, hash); 
-        } 
-        return 0; 
-} 
-    
-static int hash_addmail(anUser *user) 
-{ 
-        unsigned int hash = do_hashu(user->mail); 
-        user->mailnext = mail_tab[hash]; 
-        mail_tab[hash] = user; 
-        return 0; 
-} 
- 
-int switch_mail(anUser *user, const char *newmail) 
-{ 
-        hash_delmail(user); 
-        Strncpy(user->mail, newmail, MAILLEN); 
-        hash_addmail(user); 
-        return 0; 
-} 
-
-anUser *GetUserIbyMail(const char *mail) 
-{ 
-        unsigned int hash = do_hashu(mail); 
-        register anUser *tmp = mail_tab[hash]; 
-        for(;tmp && strcasecmp(mail, tmp->mail);tmp = tmp->mailnext); 
-        return tmp; 
-} 
-
-anUser *add_regnick(const char *user, const char *pass, time_t lastseen,
-		time_t regtime, int level, int flag, const char *mail, const char *vhost)
+anUser *add_regnick(const char *user, const char *pass, time_t lastseen, time_t regtime,
+					 int level, int flag, const char *mail, unsigned long userid)
 {
 	anUser *u = calloc(1, sizeof *u);
 
@@ -239,44 +180,59 @@ anUser *add_regnick(const char *user, const char *pass, time_t lastseen,
 	Strncpy(u->mail, mail, MAILLEN);
 	u->flag = flag;
 	u->suspend = NULL;
+	u->cantregchan = NULL;
+	u->nopurge = NULL;
 	u->lastlogin = NULL;
-	u->cantregchan = -1;
-	Strncpy(u->vhost, vhost, HOSTLEN);
+	u->cookie = NULL;
+	u->userid = userid ? userid : ++user_maxid;
 
 	hash_adduser(u);
 	hash_addmail(u);
-	if(strcasecmp(vhost, "none")) hash_addvhost(u);
+	hash_addid(u);
 	return u;
 }
 
 void del_regnick(anUser *user, int flag, const char *raison)
 {
 	anAccess *acces, *acces_t;
+#ifdef USE_MEMOSERV
 	aMemo *memo = user->memohead, *mem;
-        struct track *track = istrack(user); 
-    
-        if(GetConf(CF_TRACKSERV) && track) 
-        { 
-                csreply(track->tracker, "[\2Track\2] L'UserName %s que vous trackez vient d'être supprimé.", 
-                        user->nick); 
-                del_track(track); 
-        } 
+#endif
+#ifdef HAVE_TRACK
+	struct track *track;
 
-	for(acces = user->accesshead;acces;acces = acces_t)
+	if(UTracked(user) && (track = istrack(user)))
+	{
+		csntc(track->tracker, "[\2Track\2] L'UserName %s que vous trackez vient d'être supprimé.",
+			user->nick);
+		del_track(track);
+	}
+#endif
+
+	for(acces = user->accesshead; acces; acces = acces_t)
 	{
 		acces_t = acces->next;
-		if(AOwner(acces)) del_chan(acces->c, flag, raison);
+		if(AOwner(acces)) del_chan(acces->c, flag|HF_LOG, raison);
 		else del_access(user, acces->c);
 	}
-	for(;memo;memo = mem)
+#ifdef USE_MEMOSERV
+	for(; memo; memo = mem)
 	{
 		mem = memo->next;
 		free(memo);
 	}
+#endif
+
+ 	if(flag & HF_LOG)
+		log_write(LOG_UCMD, 0, "purge %s (%d)", user->nick, CurrentTS - user->lastseen);
 
 	hash_deluser(user);
 	hash_delmail(user);
-	SUSPEND_REMOVE(user->suspend);
+	hash_delid(user);
+	if(user->suspend) data_free(user->suspend);
+	if(user->cantregchan) data_free(user->cantregchan);
+	if(user->nopurge) data_free(user->nopurge);
 	if(user->lastlogin) free(user->lastlogin);
+	if(user->cookie) free(user->cookie);
 	free(user);
 }

@@ -1,10 +1,12 @@
 /* include/divers.h
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2007 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: divers.h,v 1.19 2006/03/08 03:12:20 bugs Exp $
+ * $Id: divers.h,v 1.4 2007/01/02 19:44:30 romexzf Exp $
  */
 
 #ifndef HAVEINC_divers
@@ -28,15 +30,10 @@
 extern int uptime(aNick *, aChan *, int, char **);
 extern int ctcp_ping(aNick *, aChan *, int, char **);
 extern int ctcp_version(aNick *, aChan *, int, char **);
-extern int version(aNick *, aChan *, int, char **);
 extern int lastseen(aNick *, aChan *, int, char **);
 extern int show_admins(aNick *, aChan *, int, char **);
-extern int show_helper(aNick *, aChan *, int, char **);
-extern int show_ignores(aNick *, aChan *, int, char **);
 extern int verify(aNick *, aChan *, int, char **);
-extern int swhois(aNick *, aChan *, int , char **);
-extern int sethost(aNick *, aChan *, int, char **);
-extern int myinfo(aNick *, aChan *, int, char **);
-extern int show_country(aNick *, aChan *, int, char **);
+
+extern void CleanUp(void);
 
 #endif /*HAVEINC_divers*/

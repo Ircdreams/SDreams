@@ -1,10 +1,12 @@
 /* include/admin_chan.h - commandes admins pour gerer les chans
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://www.ircdreams.org
+ * Copyright (C) 2002-2006 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@kouak.org>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IrcProgs et IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: admin_chan.h,v 1.5 2005/04/19 16:23:19 bugs Exp $
+ * $Id: admin_chan.h,v 1.3 2006/05/30 17:29:57 romexzf Exp $
  */
 
 #ifndef HAVEINC_adminchan
@@ -27,6 +29,5 @@
 
 extern int admin_chan(aNick *, aChan *, int, char **);
 extern int whoison(aNick *, aChan *, int, char **);
-extern void show_suspend(aNick *, aChan *);
-extern int setchan(aNick *, aChan *, int, char **);
+
 #endif /*HAVEINC_adminchan*/

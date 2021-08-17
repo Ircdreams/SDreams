@@ -1,10 +1,12 @@
 /* include/flood.h
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2007 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: flood.h,v 1.5 2005/05/02 11:12:51 bugs Exp $
+ * $Id: flood.h,v 1.4 2007/01/02 19:44:30 romexzf Exp $
  */
 
 #ifndef HAVEINC_flood
@@ -30,6 +32,10 @@
 
 extern int checkflood(aNick *);
 extern int isignore(aNick *);
-int callback_delignore(Timer *);
+extern int callback_delignore(Timer *);
+
+extern void ignore_clean(void);
+
+extern int show_ignores(aNick *, aChan *, int, char **);
 
 #endif /*HAVEINC_flood*/

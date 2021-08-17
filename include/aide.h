@@ -1,10 +1,12 @@
 /* include/aide.h
- * Copyright (C) 2004 ircdreams.org
+ * Copyright (C) 2002-2003 Inter System
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * contact: Progs@Inter-System.Net
+ *          Cesar@Inter-System.Net
+ *          kouak@kouak.org
+ * site web: http://coderz.inter-system.net
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * Services pour serveur IRC. Supporté sur IrcProgs et IrCoderZ
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: aide.h,v 1.7 2006/03/15 17:36:47 bugs Exp $
+ * $Id: aide.h,v 1.3 2004/08/24 15:19:10 romexzf Exp $
  */
 
 #ifndef HAVEINC_aide

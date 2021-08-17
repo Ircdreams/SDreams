@@ -1,10 +1,12 @@
 /* src/token.h listes des tokens P10
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2005 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@ir3.org>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,7 +51,4 @@
 #define TOKEN_INVITE "I"
 #define TOKEN_GLINE "GL"
 #define TOKEN_WALLCHOPS "WC"
-#define TOKEN_SVSHOST "SA"
-#define RECUP_MOTD "372"
 #define TOKEN_DESTRUCT "DE"
-#define TOKEN_SWHOIS "SW"

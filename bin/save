@@ -1,7 +1,7 @@
 #!/bin/sh
 # Ce script permet de sauvegarder la base de donnée, les fichiers logs et la configuration
 #
-# $Id: save,v 1.2 2004/07/04 02:22:34 bugs Exp $
+# $Id: save,v 1.2 2004/03/07 15:13:48 romexzf Exp $
 #
 ts=`date '+%d%m%y_%H%M%S'`
 
@@ -16,12 +16,12 @@ else
   fi
 fi
 
-if [ ! -d database ] || [ ! -f sdreams.conf ]; then
-  if test "$1" ; then echo "Erreur: le répertoire $1 n'est pas la racine de SDreams"; fi
-  echo "Syntax: bin [repetoire racine de sdreams]";
+if [ ! -d database ] || [ ! -f scoderz.conf ]; then
+  if test "$1" ; then echo "Erreur: le répertoire $1 n'est pas la racine de SCoderZ"; fi
+  echo "Syntax: bin [repetoire racine de scoderz]";
 else
   if [ ! -d sauvegardes ]; then mkdir sauvegardes; fi
-  tar cfz sauvegardes/save_$ts.tgz database sdreams.conf
+  tar cfz sauvegardes/save_$ts.tgz database scoderz.conf
   echo "*"
   echo "Base de donnée, fichiers de logage et configuration sauvegardés dans le fichier save_$ts.tgz, situé dans le répertoire sauvegardes/"
   echo "Pour restaurer la sauvegarde, tapez :"

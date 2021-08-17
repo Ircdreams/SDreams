@@ -1,0 +1,150 @@
+
+			-- [ -> SCODERZ <- ] --
+					version 1.3.2
+		--< README >--
+
+Dernière mise à jour :
+$Id: README,v 1.18 2007/03/15 13:41:52 romexzf Exp $
+            ____   ____          _          _____
+           / ___| / ___|___   __| | ___ _ _|__  /
+           \___ \| |   / _ \ / _` |/ _ \ '__|/ /
+            ___) | |__| (_) | (_| |  __/ |  / /_
+           |____/ \____\___/ \__,_|\___|_| /____|
+
+Des Services en tout genre existent, de GNUworld à Epona, en passant par CS.
+Ils ont tous été créés pour faciliter l'utilisation d'Internet Relay Chat, que les salons
+aient des propriétaires, que les pseudos puissent être enregistrés, que les users aient
+des pouvoirs, puissent se laisser des messages, etc. En gros, les services ont été créé pour
+rendre l'IRC plus disponible et que chaque user se retrouve en un pseudo et soit
+toujours existant après la déconnexion.
+
+Les Services CoderZ ont été créés en août 2002 par Progs, pour le réseau kouak.org, qui
+lui même deviendra le réseau irc.jeux.fr. Il décida de réunir plusieurs systèmes (le
+mono login de gnuworld, les commandes en ! dans les salons de cs, le memoserv de epona)
+en un seul programme, le tout compatible avec son ircd du moment, ircprogs. Ce qui fit
+naître SCoderZ, qui a beaucoup évolué et qui a été beaucoup utilisé à travers les petits
+réseaux.
+Il est tout de même à noter qu'étant programmé à la base POUR le réseau irc.jeux.fr, il n'est pas
+forcément pris en compte de vos paramètres personnels quant à l'utilisation de ce programme.
+Note: le réseau irc.jeux.fr n'existe plus. L'équipe coderz est maintenant sur IRCube.
+
+CONTENU:
+
+	Ce programme contient les services suivants :
+	  - NickServ: Les utilisateurs peuvent enregistrer un account sur scoderz, et leur
+	              pseudo sera protégé. Il leur appartiendra, et l'user pourra paramétré
+	              un auto kill ou un auto changement de pseudo à ceux qui prendront leur
+	              pseudo sans s'identifier dessus.
+	  - ChanServ: Les utilisateurs enregistrés pourront posséder un salon, mettre des
+	              access à d'autres utilisateurs enregistrés ou posséder des access eux
+	              même sur des salons enregistrés par d'autres users. Le module chanserv
+	              contient de nombreux outils pour aider l'entretien d'un salon.
+	  - MemoServ: Les utilisateurs pourront s'envoyer des memos entre utilisateurs
+	              enregistrés. Laisser des messages à des utilisateurs non connectés qui
+	              pourront les lire à leur reconnexion peut être interressant pour une
+	              durée de vie sur l'irc plus longue.
+	  - Welcome: Les administrateurs pourront paramétrer des messages de bienvenue ou
+	             d'information aux users à leur connexion. Il y a de nombreuses options,
+	             comme le moyen d'envoi, des messages pris aléatoirement suivant un niveau
+	             de probabilité d'être pris.
+	  - Vote: Les administrateurs pourront organiser des votes que les utilisateurs enregistrés
+	          à scoderz pourront participer. Les votes peuvent avoir plusieurs buts, élection
+	          d'administrateurs, demande d'opinion, organisation de concours (chatteur du mois), etc.
+	          Les résultats sont tenus secret jusqu'à l'arrêt officiel du vote par un admin.
+	  - Web2Cs: Ce module demande à scoderz de lancer un serveur sur lequel un script php peut
+	            se connecter pour envoyer et recevoir des données. Ce script se loguera comme
+	            tout user et pourra agir en conséquence. Ceci permettra, le script php fini, de
+	            permettre aux users de modifier leurs paramètres d'account ou d'access salon, ou
+	            de gérer les options et bans salons. Les administrateurs pourront aussi y avoir accès
+	            pour gérer scoderz de manière efficace. Le php ne doit rien gérer niveau authentification
+	            vu que celle ci se fait sur scoderz via le serveur web2cs.
+	            Note: la documentation n'est absolument pas à jour, au même titre que tout le contenu
+	            du répertoire website/. Veuillez vous renseigner auprès d'un membre de l'équipe CoderZ.
+	  - Sql Logs: Les logs sont écrits dans une base relationnelle SQL. Peut être que Cesar écrira
+	              pourquoi c'est si bien:) (on attend toujours!).
+	  - Tracks: Possibilité pour un admin de surveiller un user. A chaques fois que le tracké utilise
+	            une commande scoderz, le trackeur reçoit une notice.
+
+AVANT TOUTES CHOSES:
+
+	Veuillez lire la licence d'utilisation (en anglais) dans le fichier LICENSE.
+	Ceci est une licence GPL. L'utilisation de ce programme implique que vous l'ayez
+	lue et acceptée.
+
+INSTALLATION:
+
+	Lire le fichier INSTALL
+
+COMPATIBILITÉ:
+
+	SCoderZ est compatible avec IRCoderz v1 et v2, ainsi qu'avec les ircu de génération 2.10.11 et plus,
+	dans ce cas il est nécessaire d'activer --enable-ircu au configure si c'est ircu2.10.12.
+	Il est à noter que nous ne garantissons pas une compatibilité totale sur les ircu, en
+	effet nos tests ne sont effectués que sur ircoderz.
+	Il est aussi à noter qu'il est compatible pour le moment pour la plupart des systemes Linux
+	et a été testé avec succès sur quelques systèmes FreeBSD.
+
+	Note: SCoderz n'est *plus* compatible avec ircprogs. Veuillez utiliser une version plus ancienne.
+	Veuillez voir :
+	> https://sourceforge.net/project/showfiles.php?group_id=61070&package_id=57375&release_id=206738,
+	qui est probablement encore compatible avec ircprogs.
+
+MISE À JOUR:
+
+	Vous avez la possibilité de mettre à jour votre version de scoderz de deux manières:
+	- Télécharger depuis le site sourceforge la toute dernière release faite à
+	  http://sf.net/projects/scoderz
+
+	- En utilisant CVS.
+	  Vous avez deux possibilités :
+	  	- Télécharger la dernière version stable de scoderz (conseillé) :
+	  	  $ cvs update -Pd # oui faudra essayer un jour d'utiliser les branches
+	  	- Télécharger la toute dernière version de scoderz (code frais, peu contenir des bugs) :
+	  	  $ cvs update -Pd
+	  Vous pouvez maintenant taper "make install" pour recompiler et réinstaller scoderz.
+
+GUIDE D'UTILISATION:
+
+	Lire le fichier UTILISATION
+
+WEB2CS:
+
+	Cette nouvelle fonction permet de faire communiquer un site web avec un processus scoderz.
+	Il faut prendre en compte le fait que seul le serveur du web2cs sur scoderz est disponible ici,
+	et non pas le client php que vous devrez créer vous même en vous aidant de la documentation
+	sur le web2cs. (fichier WEB2CS)
+	Note: La documentation n'est plus à jour, veuillez vous renseigner auprès de l'équipe CoderZ
+	      sur #coderz @ IRCube en attendant que Cesar s'occupe de ça, et dieu sait qu'il a rien
+	      à foutre de la journée.
+
+SCRIPTS D'AIDE:
+
+	Des petits scripts pour vous aider à utiliser SCoderZ (sauvegarde des données, relancement
+	automatique en cas de plantage, etc).
+	Pour cela, lisez le fichier README dans le répertoire bin/
+
+PLUS D'INFORMATION:
+
+	Vous pouvez obtenir plus d'informations à propos de ces services irc à l'adresse suivante :
+	- http://sf.net/projects/scoderz/
+	- http://scoderz.coderz.info/
+
+	Vous pouvez contacter l'équipe aux adresses suivantes :
+	- Progs <Progs@coderz.info>, programmeur IrCoderZ et SCoderZ
+	- Cesar <Cesar@ircube.org>, programmeur SCoderZ et BonD
+	- kouak <kouak@kouak.org>, programmeur IrCoderZ et SCoderZ
+
+	Et pour des informations sur le réseau IRCube, http://ircube.org/
+
+REMERCIEMENTS
+
+	Bien entendu, ceux ci sont fait à tous les utilisateurs du réseau IRCube qui nous
+	ont permis de tester nos programmes.
+	Et merci à vous de nous avoir fait confiance et d'utiliser nos programmes, ce qui vous
+	permettra de trouver des bugs et de nous contacter pour qu'on puisse les corriger.
+
+Bonne utilisation,
+
+		-Progs <Progs@coderz.info>
+
+(Mise à Jour 09/03/07 par Cesar chef de projet SCoderZ)

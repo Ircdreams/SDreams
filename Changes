@@ -1,0 +1,3727 @@
+*** Changements SCoderz.
+
+2008-02-09 Cesar <Cesar@ircube.org>
+
+	* src/timers.c: Fix SF bug #1890247: Z was not leaving idling channels unless their owners were 
+		admin or nopurge
+
+2008-02-07 Cesar <Cesar@ircube.org>
+
+	* src/timers.c: More SF Bug #1846815: fix should now handle both cases and in a smoothier way
+
+2008-02-06 Cesar <Cesar@ircube.org>
+
+	* bin/w2c.memosend.patch: Bug fix: invalid memo count
+
+2008-02-04 Cesar <Cesar@ircube.org>
+
+	* src/web2cs-commands.c: Fix SF bug #1886667: crash in memo del if syntax is invalid
+
+	* bin/w2c.memosend.patch: Add SF patch #1886648 which supports memo send in web2cs
+
+	* bin/autovoice.patch: Add SF patch #1886651 which add a CFlag Autovoice
+
+2008-01-20 Cesar <Cesar@ircube.org>
+
+	* src/mystring.c, include/mystring.h, src/cs_cmds.c: 
+		my[v]snprintf et fastfmt renvoient désormais un size_t
+
+	* src/serveur.c: Modifications mineures
+
+2008-01-04 Cesar <Cesar@ircube.org>
+
+	* src/admin_chan.c, src/divers.c, src/outils.c, src/mystring.c, src/socket.c, src/web2cs-engine.c,
+	src/convertdb.c, include/structs.h, include/main.h, include/outils.h, include/mystring.h:
+		Nettoyage (si on peut dire) d'une partie des problèmes de signe, et d'autres warnings du
+		compilateur en mode verbeux
+
+	* src/hash_user.c, src/hash_nick.c, src/serveur.c, src/nickserv.c, include/main.h,
+	src/track.c, include/track.h:
+		Ajout d'un flag U_TRACKED pour éviter de parcourir la liste des tracks à chaque event
+		Ajout de track_notify()
+
+	* src/fichiers.c, include/structs.h:
+		Ajout d'un flag U_TRACKED pour éviter de parcourir la liste des tracks à chaque event
+		Ajout d'un mask U_INTERNAL de flags uniquement à usage au runtime (non écrits dans les DBs)
+		
+2008-01-04 Cesar <Cesar@ircube.org>
+
+	Mises à jour des Copyright 2008
+
+	* include/ban.h, src/ban.c, src/hash_cmd.c, include/hash.h:
+		Nettoyage, passage de GetBanType() et RealCmd() de char* en const char*
+		
+	* include/structs.h, src/admin_chan.c, src/convertdb.c, src/fichiers.c, src/outils.c,
+	src/hash_chan.c, src/timers.c, src/web2cs-commands.c: 
+		Bug #1863718: passage des limit en unsigned int
+		
+	* src/chaninfo.c, include/chaninfo.h, src/serveur.c: Nettoyage, 
+		Bug #1863718: passage des limit en unsigned int
+		
+	* src/cs_cmds.c: Bug #1863718: passage des limit en unsigned int,
+		Ajout du support de %u dans csreply()
+
+	* src/memoserv.c: Meilleure gestion du parsage des memoids
+
+2007-12-27 Cesar <Cesar@ircube.org>
+
+        * src/ban.c: 
+		(getbanmask): Fix bug not appending the last dot in *!*user@a.b.c.* masks
+		Petites optimisations
+
+2007-12-16 Cesar <Cesar@ircube.org>
+
+	* src/add_info.c, src/del_info.c, include/add_info.c, include/del_info.c, src/timer.c, src/fichiers.c:
+		Modifications des fonctions de manipulations de ban
+
+	* src/ban.c, src/outils.c, include/ban.h, include/outils.h, include/structs.h, src/hash_nick.c, src/flood.c:
+		- Support des bans CIDR et corollaires avec le support de l'IP au format binaire dans la struct Nick
+		- Support des IPv6
+		- Modification du ban généré par getbanmask() en bantype 2 de *!*user@a.* en *!*user@a.b.c.*
+
+	* src/main.h: Support des bans CIDR & IPv6
+		Bantype par défaut changé en 4 (*!*@host)
+
+2007-12-08 Cesar <Cesar@ircube.org>
+
+	* src/timers.c: SF Bug #1846815 fixed: random crashes after channel's purge, 
+		due to invalid handling of pointer's alteration by pointer's callback
+	
+	* src/main.c:   Debug N+1 des fermetures de std*
+			Création de pid_write()
+			Passage en static
+
+	* src/sql_log.c, src/main.c: passage du log dans sql_init()
+
+2007-12-01 Cesar <Cesar@ircube.org>
+
+	* src/main.c, include/fichiers.h, src/fichiers.c, src/dnr.c, include/dnr.h:
+		Nettoyage (N+1) de main() avec intégration de l'affichage des infos dans load_*()
+
+2007-12-01 Cesar <Cesar@ircube.org>
+
+	* src/lang.c, include/lang.h:  utilisation de log_write(), ajout de lang_check_default()
+
+	* src/mylog.c, include/mylog.h: ajout de log_fd_in_use()
+
+	* src/socket.c, include/socket.h: ajout de fd_in_use()
+
+	* src/main.c: RFE #1841994: initialisation du générateur de nombre aléatoire via srand()
+			Migration de la vérification du langage par défaut dans lang.c
+			Enième correction de la fermeture des fichiers std* avec la vérification
+				de l'utilisation du fd par les systemes de log et socket
+
+2007-11-20 Cesar <Cesar@ircube.org>
+
+	* src/admin_user.h: Mise à jour des Copyright (2007) + changement de mail de Progs
+		suppression de prototypes redondants/inutiles/faux
+		
+2007-11-17 Cesar <Cesar@ircube.org>
+
+	* src/chanopt.c: Mise à jour pour utiliser l'interface des getoption()
+
+	* src/chanserv.c: Mise à jour pour utiliser l'interface des getoption()
+			Nettoyage de la fonction access
+
+	* src/config.c: Correction d'un warning sur le signe
+
+	* src/cs_cmds.c: Correction d'un warning sur le signe, nettoyage
+
+	* src/nickserv.c, src/template.c: nettoyage d'include
+
+	* src/socket.c, src/socket.h, src/web2cs-engine.c, src/main.c: Utilisation de l'API des sockets, nettoyage
+
+	* src/divers.c: Utilisation de l'API des sockets
+
+2007-11-04 Cesar <Cesar@ircube.org>
+
+	* src/vote.c: Bug #1825635: Correction du bug fermant un vote en cours au rehash
+
+2007-05-12 Cesar <Cesar@ircube.org>
+
+        * bin/sqlpurge_u.c, bin/sqlpurge_c.c: Mise à jour pour prendre en compte le "nouveau" format de DB
+
+2007-05-02 Cesar <Cesar@ircube.org>
+
+	* src/ban.c: RFE #1711523: Améliore l'expérience de la commande "ban":
+		dans le cas où la chaine fournie est un pseudo, Z essaye désormais d'en extraire l'host si il est 
+		présent avant de générer un mask à partir de la chaine
+
+2007-04-20 Cesar <Cesar@ircube.org>
+
+	* src/admin_user.c, src/admin_chan.c: RFE #1704221: Flush des buffers SQL avant de lancer une requête 
+		d'historique pour pendre en compte les dernières actions
+
+2007-02-12 Progs <progs@coderz.info>
+
+	* Usage of a CIA entry (and this message is the first test).
+
+2007-02-04 Cesar <Cesar@ircube.org>
+
+        * src/ban.c: Corrolaire au bug #1649146 pour unban %nick
+
+2007-01-31 Cesar <Cesar@ircube.org>
+
+	* src/ban.c: Bug #1649146: unban ne retirait pas les bans du serveur si moins de 6 étaient enlevés
+
+2007-01-06 Cesar <Cesar@ircube.org>
+	
+	* src/divers.c: "Memory leak" les aData* n'étaient pas libérés dans CleanUp()
+
+2007-01-02 Cesar <Cesar@ircube.org>
+
+	* Mises à jours des Copyright (2007) + changement de mail de Progs
+
+	* src/hash.c, src/cs_register.c, src/nickserv.c, src/dnr.c, src/fichiers.c,
+	src/web2cs-commands.c, include/dnr.h, include/hash.h, include/fichiers.h:
+		- RFE #1626186: l'ajout d'un mask de DNR plus large supprimé désormais les autres DNR couverts
+		- Migration du code des DNR dans src/dnr.c et include/dnr.h
+
+	* src/flood.c: Migration du code des ignores dans src/flood.c et include/flood.h
+
+	* src/add_info.c, src/del_info.c, src/main.c, include/main.h, include/lang.h, include/add_info.h,
+	include/del_info.h, include/structs.h, src/config.c, include/config.h:
+		Nettoyage des variables globales avec migrations des codes des DNR, ignore et leurs variables 
+		globales dans leurs fichiers respectifs
+
+	* src/admin_cmds.c, include/admin_cmds.h, include/timers.h, src/timers.c:
+                - Migration de CleanUp()
+		- Migration du code des DNR dans src/dnr.c et include/dnr.h
+		- Ajout de ignore_clean, timers_clean, dnr_clean
+
+	* src/divers.c, include/divers.h:
+		- Migration du code des ignores dans src/flood.c et include/flood.h
+		- Migration de CleanUp()
+	
+2006-12-28 Cesar <Cesar@ircube.org>
+
+	* src/ban.c: RFE #1623240: Ajout du système de queue des debans pour éviter le flood de -b
+
+	* src/socket.c: Bug #1623238: crash si Z deconnectait du serveur IRC
+
+2006-12-20 Cesar <Cesar@ircube.org>
+
+	* include/web2cs.h include/web2cs-engine.h include/web2cs-commands.h 
+	src/web2cs-commands.c src/web2cs-engine.c src/Makefile.in :
+		- Bug #1619791: la gestion des structures des clients web2cs était désastreuse causant à la fois
+	le gaspillage de structure (ram) et une possible saturation du web2cs si le nombre de fd utilisé 
+	par l'application entière dépassait la taille prévue de l'array.
+		Désormais, il y a une indexation par une array intermédiaire, dont la taille est calculée
+	en fonction du nombre max de fd possiblement en cours d'utilisation.
+
+		- Réorganisation du web2cs avec séparation des commandes dans leur fichier propre.
+		(+headers appropriés)
+		
+
+2006-12-13 Cesar <Cesar@ircube.org>
+
+        * src/config.c: utilisation de la fonction access() plutot que stat() car elle permet de tester les accès.
+
+2006-12-06 Cesar <Cesar@ircube.org>
+
+	* src/admin_user.c, src/fichiers.h: 
+		- Merge des flags HF_WRITE/HF_SQLLOG en HF_LOG
+		- Permets de faire des user historiques sur des usernames non existant
+
+	* src/vote.c:
+		- Bug #1610318: le timer de cloture des votes n'est plus ajouté si le vote n'est plus actif
+		- RFE #1608171: Ajout de log, suppression de l'incude errno.h
+
+	* src/admin_cmds.c, src/admin_chan.c, src/config.c, src/fichiers.c, src/serveur.c, src/timers.c,
+	src/nickserv.c, src/aide.c, src/sql_log.c, src/hash_user.c, src/hash_chan.c, src/welcome.c,
+	src/mylog.c, src/cs_cmds.c, include/main.h, include/mylog.h:
+		- RFE #1608171: Ajout du système de log: fonctions, configuration, appels divers
+
+	* src/main.c:
+		- RFE #1608171: Ajout du système de log
+		- Bug #1610385: Debug des fermetures des fds des std(in|err|out)
+
+	* src/web2cs-engine.c:
+		- RFE #1608171: Ajout du système de log
+		- Ajout de isreg()
+
+	* src/outils.c: RFE #1608171: Ajout du système de log, suppression de putlog()
+
+	* src/socket.c:
+		- RFE #1608171: Ajout du système de log, appels
+		- RFE #1608174: Mise en dehors de la boucle sur highsock du socket IRC (car cas le plus fréquent)
+
+2006-11-11 Cesar <Cesar@ircube.org>
+
+	* src/config.c: Bug #1594326: sendmail ne pouvait être réactivé au rehash (si desactivé)
+		+ ajout d'un test sur l'existence du fichier
+
+2006-11-10 Cesar <Cesar@ircube.org>
+
+        * src/main.c:
+		- Ajout d'umask() pour protéger les DBs
+		- Fermeture des fds std(in|out|err) au lancement pour ne pas gaspiller (si lancement en background)
+
+	* src/convertdb.c: Ne regénère les ids que s'il y a un besoin manifeste (bug)
+
+2006-11-04 Cesar <Cesar@ircube.org>
+
+	* src/outils.c: Bug #1590382: correction de is_ip() qui detectait comme IP certaines hosts
+
+2006-11-02 Cesar <Cesar@ircube.org>
+
+        * src/admin_cmds.c: Bug #1581765: le texte des memos globaux étaient tronqués
+
+2006-09-26 Cesar <Cesar@ircube.org>
+
+	* src/web2cs-engince.c:
+		- (user set) RFE #1569302: ajout de suspend/nopurge
+		- (user set): protection des modes bloqués (cantregchan, nopurge, changed, suspend..)
+		- (user set): correction du bug permettant que certains flags requis soit supprimés
+		- (channel info): nettoyage / correction d'un bug pouvant lister deux fois l'owner.
+		- (channel set): utilisation des outils str
+
+	* src/serveur.c: Bug #1565807: Z ne s'eoppait plus sur le salon de log si il existait au burst
+
+2006-09-19 Cesar <Cesar@ircube.org>
+
+	* src/nickserv.c: Bug #1562095: Autoinvite ne fonctionnant plus sur les salons avec strictop:
+				typo avec les suspends
+
+2006-09-19 Cesar <Cesar@ircube.org>
+
+	* src/data.c:
+		- Bug #1561566: Ne detectait pas si un item était actif avant d'ajouter un timer
+		- Bug #1561621: les suspends illimités expiraient lors du chargement de la DB au restart
+
+	* src/convertdb.c: Bug qui effaçait les raisons des items
+
+2006-09-18 Cesar <Cesar@ircube.org>
+
+        * src/data.c, include/structs.h:
+		RFE #1560380: retour de l'option nolog pour éliminer les traces d'un suspend
+
+	* src/welcome.c: Bug #1560839: oubli du 1er mot du global welcome
+
+2006-09-12 Cesar <Cesar@ircube.org>
+
+	* src/admin_chan.c: Correction d'un bug qui empechait l'activation d'un susped
+
+	* src/admin_user.c: Mises à jour des stats de aData* (RFE #1557062)
+
+	* src/convertdb.c: Nettoyage
+
+2006-09-12 Cesar <Cesar@ircube.org>
+
+	* src/mystring.c, include/mystring.h, include/main.h:
+		- ajout de HasWildCard() pour remplacer l'ancienne macro.
+
+	* src/add_info.c, src/admin_user.c, src/admin_chan.c, src/hash.c, src/hash_user.c, src/hash_chan.c,
+	src/cs_register.c, src/chaninfo.c, src/userinfo.c, src/data.c, src/timer.c, src/serveur.c, include/main.h,
+	include/structs.h, include/userinfo.h, include/data.h, include/hash.h:
+		- RFE #1557062: Ajout du système générique pour gérer les options avec expiration et commentaire
+		tels quel: suspend, cantregchan, nopurge
+
+	* include/structs.h, src/cs_cmds.c, src/timers.c:
+		- Variable timer de aChan renommée en fltimer (floating limit timer)
+
+	* src/web2cs-engince.c:
+		- Modification de la gestion des buffers,
+		- Envoi d'userid selon la demande de kazhar
+
+	* src/fichiers.c: Bug #1556979: les cookies n'étaient pas chargés à cause d'une typo sur le nombre d'items
+
+	* src/admin_manage.c: Bug #1557289: envoi d'un mémo vide non initialisé
+
+2006-09-01 Cesar <Cesar@ircube.org>
+
+	* src/hash_nick.c: Bug #1550458: bug pouvant amener num2nickinfo() à retourner un pointeur valide,
+		si la numeric d'un serveur est donné et qu'un client se trouve au bon offset.
+
+2006-08-25 Cesar <Cesar@ircube.org>
+
+	* src/sql_log.c:
+		- Bug dans la gestion des index des buffers (invisible car longueur de l'initialisation identique)
+		- cf timers.c
+
+	* src/timers.c:
+		- timer_run() remet en fil d'attente le timer si le callback retourne 0
+		- derniers passages snprintf->mysnprintf
+
+	* src/hash_cmd.c, src/showcommands.c, src/fichiers.c, src/serveur.c, src/admin_cmds.c, include/main.h:
+		- Ajout de 2 macros pour les aCmd: IsCTCP() et DisableCmd()
+
+	* src/admin_user.c:
+		- Ajout d'un argument pour user info: -level qui ne liste les usernames de level supérieur à celui
+		indiqué
+		- Modification de la gestion des options
+		- csntc -> csreply
+		- modifications de cs_whois(): la ligne des usermodes n'est envoyés que s'il y en a,
+		réécriture partielle de la génération des salons
+
+	* include/outils.h, src/outils.c, src/admin_user.c, src/admin_cmds.c, src/fichiers.c:
+		- Utilisation d'une macro pour les types de recherche de getoption() plutot que des magic numbers
+
+2006-08-16 Cesar <Cesar@ircube.org>
+
+ 	* src/memoserv.c: Bug #1541222: array d'options par défaut non accessible depuis memoserv.c,
+		 crash car NULL par défaut si on essaye de supprimer un seul memo inexistant.
+		corrigé par l'ajout d'une array static locale à memoserv.
+
+2006-08-12 Cesar <Cesar@ircube.org>
+
+	* aide/francais.help, aide/english.help, src/vote.c, include/vote.h:
+		- RFE #1538993: Ajout de la possibilité de mettre une fin automatique aux votes
+		dans la sous commande OPEN.
+		- la sous commande OPEN permet également de modifier le level (et la fin)
+		une fois le vote ouvert.
+
+2006-08-10 Cesar <Cesar@ircube.org>
+
+	* src/sql_log.c: RFE #1537754: Z se reconnecte également au serveur SQL lorsqu'il rencontre
+		l'erreur "MySQL Server has gone away"
+
+2006-08-02 Cesar <Cesar@ircube.org>
+
+	* src/showcommands.c: Bug #1534779: crash dans showcommands si un level se trouvait sans commande.
+
+2006-08-01 Cesar <Cesar@ircube.org>
+
+	* src/vote.c, include/vote.h:
+		- Modification du fonctionnement des votes: le nombre des propositions n'est plus à définir à
+	l'avance, on ajoute les propositions puis ouvre le vote avec VOTE OPEN
+
+	* src/track.c, src/admin_manage.c, include/track.h:
+		- Bug #1533973: timer leak lors d'un del_track()
+		- Migration du code de purge des tracks dans track.c, ajout de track_admin_quit(),
+		trackhead rendue static
+
+	* src/web2cs-engine.c:
+		- Typo causant une erreur de compilation si configure sans SQLLOG
+
+2006-07-30 Cesar <Cesar@ircube.org>
+
+	* src/outils.c, include/outils.h:
+		- Feature #1531039: Ajout du support des intervalles pour les listes
+		- Rassemblement de GetIPv6() dans GetIP()
+		- Ajout d'un paramètre pour fournir un buffer de destination à GetIP()
+
+	* src/divers.c, src/admin_user.c:
+                - Ajout d'un paramètre pour fournir un buffer de destination à GetIP()
+
+ 	* src/memoserv.c, src/web2cs-engine.c, src/add_info.c, include/memoserv.h, include/structs.h:
+                - Feature #1531039: Ajout du support des intervalles pour les listes
+		- Bug #1531015: Bug de lecture des mémos par leur Id
+		- Ajout de memo_free()
+		- Nettoyage divers (memo_del)
+		- Ajout de memotail dans aNick, double chainage des mémos
+
+	* src/ban.c:
+                - Feature #1531039: Ajout du support des intervalles pour les listes
+
+2006-07-14 Cesar <Cesar@ircube.org>
+
+	* src/sql_log.c:
+		- Meilleure initialisation des buffers SQL
+
+	* src/hash_chan.c, src/nickserv.c:
+		- Bug #1522801: Flag Warned non retiré si l'owner s'auth avant de joindre le salon
+		(+meilleure restauration du topic)
+		- Clean up
+		- Ajout de DelUChanged, SetUChanged et UChanged
+
+	* src/outils.c:
+		- (GetIP): utilise le formateur "maison"
+		- (convert_duration): ajout du flag 'M', nettoyage/optimsiation
+		- Ajout des casts (unsigned char) pour les macro de ctype.h
+
+2006-06-29 Cesar <Cesar@ircube.org>
+
+	* src/memoserv.c:
+		- Bug #1514513: Nombre de nouveaux mémos mal décomptés
+		- N'envoie plus le texte du mémo envoyé
+		- Nettoyage
+
+2006-06-26 Cesar <Cesar@ircube.org>
+
+	* src/chanserv.c src/cs_register.c src/admin_chan.c src/web2cs-engine.c include/main.h:
+		- Bug #1510769: les accès nouvellement ajoutés avaient le lastseen incorrect
+		si l'user était membre du salon
+		- Ajout de A_MANAGERLEVEL, A_MANAGERFLAGS plutot que des magics numbers
+		- Ajout de DelUChanged, SetUChanged et UChanged
+
+2006-06-05 Cesar <Cesar@ircube.org>
+
+        * src/config.c src/add_info.c src/admin_cmds.c src/flood.c src/chanserv.c src/ban.c
+	src/template.c
+		- Homogénéisation: toutes les options de config commencent par cf_*
+		- Passage d'appels à snprintf() en myvsnprintf() (utilisation de %u)
+		- (show_alist) : Simplification de la génération des buffers
+		- Utilisation des defines BASE64LEN, RAISONLEN lorsque cela est possible
+
+	* src/serveur.c:
+                - Homogénéisation: toutes les options de config commencent par cf_*
+		- (m_whois): Replies du whois en anglais pour ne plus perturber irssi
+		- (m_eob): simplification
+
+	* src/nickserv.c include/lang.h lang/francais.lang lang/english.lang:
+                - Homogénéisation: toutes les options de config commencent par cf_*
+		- Ajout de deux messages en multilang
+		- Feature #1430786: ajout d'une option(LOG_USER_FAUTH) pour loguer en sql
+		les failed auth des users (avec un antiflood LOG_USER_FAUTH_DELAY)
+
+2006-05-30 Cesar <Cesar@ircube.org>
+
+	* src/web2cs-engine.c:
+		- Feature #1497207: suppression des limites de regchan pour les admins
+		- Bug #1497205: cf Feature ci dessus: Z ne rejoignait pas le salon enregistré via Web2CS
+		- (w2c_channel): Simplication du choix des options à lister sous forme de flag: '*obaitu'
+
+2006-05-16 Cesar <Cesar@ircube.org>
+
+        * src/admin_chan.c src/chaninfo.c include/chaninfo.h include/admin_chan.h:
+		- (show_suspend) : Déplacement de la fonction dans chaninfo.c
+                - (whoison) : Simplification de la génération des buffers
+
+	* include/main.h:
+		Passage de REGCHANLEN à 30 (le plus long actuellement est 22..)
+
+	* src/userinfo.c:
+		Simplification de la génération des buffers
+
+2006-05-16 Cesar <Cesar@ircube.org>
+
+	* src/hash_user.c:
+		- GetUserIbyID(): Bug #1488946: erreur dans la comparaison amenant la fonction à échouer
+	alors que l'userid existe.
+		- hash_delid(): Bug #1489854: Crash possible (mauvais pointeur utilisé)
+
+	* src/web2cs-engine.c: Feature #1489828: Homogénéisation des messages d'erreur
+
+2006-05-08 Cesar <Cesar@ircube.org>
+
+	* src/mystring.c: Ajout du formateur %x/%X pour l'hexadécimal, 6 fois plus rapide pour le formatage de base
+
+	* src/hash_nick.c, src/mkpasswd.c: Utilisation de mysnprintf() pour %x/%X
+
+2006-05-02 Cesar <Cesar@ircube.org>
+
+        * src/cs_cmds.c: Optimisations de putchan() et csmode()
+
+	* src/serveur.c: Bug #1478532: mauvaise réponse aux ctcps ping
+			 Utilisations des nouveaux formateurs %T %u de myvsnprintf
+
+	* src/mystring.c: Ajout de nouveaux formateurs %T pour les ulong(time_t), %u pour les uint
+
+	* src/outils.c: Optimisation de get_time()
+
+2006-04-09 Cesar <Cesar@ircube.org>
+
+	* src/main.c: (corolaire au bug #1462650) fermeture de stdout (fd=1) puisque l'ensemble des sous systèmes
+		après le lancement gère son absence pour l'écriture
+
+	* src/admin_user.c src/hash_user.c src/mkpasswd.c include/crypt.h src/nickserv.c:
+		- Ajout de password_update() qui regroupe tous les évenements se produisant
+			 lors d'un changement de pass
+		- RFE #1462650: Ajout de create_cookie() lors des modifications de pass
+
+	* src/web2cs-engine.c include/web2cs.h include/structs.h:
+		- RFE #1462650: Ajout du système de cookie pour l'auth
+		- Bug #1467242: correction du décalage des fds dans l'array des WebClients qui pouvaient
+				causer des problèmes lorsqu'un fd < 2 venait à être attribué au Web2CS.
+		- Gestion des \r\n comme fin de ligne
+		- Bug #1467267: Gestion des EOF du WebClient...
+
+2006-04-07 Cesar <Cesar@ircube.org>
+
+	* src/config.c: Bug: les erreurs d'ouverture du fichier n'était pas affichées, nettoyage
+
+	* src/lang.c: Bug: les avertissements de langage incomplet étaient déclenchés au rehash
+
+	* include/structs.h include/hash.h src/hash_user.c src/fichiers.c src/cs_register.c
+	src/web2cs-engine.c src/convertdb.c: Feature #1462637: ajout d'un userID unique
+
+	* src/admin_user.c src/nickserv.c src/userinfo.c src/hash.c include/hash.h include/admin_user.h
+	include/userinfo.h: migration de show_userinfo() & cie dans userinfo.c pour déchager admin_user.c
+
+	* src/web2cs-engine.c: Bug #1462644: le Web2CS accepte désormais le pass généré par la commande oubli
+
+2006-03-16 Cesar <Cesar@ircube.org>
+
+	* src/aide.c: Bug #1450976: disparition de la ligne Options (typo)
+
+	* src/config.c: Bug #1450990: lang_add() appelée deux fois dans reaconf() pour chaque langage
+
+2006-03-15 Cesar <Cesar@ircube.org>
+
+        * src/template.c: erreur de décompte de bytes, overflow possible
+
+	* src/Makefie.in: Maj des dépendances des .c
+
+2006-03-11 Cesar <Cesar@ircube.org>
+
+        * src/main.c: Bug #1447944 : putlog() doit être appelé avant CleanUp() qui détruit les infos de langage
+
+2006-03-09 Cesar <Cesar@ircube.org>
+
+        * src/debug.c: le fd du socket du bot peut être 0, augmentation de la taille du buffer de log
+
+	* src/chaninfo.c: Utilisation de mysnprintf()
+
+	* src/chanserv.c: Utilisation de mysnprintf(), déblocage du listing des accès aux admins
+
+	* src/lang.c, src/aide.c: nettoyage, rationalisation, ajout de messages de debug
+
+2006-03-02 Cesar <Cesar@ircube.org>
+
+        * src/cs_register.c: Crash dans drop_user()
+
+2006-02-28 Cesar <Cesar@ircube.org>
+
+        * src/serveur.c: Bug #1440146: les voices placés par des ops n'étaient pas inversés selon le NoVoices
+
+2006-02-26 Cesar <Cesar@ircube.org>
+
+	* src/add_info.c src/nickserv.c src/hash_chan.c src/chaninfo.c src/chanopt.c src/opdeop.c
+	include/hash.h include/structs.h include/main.h:
+		Feature #1434144: Ajout du NoVoices et nettoyage de la méthode d'application des automodes.
+
+	* src/ban.c: Optimisation + csntc -> csreply
+
+	* src/outils.c src/serveur.c include/outils.h:
+		Bug #1438968: Desynch possible si un token M suit immédiatement un C (DEFCHMODES ou lag)
+
+2006-02-03 Cesar <Cesar@ircube.org>
+
+	* src/lang.c include/lang.h: ajout de lang_clean(), ajout de quelques replies en multilang
+
+	* src/template.c include/template.h: ajout de tmpl_clean()
+
+	* src/admin_cmds.c aide/francais.help aide/english.help:
+		- Feature #1274608: ajout de GLOBAL CMEMO pour envoyer un mémo aux accès d'un salon
+		- Nettoyage de CleanUp() en appellant *_clean(), à poursuivre
+		- Fin du hardcodage de la taille max d'une commande
+		- disable_cmd utilise switch_option désormais
+		- Maj des aides, corrections de certaines fautes d'orthographe
+
+	* src/admin_user.c lang/english.lang lang/francais.lang:
+		Ajout de 2 replies en multilang
+
+2006-02-03 Cesar <Cesar@ircube.org>
+
+        * src/nickserv.c include/nickserv.h:
+		- Feature #1430784: les failed auth sur les login admin sont logués dans la base SQL
+		- Migration de register_user(), drop_user() vers src/cs_register.c
+
+	* src/outils.c src/admin_chan.c src/cs_register.c include/cs_register.h include/outils.h:
+		- Migration de chan_check() vers src/cs_register.c
+
+	* src/convertdb.c: correction des erreurs de compilation
+
+2006-02-03 Cesar <Cesar@ircube.org>
+
+        * src/nickserv.c aide/francais.help aide/english.help: Renommage de virtual host en autohide (SET)
+
+2006-02-03 Cesar <Cesar@ircube.org>
+
+        * src/cs_cmds.c:
+		- Ajout de my[v]snprintf()
+                avec bound checks qui reste 6 à 10 fois plus rapide que [v]snprintf natif.
+
+		- Bug #1427607: meilleure gestion de la valeur de retour de vsnprintf pour éviter les overflow.
+		- Bug #1427568: les lastseens des salons sont correctement mis à jour lors d'un deauth
+		 (deauth, recover, suspend)
+
+	* src/mystring.c include/mystring.h src/web2cs-engine.c: Ajout de my[v]snprintf()
+		avec bound checks qui reste 6 à 10 fois plus rapide que [v]snprintf natif.
+
+	* src/nickserv.c: bug #1427623: (drop_user): UB potentiel par la manipulation de données déjà free()
+
+	* src/outils.c include/outils.h:
+		- Ajout de my[v]snprintf() avec bound checks qui reste 6 à 10 fois plus rapide que [v]snprintf natif.
+		- Ajout d'un système d'array pour les chanmodes afin d'éviter les loops.
+		- Passage de nombreuses fonctions dans src/mystring.c
+
+2006-02-03 Cesar <Cesar@ircube.org>
+
+	* src/hash_chan.c: Bug #1423839 : crash sous certaines conditions de modes_reset_default()
+		à cause d'un formatteur surnuméraire.
+
+2006-01-31 Cesar <Cesar@ircube.org>
+
+        * src/add_info.c:
+		bug #1420974 : Z envoyait un create en réponse à un create qui se faisait bouncer par le hub.
+
+	* src/cs_cmds.c, src/admin_chan.c, src/nickserv.c:
+		Feature #1420999: amélioration du comportement de csjoin et mise en conformité des appels.
+
+2006-01-27 Cesar <Cesar@ircube.org>
+
+	* src/cs_cmds.c, src/nickserv.c, include/cs_cmds.h:
+		 Feature #1198480 Ajout de la possibilité de réponse par msg, renommage de csntc en csreply
+	* include/main.h: typo dans IsIPv6(), ajout de UPMReply()
+	* include/structs.h: ajout du flag PMREPLY
+	* src/showcommands.c: BuildCommandsTable() ne parcourt que les levels comportant des commandes
+
+2006-01-23 Cesar <Cesar@ircube.org>
+
+        * src/main.c src/serveur.c include/main.h include/structs.h:
+		a/ optimisation légère de exec_cmd en prémachant les commandes pouvant être Secure
+		b/ optimisation légère dans m_privmsg
+		c/ mise en conformité du style des for()
+
+2006-01-15 Cesar <Cesar@ircube.org>
+
+	* src/hash_nick.c src/outils.c include/structs.h include/main.h: Feature #1341944:
+		ajout du support des IPv6 dans le protocole s<>s
+
+2006-01-08 Cesar <Cesar@ircube.org>
+
+        * src/divers.c: bug #1403326: les ips de l'ignorelist sont maintenant montrées sous la forme a.b.c.d
+		mise à jour du copyright/version
+
+2006-01-08 Cesar <Cesar@ircube.org>
+
+	* src/admin_manage.c: bug #1399473: le level de la cible est vérifié dans la commande adminlvl
+
+2005-12-30 Cesar <Cesar@ircube.org>
+
+	* src/memoserv.c: ajout d'un système d'avertissement lorsque la limite de mémo est atteinte pour un
+expéditeur
+	* src/timers.c, include/main.h, include/lang.h, src/memoserv.c:
+		ajout de GetUReply(), et d'une reply en multilangage
+
+2005-12-18 Cesar <Cesar@ircube.org>
+
+	* src/admin_user.c: Feature #1384161 ajoutée: les critères de recherche sur le lastlogin
+			 sont plus intuitifs
+
+2005-11-03 Cesar <Cesar@ircube.org>
+
+	* src/config.c: nettoyage
+
+	* src/welcome.c, include/welcome.h: suppression du système de pseudo probabilité inefficace
+
+2005-11-05 Cesar <Cesar@ircube.org>
+
+	* src/add_info.c, src/chanserv.c, src/hash_chan.c, src/serveur.c, src/outils.c,
+	include/main.h, include/structs.h:
+		Feature #1349051 ajoutée: support plus complet des oplevels
+		Suppression du champ 'timestamp' de la struct aJoin : inusitée
+		m_join: converti le TS fourni
+
+2005-11-02 Cesar <cesar@ircube.org>
+
+	* src/serveur.c: mise à jour des oplevels selon les dernières modifications de c-c
+
+2005-11-02 Cesar <cesar@ircube.org>
+
+	* src/serveur.c: ajout du support des oplevels dans m_burst, m_join
+			  passage des zannels et m_destruct dans le define des oplevels
+			  simplification de m_burst
+
+	* src/cs_cmds.c, src/socket.c: mise sous define de la gestion des oplevels/zannels
+
+	* src/add_info.c: mise en accord avec l'API, ajout de J_CREATE pour une meilleure lisibilité
+
+        * configure.ac: ajout de --enable-oplevels pour ne pas mélanger ircoderzv2 et les oplevels
+
+	* include/main.h, include/structs.h, include/serveur.h: mise à jour
+
+2005-11-02 Progs <Progs@coderz.info>
+
+	* src/serveur.c (m_burst): prise en compte des zannels
+
+	* src/serveur.c,ircd/socket.c (m_destruct): prise en compte des destructs
+
+	* src/cs_cmds.c (cs_part): quand je pars j'envoie un DESTRUCT
+
+	* src/cs_cmds.c (cs_join): utilisation d'un flag JOIN_CREATE pas très beau mais
+	quand même nécessaire (on ne sait pas sinon, en regardant le nombre de membres, si
+	le chan existait déjà ou pas). Ca evite d'envoyer un CREATE lors d'un join d'un zannel,
+	et ainsi de causer un bounce.
+
+	* configure.ac: ajout de --enable-ircoderz2 (voir cs_cmds.c:cspart():271)
+
+	* Ce code est compatible uniquement ircu2.10.12 maintenant, les zannels vont être virés
+	  d'ircoderz2.
+
+2005-10-30 Progs <Progs@coderz.info>
+
+	* include/main.h,include/token.h,src/socket.c,src/config.c: suppression des derniers N2K
+
+2005-10-29 Cesar <cesar@ircube.org>
+
+	* src/serveur.c: Feature #1341502 ajoutée: Z met les topics par défaut sur les salons sans topic
+	 après le burst
+
+2005-10-27 Progs <Progs@coderz.info>
+
+	* src/add_info.c  (add_join): gestion des joins sur les chans +D
+
+2005-10-26 Progs <Progs@coderz.info>
+
+	* src/Makefile.in: Debug lors d'un make install sans make avant.
+
+	* mise à jour de la doc
+
+	* src/Makefile.in: menage
+
+	* Changes: nouveau format du fichier.
+
+2005-10-25 Progs <Progs@coderz.info>
+
+	* configure.ac;Makefile.in: maintenant possible d'utiliser --with-symlink (par default avec
+	"services") pour créer des liens symboliques
+
+2005-10-25 Cesar <cesar@ircube.org>
+
+	* nickserv.c: problème de casse dans myaccess accept
+
+	* bug #1337809 fixed: fichiers.c: crash dans write_dnr() si Z n'avait pas les droits en
+	écriture.
+
+2005-10-22 Cesar <cesar@ircube.org>
+
+	* outils.c, structs.h: ajout des cmodes D,N
+
+	* nickserv.c: typo dans le choix des replies de myaccess accept|refuse
+
+	* main.c: update copyright
+
+	* template.c: petit bug dans le decompte des buffers
+
+	* mkpasswd.c: ajout d'un cast
+
+2005-10-19  Progs <progs@headfucking.net>
+
+	* configure.ac: petites corrections et rajout de --enable-warnings
+
+	* Makefile.in: corrections
+
+2005-10-28  Progs <progs@headfucking.net>
+
+	* configure.ac: vérification de mysql
+
+2005-10-16  Progs <progs@headfucking.net>
+
+	* configure.ac: rajout d'un résumé de la configuration
+
+2005-10-16 Cesar <cesar@ircube.org>
+
+	* ban.c: prevention des buffer overflow en utilisant RAISONLEN plutot qu'un magic number
+
+	* config.c: mauvaise utilisation de l'api
+
+2005-10-15 Progs <progs@headfucking.net>
+
+	* chanserv.c,ban.c: passage de la macro DEFRAISON à la variable de config defraison (macro
+	RAISONLEN)
+
+	* utilisation des autotools: plus de make config mais passage d'arguments à configure
+
+2005-10-15 Cesar <cesar@ircube.org>
+
+	* bug #1327466 fixed: serveur.c: correction du parsage des flags dans les tokens B
+
+2005-10-08 Cesar <cesar@ircube.org>
+
+	* track.c: correction d'un bug sur l'expiration des tracks, ajout du double chainage
+
+	* hash_user.c, hash.c: ajout du hahshage sur les mails
+
+	* bug #1318814 fixed: memory leak dans del_regnick() (free(u->lastlogin))
+
+	* aide.c: copyright, memory leak lors du reload
+
+	* hash_cmd.c, aide.c: malloc inutile d'un item (LangCount)
+
+	* Feature #1318592 : vote.h, main.h, vote.c, nickserv.c, outils.c: ajout du flag NoVote pour ne
+	plus être notifié des votes.
+
+	* bug #1318864 fixed: outils.c: overflow du buffer static de GetUserOptions()
+
+	* bug #1318874 fixed: template.c: overflow dans tmpl_load_addstr() (+1 du \0 oublié)
+
+2005-10-06 Cesar <cesar@ircube.org>
+
+	* feature #1315312 : ajout de l'expiration pour les tracks
+
+2005-10-05 Cesar <cesar@ircube.org>
+
+	* serveur.c: meilleure gestion des kills Ghost5
+
+2005-10-02 Cesar <cesar@ircube.org>
+
+	* serveur.c, hash_nick.c, socket.c, cs_cmds.c, serveur.h, main.h: début de la prise en compte
+	des modifications d'ircu2.10.12
+
+2005-10-01 Cesar <cesar@ircube.org>
+
+	* feature #1310466 : better banmask generation for sethost'ed users.
+
+2005-09-28 Cesar <cesar@ircube.org>
+
+	* bug #1306488 fixed: crash in squit
+
+2005-09-26 Cesar <cesar@ircube.org>
+
+	* Ajout de Strtoint() pour wrapper les anciens appels à atoi() en les renvoyant vers strtol()
+	la fonction fait également la validation de la chaine en tant que nombre pur,
+	ainsi que des vérifications de limites
+
+2005-09-24 Cesar <cesar@ircube.org>
+
+	* bug #1303480 fixed: useless & annoying topic changes after Z's burst
+
+	* bug #1303494 fixed: incorrect server's capacity handling if it was not a power of two or
+	below 16
+
+2005-09-23 Progs <progs@headfucking.net>
+
+	* vote.c: implémentation de VOTE CLEAR
+
+2005-09-18 Cesar <cesar@ircube.org>
+
+	* hash.c, hash_nick.c: num2servinfo() n'appelle plus base64toint() + ajout d'AOwner()
+
+2005-09-17 Cesar <cesar@ircube.org>
+
+	* nickserv.c: nettoyage, regroupement
+
+	* feature #1293908: retour du topic au login de l'owner si salon en instance de purge (warn)
+
+	* main.h: ajout de la macro AOwner()
+
+	* Feature #1293916: ajout d'une option de config (bindip) pour spécifier une IP locale à
+	utiliser pour les connexions sortantes.
+
+	* Feature #1197738: ajout de NoInfo comme option de salon, qui empêche l'affichage des infolines
+
+*** SCoderZ1.3
+
+2005-09-16 Cesar <cesar@ircube.org>
+
+	* bug #1292402 corrigé: chlevel prenait mal en compte le niveau admin
+
+	* bug #1292758 corrigé: détails du vote étaient envoyés au login des users enregistrés après le
+	début du vote
+
+2005-09-13 Cesar <cesar@ircube.org>
+
+	* web2cs: bug #1290470 corrigé: problème de vérification de limite d'array dans channel set
+
+	* bin/memo.pl: améliorations
+
+	* outils.c: réécriture de is_ip() (énième..) plus élégante (et un poil plus rapide)
+
+2005-09-01 Cesar <cesar@ircube.org>
+
+	* ban.c: Feature #1264196: unban passe le mask à pretty_mask pour permettre le couple ban
+	blah/unban blah
+
+	* chanserv.c: bug #1279685: oubli de la raison de la commande unreg s'il elle ne faisait qu'un
+	mot
+
+2005-08-27 Cesar <cesar@ircube.org>
+
+	* admin_cmds.c: bug #1274197 corrigé: révélation d'info dans le whois distant
+
+	* renommage du mode 'x' de N_CRYPT en N_HIDE
+
+2005-08-22 Cesar <cesar@ircube.org>
+
+	* NetChan: bug de global msg
+
+	* hash_cmds.c: ajout du hashage sur les corenames des commandes
+
+2005-08-21 Cesar <cesar@ircube.org>
+
+	* web2cs: bug #1265761 corrigé: crash du w2c_regchan (parv[parc] = 0x0 dans le Web2CS)
+
+	* NetChan:
+	** serveur.c: ne pas effectuer les vérifications chanserv des modes d'un salon suspendus
+
+	** hash_chan.c: Gni?
+
+	* nickserv.c:ns_login(): clean up
+
+2005-08-20 Cesar <cesar@ircube.org>
+
+	* Bug #1264909 corrigé: gestion incorrecte des cmodes s/p
+
+2005-08-17 Cesar <cesar@ircube.org>
+
+	* del_info.c: Ajout de del_alljoin() pour supprimer tous les joins d'un aNick*
+
+	* cs_cmds.c: Mise a jour du mauvais pointeur dans cs_account()
+
+	* Uniformisation du logage des evenements salons (1262571)
+
+2005-08-16 Cesar <cesar@ircube.org>
+
+	* correction du bug #1261131: Z ne rejoignait pas le salon à la fin du suspend
+
+	* correction des netchan (suite): part idle si users == 0; chan list prends correctement en
+	compte le critère users
+
+2005-08-15 Cesar <cesar@ircube.org>
+
+	* chanserv.c: correction du crash lors de l'unreg de salons ayant été suspendus (#1260038)
+
+	* correction des oublis dus à l'ajout des NetChan
+
+2005-08-14 Cesar <cesar@ircube.org>
+
+	* serveur.c: correction du crash lors du Burst d'un salon avec un zombie et des modes à param
+	(ça existe...)
+
+	* passage de sprintf en snprintf
+
+	* debug.c: simplication du log de debug
+
+	* hash.c: nettoyage des stats des hash tables
+
+	* nettoyages divers (ajout de modes_reset_default(), migration de fonctions)
+
+	* chanopt.c: débridage des chanopt vis à vis du membership
+
+	* web2cs: fin de la mise en place des NetChan pour le web2cs
+
+2005-08-13 Cesar <cesar@ircube.org>
+
+	* serveur.c: Mise en place de la gestion de tous les salons du réseau
+	ce qui permet le maintient de la liste des membres, des modes pour tous les salons
+	et évite ainsi les *hacks* et autres procédures couteuses pour récuper l'userlist
+	et les modes du salon.
+
+	* structs.h: optimisation des SLinks
+
+	* chanserv.c:  correction du bug pouvant entrainer une desynchro via la commande modes
+
+2005-08-08 Cesar <cesar@ircube.org>
+
+	* admin_user.c: ajout de l'option -last à user info pour matcher les lastlogin
+
+2005-07-26 Cesar <cesar@ircube.org>
+
+	* main.h: ajout d'un bantime par défaut (possible)
+
+	* config.c: ajout de l'option nokill_on_nick dans la conf pour empecher les kills d'enforce
+
+	* showcommands.c: ajout de l'option 'all' à showcommands qui liste toutes les commandes (même
+	non accessible à l'user)
+
+2005-07-23 Cesar <cesar@ircube.org>
+
+	* vote.c: le calcul de participation au vote prend en compte la date d'enregistrement
+
+2005-07-20 Cesar <cesar@ircube.org>
+
+	* admin_user.c: remaniement de l'affichage des infos d'username
+
+	* outils.c: modification du format retourné par duration() en plus concis
+
+	* serveur.c: sauvegarde du TS lors du quit/deauth
+
+2005-07-18 Cesar <cesar@ircube.org>
+
+	* config.c: passage des defines 'REGISTER_TIMEOUT' et 'CANTREGONUNREG' en options de config
+
+	* config.c: suppression de l'option de config 'nick_change' inusitée
+
+	* structs.h: ajout d'une variable indiquant la date d'enregistrement d'un username (+nettoyage)
+
+2005-07-17 Cesar <cesar@ircube.org>
+
+	* web2cs-engine.c: fermeture de std[in|err] afin de libérer des fd's et éviter de gaspiller des
+	WClients dans le Web2CS
+
+	* web2cs-engine.c: augmentation du nombre max de tokens du Web2CS pour permettre la pleine
+	utilisation de channel set
+
+2005-07-13 Cesar <cesar@ircube.org>
+
+	* nickserv.c: ajout de la durée du cantregchan dans les infos d'un username
+
+2005-07-10 Cesar <cesar@ircube.org>
+
+	* ?: correction d'un bug d'insertion causé par le bug de tri (mauvaise insertion)
+
+2005-07-09 Cesar <cesar@ircube.org>
+
+	* timers.c: correction d'un bug probable du tri des timers (révélé dans GNU)
+
+2005-07-07 Cesar <cesar@ircube.org>
+
+	* serveur.c: correction d'un bug de parsage des bans
+
+2005-07-06 Cesar <cesar@ircube.org>
+
+	* vote.c: correction du bug des classements des résultats de votes
+
+	* socket.c: finition des modifications de la gestion de la reconnexion
+
+2005-07-04 Cesar <cesar@ircube.org>
+
+	* socket.c: réécriture de la gestion de la reconnexion de l'ircsock
+
+2005-07-03 Cesar <cesar@ircube.org>
+
+	* welcome.c: découpage en sous routine de certaines procédures des gwelcome
+
+	* nickserv.c: ajout de l'alias 'sendpass' vers la commande oubli
+
+2005-07-02 Progs <progs@headfucking.net>
+
+	* welcome.c: réunion des commandes setglobwelcome, addwelcome, delwelcome et listwelcome en une
+	commande globwelcome
+
+2005-06-20 Cesar <cesar@ircube.org>
+
+	* Fix: memberscount incorrect pour les salons suspendus
+
+	* serveur.c: Fix: op/voice mal géré au burst d'un nouveau salon
+
+2005-06-10 Cesar <cesar@ircube.org>
+
+	* opdeop.c: Fix: deopall ne deop plus les services
+
+2005-06-08 Cesar <cesar@ircube.org>
+
+	* nickserv.c: suppresion du flag warned au login de l'owner
+
+	* chaninfo.c: flag warned listé dans le chaninfo
+
+	* admin_chan.c: ajout de l'option -warned dans 'chan list' pour filtrer sur ce flag
+
+	* timers.c: le topic de warn_before_purge indique la date de la purge plutot que le temps
+	restant
+
+2005-06-05 Cesar <cesar@ircube.org>
+
+	* correction des integer overflows du à convert_duration()
+
+2005-06-04 Cesar <cesar@ircube.org>
+
+	* showcommands.c: correction du bug de listing des commandes Admin+chan
+
+2005-06-01 Cesar <cesar@ircube.org>
+
+	* ban.c: correction du bug de génération d'un banmask (bantype=1, user logué +x)
+
+2005-05-30 Cesar <cesar@ircube.org>
+
+	* chanopt.c: chanopt renvoie les bonnes syntaxes
+
+	* poursuite du renommage de description en theme
+
+2005-05-27 Cesar <cesar@ircube.org>
+
+	* serveur.c: bug du dereferencement de nick* dans m_mode() lors des [+-]b par un serveur
+
+2005-05-18 Cesar <cesar@ircube.org>
+
+	* config.c: Suppression de la variable de config 'network' inutilisée, renommage de maxlastseen,
+	quit_msg, chanmaxidle
+
+	* timers.c: Ajout d'un avertissement avant purge de salon pour absence de l'owner (topic)
+
+*** SCoderZ1.2
+
+2005-05-13 Cesar <cesar@ircube.org>
+
+	* Makefile: oubli dans le Makefile
+
+	* serveur.c: empeche Z d'enforcer le topic si il est locké lors du topicburst
+
+2005-05-08 Cesar <cesar@ircube.org>
+
+	* chanserv.c: correction d'un crash dans le listing des access..
+
+2005-05-06 Cesar <cesar@ircube.org>
+
+	* outils.c,chanserv.c: nettoyage
+
+	* nickserv.c: simplication de check_protect()
+
+2005-05-05 Cesar <cesar@ircube.org>
+
+	* nickserv.c: user cantregchan permet de modifier le temps plutot qu'un toggle idiot
+
+	* amélioration de la compilation sous BSD
+
+	* admin_chan.c: ajout d'une protection de listing trop long pour chanlist
+
+	* admin_user.c,admin_chan.c: nettoyage
+
+2005-04-24 Cesar <cesar@ircube.org>
+
+	* fichiers.c: ajout de split_buf() pour simplifier le parsage des fichiers
+
+2005-04-23 Cesar <cesar@ircube.org>
+
+	* mkpasswd.c: correction de create_password() qui pouvait tronquer prématurément le pass
+
+2005-04-22 Cesar <cesar@ircube.org>
+
+	* timers.c: Ajout d'une API de timers qui remplace avantageusement l'ancien système, il n'est
+	plus nécessaire de parcourir toutes les données pour trouver les maintenances.
+
+	* nettoyage en conséquence
+
+	* correction du problème de CurrentTS depuis le changement du mode de timeout
+
+	* cs_cmds.c: csmode() n'envoie plus les modes si Z n'est pas sur le salon
+
+2005-04-20 Cesar <cesar@ircube.org>
+
+	* fichiers.c: passage de la DB dans un fichier unique, avec sauvegarde globale itérative
+
+	* nettoyage en conséquence
+
+	* ajout d'un outil de conversion des DBs, +/- automatique
+
+	* sockets.c: correction des define dans run_bot() si compilé sans WEB2CS
+
+	* casts "unsigned char" pour les accès à tolower/toupper
+
+2005-04-17 Cesar <cesar@ircube.org>
+
+	* ban.c: correction d'un bug dans pretty_mask qui ne corrigeait pas bien '!b@c' en '*!b@c'
+	(rapporté par BuGs)
+
+2005-04-16 Cesar <cesar@ircube.org>
+
+	* main.c: suppression du recours à SIGALARM grace à l'exploitation du timeout de select.
+
+	* nettoyage en conséquence
+
+2005-04-15 Cesar <cesar@ircube.org>
+
+	* memoserv.c: Ajout d'une macro MemoRead()
+
+	* memoserv.c: memo send utilise le parser habituel pour %nick|username
+
+	* chanserv.c: les admins/opers ne peuvent plus kicker les +p|k via Z
+
+2005-04-11 Cesar <cesar@ircube.org>
+
+	* sql_log.c: déblocage des query historique sur les salons purgés (pour profiter de l'entrée
+	purge)
+
+	* suppresion du code redondant des do_*_suspend, rassemblés en do_suspend ubiquitaire
+
+	* suppression de quelques warnings sur les signes
+
+2005-04-09 Cesar <cesar@ircube.org>
+
+	* cs_register.c: bug dans la vérification de la longueur du nom du salon au register
+	[perte dans la hash]
+
+2005-04-05 Cesar <cesar@ircube.org>
+
+	* ban.c: modification de la fonction pretty_mask() pour mieux traiter les erreurs les plus
+	courantes [Reprise d'ircu (Carlo Wood), améliorée.]
+
+2005-03-29 Cesar <cesar@ircube.org>
+
+	* aide.c: correction d'un oopsy (syntaxe + aide)
+
+2005-03-26 Cesar <cesar@ircube.org>
+
+	* cs_cmds.c: intégration des mises à jour de liens user/nick dans cs_account()
+
+2005-03-18 Cesar <cesar@ircube.org>
+
+	* sql_log.c: ajout de flags pour modifier le comportement de del_regnick()/del_chan() ecriture
+	de la liste/ajout d'entrée SQL
+
+2005-03-17 Cesar <cesar@ircube.org>
+
+	* timers.c: nettoyage
+
+	* sql_log.c: ajout d'entrées sql lors des purges
+
+	* web2cs: ajout de channel set
+
+	* memoserv.c: modification de l'item 'read' en 'flag' pour les memos
+
+	* memoserv.c: ajout des memos autoexpire qui se supprime à la lecture
+
+2005-03-12 Cesar <cesar@ircube.org>
+
+	* mkpasswd.c: Ajout d'une verification anti-typo dans set pass
+
+2005-02-04 Cesar <cesar@ircube.org>
+
+	* track.c: correction d'un bug sur les tracks (lors d'un deauth de l'admin trackeur), et
+	remodalage
+
+2005-01-22 Cesar <cesar@ircube.org>
+
+	* config.c: bug d'index lors d'une compilation sans toutes les options (décrit par julien_)
+	* config.c: correction d'un problème de conception.. (vive les pointeurs!)
+
+2005-01-16 Cesar <cesar@ircube.org>
+
+	* serveur.c: correction d'un bug de synch, causé par le jin d'un user sur un salon quitté par Z
+	sur une requête d'un admin
+
+2005-01-11 Cesar <cesar@ircube.org>
+
+	* config.c: correction d'un UB en cas d'erreur lors du loadconf
+
+	* config.c: réécriture complète
+
+	* serveur.c: suppression de make_servnum()
+
+2005-01-08 Cesar <cesar@ircube.org>
+
+	* Nettoyage
+
+	* chanserv.c: Ajout de la macro HasDMode() similaire à HasMode mais pour les defmodes
+
+	* serveur.c: hack pour le burst du salon de log
+
+	* serveur.c: clean up de m_whois
+
+2005-01-07 Cesar <cesar@ircube.org>
+
+	* serveur.c: Nettoyage
+
+	* Rajout des defines nickserv
+
+	* serveur.c: correction d'un bug possible si le burst du chan de log prenait plusieurs TOKEN B
+
+2005-01-02 Cesar <cesar@ircube.org>
+
+	* match.c: Ajout de la vraie fonction match(), l'ancienne retrouve sa vraie fonction en tant
+	que mmatch():
+	match() vérifie une string contre un mask, mmatch() un mask contre un mask
+	Les vérifications contre des strings seront donc plus rapides (is_ban)
+
+2005-01-01 Cesar <cesar@ircube.org>
+
+	* serveur.c: overflow in exec_cmd() ..
+
+2004-12-28 Cesar <cesar@ircube.org>
+
+	* serveur.c: -m_mode(),m_kick() plus tolérants enverant les autres services (+k)
+
+2004-12-24 Cesar <cesar@ircube.org>
+
+	* timers.c: del_killinfo oublié dans m_nick:chnick qui provoquait un kill malgré le login
+
+	* suppression du paramètre against devenu inutile
+
+	* structs.h: ajout du flag HasKill pour les aNick, marquant la présence d'un kill en instance
+
+2004-12-18 Cesar <cesar@ircube.org>
+
+	* showcommands.c: clean up
+
+	* aide.c: petite modif de la ligne de syntaxe dans les fichiers d'aide
+
+	* aide.c: correction du bug de la prise en compte de la syntaxe lors du reload help
+
+2004-12-16 Cesar <cesar@ircube.org>
+
+	* chanopt.c: Correction d'un overflow dans chanopt.c (alias)
+
+	* timers.c: typo dans timers.c
+
+	* includes..
+
+	* correction de shadowing & pb de prototypes
+
+2004-12-14 Cesar <cesar@ircube.org>
+
+	* hash.c: migration des Get* (recherches dans les listes/hash) dans hash.c pour décharger
+	outils.c
+
+	* outils.c: migration de hostprot
+
+	* memoserv.c: intégration de memo_list de manière plus ubiquitaire
+
+	* ban.c: unban permet de débannir sur des Ids de bans plutôt que le mask
+
+2004-12-13 Cesar <cesar@ircube.org>
+
+	* admin_user,admin_chan.c: ajout d'une limite à 100 items dans user|chan historique
+
+	* aide.c: aide chan|user historique à jour
+
+*** SCoderZ1.1.11
+
+2004-12-02 Cesar <cesar@ircube.org>
+
+	* templates.c: Ajout d'un système de template pour les mails
+
+2004-11-26 Cesar <cesar@ircube.org>
+
+	* nickserv.c: les envois de mail se font via popen()
+
+2004-11-24 Cesar <cesar@ircube.org>
+
+	* flood.c:correction d'un bug dans isignore() strcasecmp() -> strcmp()
+
+2004-11-23 Cesar <cesar@ircube.org>
+
+	* suppression de CountUsers() inutilisée
+
+	* admin_cmds.c: correction d'un bug dans DNRADD qui ne prenait pas la bonne raison
+
+2004-11-20 Cesar <cesar@ircube.org>
+
+	* mkpasswd.c: Changement du générateur de pass pour mieux controler l'output
+
+	* fichiers.c: correction d'un bug au chargement de la DB qui rajoutait les modes par défault
+	globaux à tous les salons
+
+2004-11-19 Cesar <cesar@ircube.org>
+
+	* admin_cmds.c: réécriture du système des badchans/badnicks en DNR
+
+	* add_info.c;fichiers.c:nettoyage/classement/optimisations
+
+2004-11-16 Cesar <cesar@ircube.org>
+
+	* cs_cmds.c: fastfmt[v]() retournent désormais le nombre de char écrits (compatibilié..)
+
+	* fichiers.c/load_cmd(): mécanisme de load flag beaucoup plus fiable
+
+	* remplacement des int secure par des flags dans la struct cmd
+
+2004-11-14 Cesar <cesar@ircube.org>
+
+	* outils.c: ajout de fastfmt[v]() pour formater les strings, et remplacement.
+
+2004-11-10 Cesar <cesar@ircube.org>
+
+	* del_info.c: bug dans del_abadnick(), if inversé
+
+	* del_info.c: clean up de del_ban
+
+2004-11-09 Cesar <cesar@ircube.org>
+
+	* main.h: ajout de la macro IsAdmin() en complément de IsAnAdmin() si (x) != NULL
+
+	* structs.h: création d'une liste d'admins logués plutot que de parcourir la table des nicks
+
+2004-11-08 Cesar <cesar@ircube.org>
+
+	* chaninfo.c: changement du terme description vers thème pour une meilleure compréhension
+
+	* cs_register.c: Z mets en topic le thème lors du regchan
+
+2004-11-07 Cesar <cesar@ircube.org>
+
+	* ban.c: optimisation du check des bans on join (division par 3.5) en precachant les
+	nick/ident/host et les '*'
+
+2004-11-02 Cesar <cesar@ircube.org>
+
+	* oopsy dans user del
+
+	* sql_log.c: nettoyage de sql_log, plus de shadowing, suppression des ';'
+
+2004-10-24 Cesar <cesar@ircube.org>
+
+	* aide.c: migration des syntaxes dans le fichier d'aide
+
+	* aide.c: nettoyage du vieux system de loadsyntax
+
+	* sql_log.c: ajout de sqlflush dans CleanUP()
+
+	* admin_cmds.c: ajout d'un rehash -sql pour forcer un flush
+
+	* admin_cmds.c: suppression d'un rehash -syntax
+
+2004-10-21 Cesar <cesar@ircube.org>
+
+	* admin_chan.c,admin_user.c: user/chan suspend permettent de modifier le temps de suspend/la
+	raison/supprimer l'historique sans recommencer
+
+2004-10-12 Cesar <cesar@ircube.org>
+
+	* memoserv.c: MEMOS READ envoit les nouveaux directement par défaut
+
+2004-10-06 Cesar <cesar@ircube.org>
+
+	* hash_nick.c: Ajout de switch_nick, do_hashn/hash_delnick plus exportees
+
+2004-09-16 Cesar <cesar@ircube.org>
+
+	* main.c: ajout du support de SIGINT pour restart les services de la console
+
+	* ban.c: ajout d'unban %nick pour débannir les bans le couvrant dans la même idée qu'unbanme
+
+2004-09-12 Cesar <cesar@ircube.org>
+
+	* mkpasswd.c: modif du hashage md5
+	* aide.c: meilleur protection du loadhelp
+
+2004-09-11 Cesar <cesar@ircube.org>
+
+	* mkpasswd.c:passage des pass en md5
+
+2004-08-30 Cesar <cesar@ircube.org>
+
+	* oopsy dans set/username..
+
+2004-08-25 Cesar <cesar@ircube.org>
+
+	* admin_cmds.c: suppression de cswall, global wall
+
+	* sql_log.c: mise en place d'un système de queue des queries sql
+
+	* sql_log.c: ajout d'un system de flush des buffers sql
+
+	* chanserv.c: dans alist est indiqué si l'user listé est dans le salon
+
+2004-08-24 Cesar <cesar@ircube.org>
+
+	* aide.c: Réécriture du systême d'aide:
+	-bufferisation en ram des fichiers d'aide
+	-regroupement de tous les fichiers d'aide en un grand
+	-aide multilang, sans fallback pour le moment
+	-nombreuses protections du systême dynamique
+	-petit bug dans str_dup
+
+2004-07-23 Cesar <cesar@ircube.org>
+
+	* lang.c: date rendue compatible multilang
+
+2004-07-21 Cesar <cesar@ircube.org>
+
+	* lang.c: Les items manquants des langages supplémentaires sont maintenant des alias vers les
+	items correspondants du default
+
+	* lang.c: optimisation de GetReply grâce au changement ci dessus
+
+2004-07-18 Cesar <cesar@ircube.org>
+
+	* outils.c: Ajout d'une fonction pour rechercher un aJoin grace à un aChan plutot qu'un char*
+
+2004-07-15 Cesar <cesar@ircube.org>
+
+	* ban.c: correction d'un bug de l'algo de découpage des mask de ban, qui n'effaçait pas bien
+	l'ancien, empechant ainsi des bans d'être vérifié.
+
+2004-07-24 Cesar <cesar@ircube.org>
+
+	* petits changements de hostprot afin d'éviter des manipulations inutiles
+
+2004-07-20 Cesar <cesar@ircube.org>
+
+	* nickserv.c: la commande oubli/sendpass n'écrase plus l'ancien pass afin d'éviter
+
+	* nickserv.c: la commande oubli ne peut plus être utilisée si quelqu'un est logué sur l'username
+	les abus
+
+2004-07-18 Cesar <cesar@ircube.org>
+
+	* chanserv.c: Ajout d'une limitation au listage d'accès + cosmétique
+
+2004-07-16 Cesar <cesar@ircube.org>
+
+	* Optimisation de la vérification des bans au join
+
+2004-07-10 Cesar <cesar@ircube.org>
+
+	* admin_user.c: suppression de l'admin user checkpass
+
+	* structs.h: déplacement de beaucoup de variables W2C dans la struct bot
+
+	* ajout d'un système de timeout
+
+2004-07-02 Cesar <cesar@ircube.org>
+
+	* main.h: réduction du MAILLEN
+
+	* main.h: mise en place du PWDLEN
+
+	* web2cs-engine.c: pass envoyé hashé
+
+2004-06-28 Cesar <cesar@ircube.org>
+
+	* nickserv.c: suppression de la notice de reidentification
+
+2004-06-22 Cesar <cesar@ircube.org>
+
+	* nickserv.c: suppression du memo de bienvenue, remplacé par une notice au premier login
+	(+nettoyage)
+
+2004-06-20 Cesar <cesar@ircube.org>
+
+	* nickserv.c: correction bug, U_FIRST était aussi pour l'owner des services lors du premier
+	register: comme auto login, si pas de login manuel (/z login) avant 1 jour, suppression de
+	l'username de l'owner des services
+
+2004-06-19 Cesar <cesar@ircube.org>
+
+	* serveur.c: rajout flag CMD_NEEDNOAUTH pour empecher commandes qui ont besoin d'un auth de se
+	faire mettre (!) niveau 0, avec correction niveau db
+
+2004-06-11 Cesar <cesar@ircube.org>
+
+	* chanserv.c,nickserv.c: drop/unreg demande 'confirme' comme SECOND argument désormais pour
+	éviter les confusions
+
+2004-05-31 Cesar <cesar@ircube.org>
+
+	* admin_user.c: user info accepte un %nick
+
+*** SCoderZ1.1.10
+
+2004-05-12 Cesar <cesar@ircube.org>
+
+	* correction de problèmes de compilation sous BSD
+
+	* Makefile: correction de problèmes du makefile (pour la 1ère compilation)
+
+2004-05-11 Cesar <cesar@ircube.org>
+
+	* vote.c: bug des stats de vote réparé
+
+	* nickserv.c: si le sendmail est désactivé, Z envoyait le mail comme pass en notice
+
+2004-05-05 Cesar <cesar@ircube.org>
+
+	* admin_cmds.c: changement du systeme de restart, plus propre, il restaure correctement tous
+	les fds pour le fils
+
+2004-05-03 Cesar <cesar@ircube.org>
+
+	* welcome.c: changement de choose_welcome
+
+2004-04-30 Cesar <cesar@ircube.org>
+
+	* Z ne rejoint plus un salon dont le suspend vient de s'achever pour le quitter pour idle dans
+	la minute.
+
+2004-04-27 Cesar <cesar@ircube.org>
+
+	* sql_log.c: l'host MySQL n'est plus limitée à une IP (localhost souvent requis)
+
+	* nickserv.c: recover réécrit plus rapide
+
+2004-04-14 Kimuji
+
+	* ban.c: bug du tri des bans si il y a déjà des bans permanents en banlist
+
+2004-04-13 Cesar <cesar@ircube.org>
+
+	* aide.c,admin_cmds.c: traduction de quelques replies, changement de l'aide, ajout de rehash
+	-purge
+
+2004-04-08 Cesar <cesar@ircube.org>
+
+	* divers.c: changement de la reply version
+
+	* timers.c: la purge des salons possédés par un username lors de le suppression de celui ci est
+	centralisé dans del_regnick() qui accepte donc désormais la raison.
+
+	* del_info.c: del_regnick() n'écrite l'userlist que si cela lui est demandé (Afin d'éviter les
+	répétitions de write lors de la purge des users)
+
+	* del_info.c: del_chan n'envoit le part que si Z était sur le salon (cf ChanIdle Feature)
+
+2004-04-07 Cesar <cesar@ircube.org>
+
+	* aide.c: nettoyage
+
+	* aide.c: changement de l'apparence de l'aide
+
+	* admin_cmds.c: si une commande est renommée, Z trouve désormais l'aide à partir du corename
+
+	* outils.c: petite modif(opt)
+
+	* main.h: ajout d'un define pour la purge (PURGEDELAY)
+
+2004-04-05 Cesar <cesar@ircube.org>
+
+	* admin_manage.c: nettoyage
+
+2004-03-31 Cesar <cesar@ircube.org>
+
+	* ban.c: bug du chargement des bans temporaires
+
+	* chanserv.c: access permet désormais de lister les accès en cours d'acceptation
+
+	* moduser.c: bug des alias autoop/autovoice/protect réparé
+
+2004-03-27 Cesar <cesar@ircube.org>
+
+	* vote.c: oubli du chargement du level de vote
+
+2004-03-23 Cesar <cesar@ircube.org>
+
+	* serveur.c: Problem de conformite au protocole de m_topic
+
+	* main.h: reduction de la longueur des chanurls à 80 chars
+
+	* add_info.c: nettoyage du add_join
+
+	* ban.c: correction d'un bug d'add_ban(ptr non initialisé)
+
+2004-03-22 Cesar <cesar@ircube.org>
+
+	* chanserv.c: ne montre que les accès actifs d'un salon dans la 'alist'
+
+	* config.c: ajout d'unf lag CF_NOMAIL plutot que tester en permanence la valeur de 'mailprog'
+
+	* ban.c: ajout d'un pretty list (avec un systme de join propre au possible)
+
+	* suppression du HIDECODER
+
+	* divers.c: les admins away ne sont plus listés
+
+	* chanserv.c: les personnes suspendues/n'ayant pas accepte leur access ne sont plus listees dans
+	le ALIST
+
+2004-03-19 Cesar <cesar@ircube.org>
+
+	* oubli d'enlever un define
+
+	* nickserv.c: oh le bug dans myaccess()... :) (n'envoyait plus les infos par défaut)
+
+	* vote.c: debug & nettoyage de vote.c, proposition 'end' inutile etc..
+
+2004-03-18 Cesar <cesar@ircube.org>
+
+	* structs.h: utilisation d'une enum pour les types de Timers
+
+	* add_info.c,del_info.c: nettoyage
+
+	* timers.c: nettoyage (nombreuses variables inutiles VIVE 'continue')
+
+	* changement des nicks en <nickbase><nombre aléatoire>
+
+	* vote.c: les votes peuvent prendre désormais un level
+
+2004-03-15 Cesar <cesar@ircube.org>
+
+	* chanopt.c: les alias de chanopt passent correctement les ON/OFF
+
+2004-03-14 Cesar <cesar@ircube.org>
+
+	* hash_cmd.c: debug de BuildCmdsTable() afin qu'il se  nettoye avant de le regenerer
+
+2004-03-08 Cesar <cesar@ircube.org>
+
+	* ban.c: meilleure gestion des bans si !HAVE_CRYPTHOST
+
+	* ban.c: tri des bans par leur TS d'expiration (croissant) + patch
+
+2004-03-04 Cesar <cesar@ircube.org>
+
+	* web2cs-engine.c: ajout des sql logs dans le web2cs
+
+	* bin/convert.c: ajout de bin/convert.c
+
+2004-03-01 Cesar <cesar@ircube.org>
+
+	* nickserv.c,serveur.c: nettoyage de recover(), serveur.c
+
+	* outils.c: sous traitage à cswall()
+
+	* changement de quelques time(NULL) > CurrentTS
+
+2004-02-27 Cesar <cesar@ircube.org>
+
+	* main.h: interfaçage des levels admins pour permettre l'intercalation des helpers?
+
+	* memoserv.c: bug des index de memos.. (Xe patch)
+
+	* admin_user.c,admin_cmds.c: petites corrections
+
+	* nickserv.c: lors d'un register si !(!strcasecmp(mailprog, "nomail") || GetConf(CF_PREMIERE))
+	la langue n'était pas paramétrée donc plantage lors de l'affichage dans user info user.
+
+2004-02-25 Cesar <cesar@ircube.org>
+
+	* serveur.c: petit bug dans m_clearmode(): si CM *k*, la clé n'était pas retirée car key passée
+	comme NULL
+
+	* memoserv.c: protection contre les index de memo < 0
+
+2004-02-22 Cesar <cesar@ircube.org>
+
+	* serveur.c: Z devrait pouvoir desormais ecraser les topics! (TS)
+
+2004-02-21 Cesar <cesar@ircube.org>
+
+	* web2cs-commands.c: web2cs register()
+
+	* memoserv.c: memo del accepte plusieurs mémo/ligne séparé par des ',', paré pour les ranges
+
+	* divers.c: return dans admin()
+
+	* main.h: macro HasWildCard() ajoutée
+
+2004-02-17 Cesar <cesar@ircube.org>
+
+	* nickserv.c: l'option busy n'est plus sauvegarde
+
+2004-02-15 Cesar <cesar@ircube.org>
+
+	* serveur.c: ajout d'un error handler pour aider au link..
+
+2004-02-13 Cesar <cesar@ircube.org>
+	* outils.c: nouveau is_ip()
+
+	* sql_logs.c: bug du sql_query + prise en charge des messages d'erreur SQL + passage des noms
+	de table en define au cas ou
+
+	* main.c: renommage de want_to_quit en running (inutile OK)
+
+	* admin_cmds.c: suppression des appels à CleanUp() dans restart/die, causait un segfault lors de
+	l'appel dans main() (double free())
+
+	* nettoyages multiples
+
+	* structs.h: changement de la variable lastseend en lastseen (vieille typo ?)
+
+	* main.h: ajout de la macro IsAway()
+
+	* main.h: remplacement de la fonction IsBadNick() par une macro (getbadnick existant..)
+
+	* nickserv.c: ajout de switch_user() comme fonction externe pour changer un username, évite une
+	redondance du code (set username,user newnick, web2cs)
+
+	* divers.c: changement de la fonction show_admins
+
+	* changement d'un message FR
+
+2004-01-24 Cesar <cesar@ircube.org>
+	* cs_cmds.c: desormais, lors d'un csjoin() Z met correctement a jour le TS
+
+2003-??-??  Cesar <cesar@ircube.org>
+
+	* debug des burst des limites... énième tentative (le problème cette fois se posait si limite
+	valide remote mais pas de limite locale..)
+
+	* nettoyage de getbanmask() et débuguage du problème décelé aussi sur l'ircd (ban tendancieux
+	sur ip/host)
+
+	* quelques aménagement du sockengine +web2cs
+
+	* suppression de resolve() qui sert a  rien
+
+	* changement de la variable lastseend en lastseen (vieille typo ?)
+
+	* ajout de la macro IsAway()
+
+	* remplacement de la fonction IsBadNick() par une macro (getbadnick existant..)
+
+	* ajout de switch_user() comme fonction externe pour changer un username, évite une redondance
+	du code (set username, user newnick, web2cs)
+
+	* changement de la fonction show_admins
+
+	* changement d'un message FR
+
+	* pourquoi ISSET dans run_bot ? personne le CLR..
+
+	* suppression de l'enregistrement des topics dans les fichiers et de leur enforce au burst
+
+	* m_mode(): correction d'un bug dans la protection des modes (chmodeslevel), si limite changée
+	mais déjà existante. (+ nettoyage)
+
+	* nettoyage, avec protection du chmodeslevel que si modes autres qu'obv (evite les loops)
+
+	* ajout de HasMode(chaninfo, flag) qui vérifie si les modes sont mis: interface les modes en
+	cas de changements plus tard (ça nous aurait aidé la dernière fois..)
+
+	* changement de quelques time(NULL) en CurrentTS
+
+	* ajout de commentaires
+
+	* load_users(), vérification de la validité du fichier en vérifiant la non-nullité du dernier
+	arg
+
+	* la longueur des noms de serveur devient fixée par HOSTLEN plutot qu'hardcodé
+
+	* pour améliorer la tolérance avec les ircu de base, le reop du CS se fait via la Uline
+
+	* désormais, lors d'un csjoin() Z met correctement à jour le TS
+
+	* ajout d'espace apres les pass dans les mails, trop d'erreurs venaient de là
+
+	* nettoyage de m_mode & serveur.c
+
+	* ajout de deux msgs en multilang
+
+	* nettoyage de main.c
+
+	* changement du type de retour de resolve() en signed..
+
+	* suppression de verif inutile dans add_join
+
+	* add_join met désormais correctement les users présents après le burst
+
+	* suppresion de checks inutiles : if(!n->user || !IsAnAdmin(n->user))
+
+	* nettoyage du web2cs
+
+	* welcome n'envoit plus sa notice lors du netmerge d'un leaf
+
+	* bug des mauvaises limites stockées lors d'un netmerge d'un leaf réparé
+
+	* suppression des \n dans les syntax
+
+	* ajout de la vérification de la core limite
+
+	* bug des stats de burst négative enfin corrigé
+
+	* ajout d'une entrée sqllog pour les register (plus sécure)
+
+	* check_protect vaguement optimisé
+
+	* m_burst, gestion des séries de num optimisée
+
+	* write_achan n'écrit plus la banlist, c'est inutile et cela ralenti (les bans sont écrits
+	indépendamment)
+
+	* passage de la table de commande en hash table beaucoup plus rapide (surtout que les commandes
+	n'étaient pas classées selon leur utilisation...)
+
+	* optimisation: changement de nombreux RealCmd() en parv[0]
+
+	* optimisation: syntax() strlen inutile
+
+	* lors d'un +b, vérification sur l'host cryptée.. si il a l'host réelle, oper?
+
+	* load_chans: n'ajoute que les bans n'ayant pas encore expiré
+
+	* aChan contient désormais un membre 'owner', pointeur vers l'accès de l'owner, accélère les
+	recherches et les vérifications au runtime
+
+	* correction de la correction d'un faux bug dans chan setowner (newlevel = 0)
+
+	* add_ban: suppression de la vérification de la présence du ban dans la banlist
+
+	* ban_cmd, kickban: ajout de check_redundant_bans() qui vérifie la présence du nouveau et
+	tente de supprimer les bans couverts par le nouveau
+
+	* suppression des multiples appels à time(), CurrentTS mis à jour à chaque boucle de lecture
+
+	* oubli du return dans la notice de register si les mails donnés sont différents
+
+	* bug de recover qui deauthait mal si l'usurpateur etait logue
+
+	* changement de la requete SQL de user historique & chan historique afin que les entrées soient
+	triées par TimeStamp
+
+	* register demande maintenant le mail en double examplaire
+
+*** SCoderZ 1.1.9
+
+2003-??-?? Cesar <cesar@ircube.org>
+
+	 * ajout d'un script perl pour comparer 2 fichiers lang (bin/langcomp.pl)
+
+	 * user info fait une recherche simple plutot qu'une boucle dans la liste si l'argument n'a pas
+	 de wildcard
+
+	 * putserv ajoute lui même le \r\n
+
+	 * optimisation de csntc
+
+	 * merge du multilang
+
+	 * alist corrigé, il retounre une erreur à chaque fois qu'il n'y aucune entrée
+
+	 * chan setowner n'accepte plus un level de 0
+
+	 * myaccess & user info sous traite à show_userinfo()
+
+	 * bug du user newnick corrigé
+
+	 * aide sans argument renvoit sur showcommands
+
+	 * aide sans arg, retourne proprement le showcommands
+
+	 * ajout de l'options -users pour la commande chan
+
+	 * userinfo sous traité à une fonction
+
+	 * pb du burst <0 peut etre résolu
+
+	 * unbanme check sur les 3 hosts (cryptée, réelle, masquée) peut être le check du +b & de  la
+	 commande ban..?
+
+	 * petit bug de pretty_mask qui supprimait un char de trop fixé (merci Embryon)
+
+	 * disparition de mylog() qui ralentissait putlog()
+
+	 * putlog() ajoute désormais le \n (+cf plus haut)
+
+	 * petit changement de init_bot()
+
+	* correction de 3 buffers overflow dans csmode()
+
+	* correction d'un bug (prenait mal en compte les '-') dans csmode()
+
+	* ajout de Strtok() basé sur le ircd_strtok(ircu)
+
+	* remaniement énorme : chaque .c a son .h
+
+	* pas mal de petites modifs du à la relecture
+
+	* nettoyage de timers()
+
+	* optimisation des appels de conv_char
+
+	* nettoyage de badmanage() && add/del dérivés
+
+	* ajout de socket.c pour décharger serveur.c
+
+	* ajout de deux outils dans bin/ (check & sqlpurge)
+
+	* optimisation de fichiers.c, moins de printf
+
+	* réécriture partielle de read_conf(), utilisation d'un code plus ubiquitaire, plus concis!
+
+	* typo dans outils.c (%u > %d)
+
+	* réécriture de run_bot() avec un seul appel à recv() de 512 bytes plutot que N appels(75% plus
+	rapide)
+
+	* comments dans showcommands.c
+
+	* comments dans main.c + Debug() lors des signaux
+
+	* optimisation violente des constructions de buffer de salons (whois/user info) gain pour 4
+	salons: 56% (4.5secs au lieu de 10.4 (10^7)), 77% pour une trentaine 156/35 secs
+
+	* idem pour buffer de clearbans/whoison
+
+	* GetConf -> macro
+
+	* moduser totalement interdit sur un access de level >=
+
+	* nettoyage des messages (pas vers le multilang)
+
+	* homogénéisation des msgs dans admin_manage.c moduser/chanopt/chanserv/admin_ser/ban/chanserv
+
+	* création de GetNUHbyNick(aNick, type) qui construit un nick!user@host plutot que les sprintf
+	couteux...
+
+	* petite optimisation du traitement d'un +b
+
+	* broutilles dans cs_cmds.c
+
+	* broutilles dans outils.c
+
+	* avancées de w2c
+
+	* utilisation de la macro ASIZE pour avoir la taille d'une array plutot qu'utiliser une struct
+	de fin
+
+	* suppression d'un memory leak improbable dans hash_nick.c
+
+	* ajout d'un flag de debug: W_TTY qui envoit dans la console active
+
+	* ajout de GetChanOptions()
+
+	* optimisations de chaninfo()
+
+	* optimisations de Get*Options() [avec 10 000 000 d'itérations: strcat 2535 ms, strcpy/index
+	70-90 ms facteur *30*]
+
+	* déterminer d'ou vient le CPU usage 100% lors d'un killsock
+
+	* optimisation du formattage pour putchan sprintf(buff + strlen(buff)): 420 ms plutot que
+	sprintf + strcat: 620 ms (1000 000 it)
+
+	* le debuglog devient une réelle option de debug: désactivée par défaut, indépendante du sqllog
+
+	* correction bug du suspend (> à la place de <)
+
+	* correction d'un bug avec les -k sans clé (ne suprime plus désormais)
+
+	* correctin du bug qui faisait être délogué apres un recover  avec kill
+
+	* suppression de la var globale lastresetlogs (inusité)
+
+	* bot.uptime est initialisée définitivement dans main.c
+
+	* optimisation des macros CantRegChan() & IsSuspend()
+
+	* suppression de bot.num qui ne servait que d'intermédiaire > utilisation directe de bot.servnum
+
+	* utilisation de NUMSERV plutot que des multiples #ifdef N2K
+
+	* suppression de la var globale registered (mainhub la remplaçait déjà)
+
+	* optimisation dans renchan, ne plus strcpy N fois le nom du salon (*c est un aChan*)
+
+	* changement total du fonctionnement des modes (utilisation de struct cmode pour modes actuels
+	+ defmodes)
+
+	* chanopt defmodes normalement plus fiable dans la gestion des +lk
+
+	* ChanLevelbyUserI & GetAccessIbyUserI prennent un aChan * comme argument (optimisation)
+
+	* optimisation dans del_join : on ne cherche plus à update le lastseen si le salon n'est pas reg
+
+	* remplacement de quelques GetAccessIbyUserI par ChanLevelbyUserI là où ils ne s'imposaient pas.
+
+	* del_nickinfo nettoyé
+
+	* fichiers.c nettoyé
+
+	* add_chan accepte moins d'argument inutiles
+
+	* csmode prend un paramètre supplémentaire qui permet d'éviter le parsage des modes si ce ne
+	sont que des +obv
+
+	* changement du chargement de la DB, ajout direct dans la struct, écriture que des options/items
+	existants >> load plus
+
+	* rapide, moins de lignes à lire/écrire
+
+	* meilleure gestion des modes lors des bursts ie:
+	>lors d'un burst alors que le CS est déjà linké (split d'un autre serveur)
+	j'ajoute toujours ses modes
+	si son TS est inférieur à celui en mémoire, mise à zero de mes modes avant.
+	>lors du burst de mon uplink pour ma connexion:
+	j'ajoute les modes envoyés à mes defmodes (key du hub prioritaire)
+
+	* suppression de l'element ipnum de la struct robot (inusitée)
+
+	* suppression de l'element STS (start timestamp) de la struct robot (utilisation de bot.uptime)
+
+	* migration de la variable globale dataS dans la struct robot
+
+	* migration de la variable globale dataQ dans la struct robot
+
+	* suppression du double incrément bot.dataQ et bot.lastbytes : lastbytes est une référence vers
+	dataQ, variation du
+
+	* nombre de byte obtenue par soustraction.
+
+	* ajout des configs par défaut de chans/users
+
+	* nettoyage: 	de main.c code normalement plus clair par endroit
+			suppression de la struct aConfPara plus utilisée depuis des mois
+
+	* migration de la variable globale 'premiere' en ConfFlag
+
+	* suppression de la verification de "premiere" dans m_privmsg, ecueil dans exec_cmd (utilité
+	uniquement lors du premier lancement)
+
+	* suppression des verifications de level dans l'autoop/voice du login (justification?)
+
+	* nettoyage de l'autoop au join
+
+	* les ignores sont desormais sur les IPs (en base64) plutot que sur l'host
+
+	* fin de la migration des putlog vers Debug()
+
+	* nettoyage de welcome.c
+
+	* shell de versioning
+
+	* les stats mémoires sont plus proches de la réalité (comptabilisation des links)
+
+	* l'argument -date d'user info est désormais correctement pris en compte
+
+	* l'argument -seen d'user info accepte désormais un format de temps XjXmX
+
+	* bug d'user info réparé
+
+	* les durées à fournir dans la configuration peuvent désormais être mises sous forme XjXhXm etc.
+	de la même manière que pour les bans
+
+	* commandes d'op/deop/voice/devoice changées avec une fonction générique
+
+	* progression du multi lang, test limité OK
+
+	* suppression de kickall, kickbanall
+
+	* debug des tables de nums
+
+	* réecriture de parv2msg[n]() sans strcat
+
+	* debugage de quelques ptits trucs
+
+	* changement de la gestion des links (cf tables des pointeurs de num)
+
+	* hashage des nick > struct et ajout d'une table de pointeurs qui permet un accès direct
+
+	* fusion de chowner et newowner en setowner
+
+2003-09-12 Progs <progs@headfucking.net>
+
+	* serveur.c: plus de wallops envoyé au BURST si parc == 3 (protocole "respécté")
+
+2003-??-?? Cesar <cesar@ircube.org>
+
+	* fusion de chowneer et newoner en setowner
+
+	* ajout de Debug()
+
+	* ajout de CountUsers() GetUserIbyMail()
+
+	* optimisation des fonctions de recherche en comparant les pointeurs quand c'est possible
+
+	* optimisations de chan chowner, newoner
+
+	* hashage des usernames
+
+	* Reecriture de conv_char() jusqu'à sept fois plus rapide que l'ancien
+
+	* correction du bug qui lors du regchan desynchait Z en ignorant les modes actuels qu'il ne
+	connait pas, il annule tous les modes désormais
+
+	* grande optimisation en passant par le hashage des salons
+
+	* Debug de nombreux problèmes avec les salons suspendus
+
+	* disparition de l'unreg en deux étapes, il faut desormais spécifier CONFIRME en dernier
+	argument.
+
+	* disparition du du ToggleFlag
+
+	* Ajout du Creation Time
+
+	* Changement du fonctionnement de la commande DROP: en une passe désormais, mais requiert
+	l'argument CONFIRME
+
+	* Ajout d'une fonctionnalité SQL: user historique <user> -chan pour chercher toutes les
+	commandes chan effectuées
+	Note: pour une recherche sur un salon particulier, utilisez chan historique # -user user
+	Note2: cumulable avec les options -cmd et de durée
+
+	* Léger debug de la version précédentes de ces fonctions.
+
+	* Les messages d'erreur lors d'un echec d'une requête SQL sont plus explicite.
+
+	* reecriture de parse_this
+
+	* quelques debugs de sql_log (overflow, pb de buffer)
+
+	* ajout de sql log en version de production.. let's see
+
+	* ajout de Strncpy qui a un comportement normal (mais necessite n+1 char)
+
+	* ajout de str_dup pour ammloc/strcpy un ptr
+
+	* debut des define pour les options par defaut
+
+	* ajout d'une int mode dans la struct des chans pour soulager l'int flag
+
+	* changement de la forme de la db chan
+
+	* ajout du support de la floating limite > chanopt autolimit
+
+	* la commande nickban est regroupee dans la commande ban: ban %nick
+
+	* les logs chans ne sont plus del
+
+	* ajout de la fonction de formatage dedie a scoderz, optimisee pour son utilisation
+
+	* nettoyage de quelques autres trucs
+
+	* toggle modifie lui meme les arguments
+
+	* optimisation de show_acces + debug des <>
+
+	* passage certains free-malloc en realloc
+
+	* suppression de la ligne MODE dans les fichiers de db des chans
+
+	* ajout de pretty_mask() qui corrige les masks
+
+	* changement des fonctions de parsage des commandes de bans
+
+	* optimisations dans del_info.c
+
+	* nettoyage de nickserv.c (optimisations..)
+
+2003-07-16  Progs <Progs@coderz.info>
+
+	* config-sh: ajout de BINDIR et DBDIR pour le rep où se trouve l'executable et le rep de la
+	base de donnée (donné dans make config). On make install dans BINDIR, au lancement on se place
+	dedan et la db s'enregistre bien dans DBDIR.
+
+	* admin_cmds.c: ajout de l'arg LIST à adminmotd pour lister les deux motds
+
+2003-07-15  Progs <Progs@coderz.info>
+
+	* main.c: utilisation de getopt() pour déterminer les paramètres, et ajout du paramètre 'n'
+	pour ne pas lancer scoderz en background
+
+	* divers.c: ajout du paramètre -all à show_admin() pour afficher la liste complète des admins
+	(ancienne forme)
+
+2003-07-1?  Cesar <cesar@ircube.org>
+
+	* moduser.c: correction du bug du moduser permettant de suspendre des acces > au sien
+
+	* serveur.c,outils.c:nettoyage/optimisations mineurs
+
+	* del_info.c: optimisation de del_join et del_nick en ajoutant un ptr aChan * dans la struct
+	join (evite des getchaninfo)
+
+	* admin_chan.c,chanopt.c:nettoyages
+
+	* chanserv.c: debug de la commande de listing des accès si '*' et '?' sont spécifiés en même
+	temps (+nettoyage)
+
+2003-07-12  Progs <Progs@coderz.info>
+
+	* plein de debugs (genre)
+
+2003-07-0?  Cesar <cesar@ircube.org>
+
+	* admin_cmds.c: Ajout de -owner à la commande GLOBAL MEMO pour broadcast vers les owners
+
+	* config.c: changeemnt des malloc en realloc dans la conf
+
+	* mkpasswd.c: changement du generateur de pass
+
+	* sql_log.c: Avancées du SQL log
+
+	* admin_user.c: la commande admin user info est désormais soumise à MAXMATCHES (comme user
+	match) (arg -all a spécifier)
+
+	* showcommands.c: on peut désormais ajouter un salon en argument de showcommands pour lui faire
+	lister que les commandes accessbiels sur celui ci
+
+	* serveur.c: optimisations de exec_cmd() m_privmsg()
+
+	* optimisations des fonctions qui listent les salons
+
+2003-07-06  Progs <Progs@coderz.info>
+
+	* divers.c: nouvelle gueule du show_admins(): il n'affiche que les admins qui sont sur bot.chan
+	et qui ne sont pas absent. Il n'utilise plus qu'une ligne et ne donne que le pseudo.
+
+	* admin_chan.c: modification du chan chowner: ajout d'un arg pour dire le nouveau niveau de
+	l'ancien owner (si non paramétré: del)
+
+2003-07-03  Cesar <cesar@ircube.org>
+
+	* admin_manage.c: regroupement de deladmin/addadmin dans adminlvl qui gère add/del/mod
+
+	* main.h: ajout d'un define OWNERLEVEL
+
+	* main.h: ajout d'un define MAILLLEN
+
+	* serveur.c: suppression d'une etape qui gaspille du cpu dans m_privmsg
+
+	* nickserv.c: petite erreur dans isvalidmail: on accepte desormais les mails commencant par une
+	lettre
+
+	* del_info.c: del_chan s'occupe desormais du cspart() wallops log
+
+	* outils.c: nettoyage
+
+2003-07-02  Progs <Progs@coderz.info>
+
+	* nickserv.c: correction d'un bug dans user nopurge (mal prise en charge de l'indication ON/OFF)
+
+	* nickserv.c: correction d'un bug(master)ounet: le sendmail foirait
+
+	* nickserv.c: suppression de hello: premier register donne access admin 4
+
+2003-06-??  Cesar <cesar@ircube.org>
+
+	* fichiers.c: suppression d'une limite de load_cmds() qui perdait des donnees
+
+	* admin_chan.c: suppression de rdtopics rctopics reop qui ne servent a rien
+
+	* quelques changements d'esthetique
+
+	* del_info.c: reecriture et suppression de memory leak
+
+	* serveur.c: petite optimisation de m_privmsg
+
+	* mkpasswd.c: changement de mkpasswd() qui ne prend plus qu'un arg, le pass la clef est dans la
+	fct.
+
+	* cs_cmds.c: changement de cs_account() qui gere desormais les nick->user/nick->user->n
+
+	* nickserv.c: reecriture de recover()
+
+	* ban.c: ajout d'un bantype
+
+	* serveur.c: optimisation en preformattant les raw messages plutot que le calcul on the fly
+
+	* chanserv.c: ajout du WALLCHOPS lors d'un invite (progs)
+
+	* memoserv.c: petit oubli dans MEMOS LIRE
+
+	* timers.c: reecriture du system de kill/svsnick depuis 0
+
+	* timers.c: debug du pb des nicks perdus (delnickinfo() lors d'un timer sur un nick ne
+	correspondant pas)
+
+	* serveur.c: debug d'un pb lors d'un mode +k NULL
+
+	* ban.c: changement de la prise en charge du ban : plus logique, lorsqu'un user est +x et auth,
+	Z ban a  partir de son host +x et non cryptee/reelle
+
+	* aide.c,nickserv.c:changement esthetique
+
+	* serveur.c: petit bug dans m_mode
+
+	* sql_log.c: ajout du debut du sql log
+
+	* serveur.c: debug dans m_kick si le kickeur et la victime sont les memes
+
+	* admin_user.c: ptit bug de compte de user match corrige
+
+	* add_info.c,serveur.c: Rajout de pas mal de debugs dans add* et m* (en esperant que ca en cree
+	pas plus que ca n'en enleve ...)
+
+	* admin_user.c: user LIST renome en CHECK
+
+	* quelque nettoyae/optimisations (buffers agrandis, strcat(var,"\0"); inutiles supprimes)
+
+	* serveur.c: debug du mode +l 0 garde en memoire
+
+	* ban.c: debug du bantime et des durees de ban negative
+
+	* nombreux multi debuguage, changement des reponses, nettoyages
+
+	* ban.c,chanserv.c,chanopt.c: ajout de bantime et chmodeslevel an chan option
+
+	* moduser.c: Petit bug en moins dans autoop / autovoice
+
+2003-06-11  Progs <Progs@coderz.info>
+
+	* memoserv.c: dans MEMOS LIRE, l'argument NEW n'affiche que les nouveaux msgs
+
+2003-05-??  Cesar <cesar@ircube.org>
+
+	* quelques debuguages, optimisations, nettoyages
+
+	* cs_cmds.c: cstopic n'accepte plus de strings formatees
+
+	* ban.c: optimisation de la gestion des bans, correction d'un overflow du clearbans
+
+	* suprression d'un bug qui faisait ajouter les Link pour un salon suspendu (redondance) lors
+	d'un burst
+
+	* fichiers.c: debugage d'un pb de load_users (vive P....)
+
+	* config.c: optimisation de readconf
+
+	* serveur.c: optimisation de m_mode, kick() kickban() avec l'ajout de GetMembersbyNum qui
+	cherche dans les users dusalon plutot que du serveur
+
+2003-05-16  Progs <Progs@coderz.info>
+
+	* nickserv.c: suppression de SETKILL et PROTECT pour un int protect (0=none;1=svsnick;2=kill).
+	/z set protect 0/1/2
+
+	* nickserv.c: ajout de l'int cantregchan qui contient soit 0 si c infinie (jusqu'à qu'un admin
+	l'enlève) ou la valeur de temps unix quand ça expirera. Suppression donc du flasg CANTREGCHAN.
+
+	* admin_user.c: suspend avec temps (chan et user) + flag CANTREGCHAN (bientot avec expire aussi)
+
+2003-05-11  Progs <Progs@coderz.info>
+
+	* serveur.c: pass pour se connecter au w2c
+
+	* fichiers.c: ajout des allow_hosts et de la struct conf web2cs (allow_hosts et port)
+
+	* ban.c: Debug de is_ban() et possibilité de recover son nick si on est déjà logué dessus.
+
+	* nickserv.c: MYACCESS ACCEPT/REFUSE
+
+2003-05-0?  Cesar <cesar@ircube.org>
+
+	* fichiers.c: changement de la forme de la conf et de la proc qui la lit
+
+	* fichiers.c: ajout de GetConf()
+
+	* flood.c: augmentation des defauts du flood
+
+	* admin_chan.c: changement du fonctionnement d'adminreg
+
+	* libw2c.inc.php: Mise a jour de la librairie, suppression de l'utilisation des variables
+	globales, finalisation de plusieurs fonctions.
+
+	* suppressions de multiples bugs mineurs notamment le join (strtok etc)
+
+	* cs_cmds.c: reecriture du csmode sans strtok
+
+	* aide.c: ajout des options d'aide lors d'un /z aide cmd sans arg supplementaires
+
+	* admin_chan.c: purge des chanmembers lors d'un chan suspend
+
+	* suppression d'un bug probable qui occasionnait des del mysterieux
+
+	* ban.c: ajout de is_ban
+
+	* track.c: suppression d'un bug de track.c
+
+	* serveur.c: optimisations
+
+2003-05-02  kouak <kouak@kouak.org>
+
+	* WEB2CS: mise à jour
+
+	* libw2c.inc.php: Nouvelle version, updates majeures
+
+	* web2cs-commands.c: w2c_reg_user refait: on donne obligatoirement le pass (on n'envoi plus
+	de mail)
+
+2003-04-25  Progs <Progs@coderz.info>
+
+	* web2cs-commands.c: ajout de w2c_memos
+
+2003-04-??  Cesar <cesar@ircube.org>
+
+	* timers.c: suppression du bug de non purge lors d'un suspend (userlist)
+
+	* admin_user.c: ajout d'option de recherche dans le user match
+
+	* chaninfo.c: ajout d'une protection pour empecher la diffusion d'un chaninfo de salons s p
+
+	* fichiers.c: plus d'erreur checking ds les load
+
+	* structs.h: ajout du lastlogin
+
+	* chanopt.c: l'infoline passe en char *
+
+	* chanserv.c: changement de la prise en charge pour les waitaccess, desormais c'est un access
+	normal desactive
+
+	* nickserv.c: changement de la prise en charge des suspend, le dernier est desormais garde en
+	memoire (sauf nolog)
+
+	* main.c: changement de la presentation lors du lancement
+
+	* chanserv.c: la commande invite verifie si l'user est sur le salon
+
+	* moduser.c: possibilite de changer les options en une ligne dans moduser +flag-flag
+
+	* option pour faciliter l'utilisation 'ADDUSER MODUSER en indiquant %nick au lieu de l'usrname
+
+	* ban.c: changement de la prise en compte du temps des bans
+
+	* nettoyage de pas mal de ptit bugs vraiment mineurs
+
+	* serveur.c: nettoyage de la mebers liste lors du CHAN PART d'un chan
+
+	* ban.c: correction d'un bug dans le kickbanall
+
+	* serveur.c: reecriture du moteur socket IRC dans le cas delutilisation de webcs+++
+
+2003-04-10  Progs <Progs@coderz.info>
+
+	* memoserv.c: ajout d'une var "read" dans la struc memos qui permet de savoir les memos déjà lu
+
+2003-04-0? Cesar <cesar@ircube.org>
+
+	* serveur.c: ajout de RealCmd etc..
+
+	* main.c: rassemblement des prototypes et de cs_cmds[] dans main.c
+
+	* optimisations multiples
+
+	* divers.c: supression de la cmd copyright
+
+	* aide.c: ajout du listing des sous commandes dans AIDE
+
+	* nickserv.c: rassemblement de dropaccess et okaccess dans myaccess
+
+2003-04-07  Progs <Progs@coderz.info>
+
+	* web2cs-commands.c: ajout du w2c_chanopt
+
+	* nickserv.c: correction d'un bug sur recover (il checkait si les nicks étaient EXACTEMENT
+	(maj/min diff) pareil que l'username !)
+
+2003-04-06  Progs <Progs@coderz.info>
+
+	* chanserv.c: bug sur access corrigé (détecté par embryon, lors de l'usage d'un
+	access *[something] ça affichait tout)
+
+	* web2cs-commands.c: ajout du w2c_reg_user (w2c cmd REGISTER) et enlevage d'une faille dans
+	register_user (irc cmd REGISTER)
+
+2003-04-05  Cesar <cesar@ircube.org>
+
+	* optimisations diverses
+
+	* changement des acces chan leur level peut etre < 5 (reecriture du system de cmd  showcommands)
+
+	* nickserv.c: suppression d'un bug ds oubli
+
+	* structs.h: changement de cs.chan vers bot.pchan
+
+	* serveur.c: debug d'un parse_cmode ds m_eob
+
+	* aide.c: changement du system d'aide (plus convivial)
+
+2003-04-05  Progs <Progs@coderz.info>
+
+	* chanserv.c: ajout de dropaccess
+
+2003-03-2?  Cesar <cesar@ircube.org>
+
+	* compatibilite BSD
+
+	* outils.c: ajout ed GetPrefix GetChanPrefix, des GetOptions etc
+
+	* outils.c: retour de parv2msg
+
+	* serveur.c: optimisations du burst
+
+	* serveur.c: ajout des cmodes en flag + parsage
+
+	* serveur.c: ajout des umodes en flag + parsage
+
+	* nombreuses optimisations de memoires
+
+2003-03-22  kouak <kouak@kouak.org>
+
+	* web2cs-commands.c: mise des web2cs_cmds access, chaninfo, moduser et whoison ainsi que
+	quelques modifications de l'api et autres
+
+2003-03-22  Progs <Progs@coderz.info> & kouak <kouak@kouak.org>
+
+	* web2cs-engine.c: le moteur web2cs est enfin terminé et fonctionnel !
+
+2003-03-16  kouak <kouak@kouak.org>
+
+	* web2cs-engine.c: moteur web2cs presque fini (un tout petit pb a réglé) et commande login
+	fonctionnelle !
+
+2003-03-1?  Cesar <cesar@ircube.org>
+
+	* ajout de la transformation base64>IP (IP dans le whois)
+
+	* ban.c: ajout des args -from -minlevel -maxlevel pour clearbans + nettoyage de cette proc
+
+	* nickserv.c: ajout de do_login pour simplifier recover() & ns_login()
+
+	* admin_cmds.c: ajout de abad nick noreg <nick> cf plus bas
+
+	* ajout du NoReg pour les badnicks afin de permettre d'interdire seulement l'enregistrement
+	d'un username (et non de killer)
+
+	* structs.h: utilisation de la struct Link ds aNick
+
+	* serveur.c: m_account compile uniquement pr les nons N2K
+
+2003-03-15  Progs <Progs@coderz.info>
+
+	* nickserv.c: recover() renvoi vers ns_login() (moin de code répété) et parv[0] devient le nom
+	de la commande utilisée
+
+*** VERSION 1.1.4
+
+2003-03-12  Progs <Progs@coderz.info>
+
+	* bin/: création du rep bin/ avec dedan deux scripts: save (sauvegarde données) et crontab
+	(vérifi si Z a pas planté, le cas échéant il le relance). Petite documentation nomée README.
+
+	* main.c: meilleurs prise en charge du scoderz.pid qui ne servait à rien. (ne peut démarrer
+	qu'un seul scoderz à la foi, fichier supprimé au die et renouvelé au restart)
+
+	* admin_chan.c: dans whoison, indication du nombre d'users
+
+	* Makefile: ajout d'un petit system sur le Makefile permettant de demander de refaire make
+	config si sa version (défini par coder manuellement) est différente de celle du fichier config.h
+	(make config donne la valeur de sa version)
+
+2003-03-??  Cesar <cesar@ircube.org>
+
+	* flood.c: La verification du flood est effectuee avant tout traitement de exec_cmd desormais
+
+	* cs_cmds.c: changement du wallops en cswall pour la notification du flood
+
+	* mkpasswd.c: ajout de checkpass
+
+	* outils.c: ajout de GetUserOptions
+
+	* main.h: suppression de USE_CHANSERV et ajout de USE_NICKSERV
+
+	* outils.c: ajout de GetPrefix, GetChanPrefix, PerformLogin, show_notes qui rendent le CS plus
+	propre
+
+2003-03-08  Progs <Progs@coderz.info>
+
+	* serveur.c: correction bug dans m_nick: lorsqu'un BadNick se connectait, Z plantait.
+	Correction d'une autre petite erreur: Z killait quand CHANGE_NICK = 0 et ne killait pas dans le
+	cas inverse!
+
+2003-03-05  Progs <Progs@coderz.info>
+
+	* admin_cmds.c: correction petit bug sur GLOBAL MEMO qui fesait planter (erreur de la part de
+	cesar lors de la diffusion de son parv2msgn apparament)
+
+2003-03-02  Progs <Progs@coderz.info>
+
+	* vote.c: correction bug vote et visualisation du nb d'user qui a voté sur le nb d'user total
+	et pourcentage
+
+2003-02-2?  Cesar <cesar@ircube.org>
+
+	* meilleure gestion des strcat
+
+	* pas mal de nettoyage/optimisations, surtout dans les fonctions qui listent les salons
+	(whois/user info) qui les listent désormais tous
+
+	* serveur.c: Support du AsLL des derniers ircu
+
+	* outils.c: changement du fonctionnement de get_time & duration qui ne nécessite plus de
+	buffer temporaire
+
+	* chanserv.c: autoinvite que lorsqu'on est pas présent dans le salon
+
+2003-02-22  Progs <Progs@coderz.info>
+
+	* aide.c: suppression d'une loop dans aide et ajout d'une notice qui dit qu'une cmd est
+	desactivée ou non
+
+2003-02-21  Cesar <cesar@ircube.org>
+
+	* nickserv.c: protection contre les abus de register/kill
+
+	* chanserv.c: auto invite qd le chan est +k
+
+	* commitage par progs par erreur du patch pour cacher les admins l donc voila.. :p
+	(connerie c pas moi)
+
+2003-02-21  Progs <Progs@coderz.info>
+
+	* ajout des fichiers ./configure et ./config-sh pour le make config
+
+2003-02-20  Progs <Progs@coderz.info>
+
+	* del_info.c: debug du user del = quand il avait un chan, ça plantait
+
+2003-02-18  Progs <Progs@coderz.info>
+
+	* nickserv.c,vote.c: debug d'un bug du recover et sur le vote results
+
+2003-02-??  Cesar <cesar@ircube.org>
+
+	* ajout du scoderz.pid
+
+	* chanopt.c: ajout de l'autoinvite
+
+	* corrections de petit bugs de memoire mineurs
+
+	* suppression d'un nb assez consequent d'overflow potentiels idiots et nettoyage u code (cf cvs)
+
+	* ajout d'une option de compilation pour brider le register aux admins
+
+	* opdeop.c: grande optimisation de opall/deopall avec les link
+
+	* track.c: track version 2 ajoutee
+
+	* serveur.c: les deop manuels sont verifies pour proteger les acces > 400
+
+	* chanopt.c: le strictop est supporte
+
+	* serveur.c: m_mode reecrit
+
+	* timers.c: les users suspendus ne sont plus concernes par la purge
+
+	* serveur.c: suppression d'une erreur lors de l'enforce ban
+
+	* debug.c: changement de DEBUG
+
+	* serveur.c: Normalement la prise en charge des hubs multiples EST operationnelle
+
+2003-01-26  Progs <Progs@coderz.info>
+
+	* serveur.c: les ircops peuvent se faire deop par n'importe qui et les ircops +p peuvent etre
+	deop par les zadmins et les autres ircops
+
+2003-01-25  Progs <Progs@coderz.info>
+
+	* welcome.c: correctino d'un mini pb dans le add_welcome (pb de vars)
+
+	* serveur.c: dans le exec_cmd, empeche d'utiliser !memos ou /msg z memos uniquement si la sous
+	commande est send
+
+2003-01-21  Progs <Progs@coderz.info>
+
+	* memoserv.c: ajout du NOMEMO (en option user) pour ne pas recevoir de memos.
+
+2003-01-1?  Cesar <cesar@ircube.org>
+
+	* changements de certains includes / extern
+
+	* outils.c:suppression de parv2msg au profit de parv2msgn (suppression du buffer global)
+
+	* fichiers.c: optimisations de fichiers.c (yavait et ya encore du taff..)
+
+	* debug du lastseen / chan
+
+	* nombreuses relectures/optimisations/debug du au support des numerics etendues
+
+	* Mise en place n2k (long boulot résumé en une simple ligne)
+
+*** VERSION 1.1.3
+
+2003-01-08  Progs <Progs@coderz.info>
+
+	* nickserv.c: debug de hello (valeur incorrect pour add_chan (char != int))
+
+	* nickserv.c: Mise en place /z set access & version 11 fichiers de db
+
+2003-01-06  Progs <Progs@coderz.info>
+
+	* serveur.c: Correction exec_cmd pour masquer user newpass & set pass
+
+	* nickserv.c: Rajout d'un flag dans nickinfo qui définit si oui ou non un user peut utiliser
+	register
+
+	* nickserv.c: protection register, envoie du mot de passe par email, ajout d'un flag dans
+	nickinfo & dans userinfo, version 10 des fichiers de db
+
+	* del_info.c: debug del_chan & del_access & del_regnick
+
+2003-01-0?  Cesar <cesar@ircube.org>
+
+	* nickserv.c: debugage de newnick, renchan, oubli
+
+	* nickserv.c: regroupement des commandes de config users dans la nouvelle commande SET
+
+	* aide.c: changement de la gestion dessyntaxes, plus economes en cpu & en ram
+
+	* remaniement des fichiers
+
+	* nettoyage assez consequent, regroupement de commande, suppression de commandes inutiles,
+	changement de la conf
+
+	* add_info.c: correction d'un bug lors du add_chan (noops et nobans au lieu de noop et noban :/)
+
+2002-12-29  Progs <Progs@coderz.info> & Cesar <cesar@ircube.org>, main dans la main (pour une fois)
+
+	* ajout de flags pour les users (kill, protect, wantx, wantdrop, nopurge), chans (noops, nobans,
+	strictop, joined, locktopic, setwelcome, wentunreg) et access (op, voice, protect, suspend)
+
+*** VERSION 1.1.1
+
+2002-12-26  Progs <Progs@coderz.info>
+
+	* correction d'un bug dans les links de cesar
+
+	* fichiers.c: écriture du welcome dans UN SEUL FICHIER (n'est pas kwake) et ajout de user_motd
+	et admin_motd pour les mots envoyés aux admins et aux users lors de leur login (cmd ADMINMOTD)
+	et écrits dans welcome.db
+
+	* tous les fichiers d'aide et de syntax manquant ont été ajoutés
+
+2002-12-2?  Cesar <cesar@ircube.org>
+
+	* outils.c: maj de isvalidnick (integration a venir)  & de get_time
+
+	* ban.c: petit debug
+
+	* ban.c: optimisations memory leak
+
+	* admin_chan.c: debugage du addbadchan
+
+2002-12-24  Progs <Progs@coderz.info>
+
+	* petit system à cause duquel j'ai chier et qui va faire un truc très simple (vous allez voir:p)
+
+2002-12-23  Progs <Progs@coderz.info>
+
+	* nickserv.c: ajout du nopurge sur les usernames (et donc pas de suppression des chans)
+
+	* timers.c: ajout de check_chans() pour vérifier si ils ont des access, un owner ou que l'owner
+	a un lastseen trop gros.
+
+2002-12-22  Progs <Progs@coderz.info>
+
+	* serveur.c: debugage ds link (hub) de cesar et write des cmds lors d'un die ou restart (sinon
+	perdu, vu qu'on write pas à chq cmd:p)
+
+	* serveur.c: le loguage des modes salons fonctione convenablement (synchronisation entre
+	c->defmodes et les modes donnés lors d'un burst, autre trucs chiants à gérer comme les keys et
+	limits, etc)
+
+	* serveur.c: ne plus changer nick->crypt en <login>.<HIDDEN_HOST>
+
+2002-12-21  Progs <Progs@coderz.info>
+
+	* cs_cmds.c: correction de parse_cmode, de csjoin() et prise en charge des modes lors d'un link
+	(dans BURST)
+
+2002-12-1?  kouak <kouak@kouak.org>
+
+	* chanserv.c: Ajout des bans de kickbanall dans la banlist du bot
+
+	* del_info.c: Correction de del_join et del_access (les links c'est bien, mais faut que ca
+	marche hein !)
+
+	* welcome.c: Refonte COMPLETE de welcomeserv (kouak tout seul, tout content, tout fier !)
+
+2002-12-18  Progs <Progs@coderz.info>
+
+	* serveur.c: correction d'un bug qui arretait d'add_join lors de join #1,#2,.. lorsqu'on a
+	dépassé les 11 chans (pareil pour CREATE et PART)
+
+	* optimisations faites grace aux chaninfo->members et chaninfo->access
+
+	* structs.h: ajout de "aNick joininfo->nick" pour un access plus rapide à l'user qui a join.
+
+	* cs_cmds.c: ajout de csjoin(aChan *) pour joindre salon qui vient d'être cré
+	(chan->members = NULL)
+
+	* ajout de "aLink chaninfo->members" pour la liste des users (renvoi sur joininfo et non sur
+	nickinfo contrairement à ircu)
+
+2002-12-17  kouak <kouak@kouak.org>
+
+	* serveur.c: Lors d'un whois via scoderz (/whois Services.ircube.org pseudo), si le pseudo est != d'un pseudo des bots, envoie d'une raw rigolote
+
+2002-12-16  Progs <Progs@coderz.info>
+
+	* structs.h: remplacement de <int authed> par <aNick *n> dans userinfo et suppression de
+	getnickinfo
+
+	* del_info.c: conversion de del_access(char *nick, char *chan) en
+	del_access(anUser *user, aChan *chan)
+
+	* tests concluants après mise en place de links pour les access sur les chans. utilisation de ce
+	system pour tous les lieus où on appel les access.
+
+	* initialisation de la programmation avec les links (SLink pour accéder à des éléments plus
+	facilements).
+
+2002-12-15  Cesar <cesar@ircube.org>
+
+	* serveur.c: Debug (?) d'une boucle infinie dans m_server (plantage cet aprem)
+
+	* aide.c: ajout aide et syntax de ALIST
+
+2002-12-15  Progs <Progs@coderz.info>
+
+	* fichiers.c: utilisation du append_file pour addbadnick et addbadchan
+
+2002-12-14  Cesar <cesar@ircube.org>
+
+	* admin_user.c: changement de USER STATS et ajout de la purge des fichiers de salon
+
+	* serveur.c: premieres bribes de la nouvelle map qui supporte les arborescences complexes
+
+	* cs_register.c: suppresion du pb qui permettait de reg cs.chan
+
+2002-12-14  Progs <Progs@coderz.info>
+
+	* fichiers.c: ajout des commentaires dans la struct aConfTab (la syntax des options de
+	scoderz.conf)
+
+	* serveur.c: prise en charge du nouvel umode +x (ajout de l'option XMODE).
+
+2002-12-13  kouak <kouak@kouak.org>
+
+	* ajout de la commande checkpass
+
+2002-12-12  Progs <Progs@coderz.info>
+
+	* admin_cmds.c:correction d'un petit bug dans chlevel
+
+2002-12-11  Progs <Progs@coderz.info>
+
+	* admin_cmds.c: changement de "ASEND :message" en "GLOBAL MEMO :message" et changement de
+	"SEND :message" en "MEMO SEND :message"
+
+	* flood.c: la WALLOPS envoyée donnait la realhost
+
+	* ban.c: correctoin dans BAN: si HAVE_CRYPTHOST est actif, vérifier sur nick->crypt et plus sur
+	nick->host pour connaitre la victime.
+
+2002-12-10  Progs <Progs@coderz.info>
+
+	* chanserv.c: dans INVITE, l'user invité n'est pas invité si il est banni du salon (ça serait un
+	moyen ultime pour enculer l'monde :p)
+
+2002-12-09  Progs <Progs@coderz.info>
+
+	* serveur.c: lors d'un "MODE #chan +b" sur un user protect ban par un mec non admin
+
+2002-12-0?  Cesar <cesar@ircube.org>
+
+	* admin_user.c: ajout d'une commande USER LIST (-purge) pour lister (et purger) les fichiers
+	ds database/usr/ qui ne correspondent plus a des usernames (jespere que ca en vire pas trop ..)
+
+	* nettoyages des comments
+
+	* fichiers.c: suppression d'un pb de writechans
+
+	* serveur.c: reecriture du burst sans la struct burstinfo, plus economique!
+
+	* admin_user.c: desormais la date du dernier user-suspend est loguee et accessible au admin dans
+	le user info
+
+	* fichiers.c: ajout de append_file pour optimiser lecriture lors de chan/nick reg (n'ecrit plus
+	toute la liste)
+
+	* nickserv.c: suppression d'un bug lors du login qui provoquait des purges
+
+2002-12-07  Progs <Progs@coderz.info>
+
+	* vote.c: trie les résultats des votes (dans RESULTS et VOTE RESULTS) par resultats (du plus
+	grand au plus petit) : ct plus facile à dire qu'à faire !
+
+	* serveur.c: correction d'un bug qui fesait planter Z quand on tapait "/z : " ou "/privmsg z : "
+	(espace en premier char du msg)
+
+	* fichiers.c: ajout de fclose(fp) dans write_cmds et load_cmds ! quel oubli con qui nuit !
+
+	* outils.c: ajout de get_ip() et get_dns pour faire plaisir à sangot-n
+
+2002-12-05  Progs <Progs@coderz.info>
+
+	* serveur.c: correction du bug du m_join: ne supportait pas les multi joins (join
+	#chan1,#chan2,#chan3 ...) en cas d'autoop/autovoice ou autre trucs du style activés (mem) : Z ne
+	prenait pas en compte les join dans les chans après la ,
+
+	* nickserv.c: dans myaccess(), ajout des args -access (lister les infos sur chaques access avec
+	accessn) et -chan <chan> (mask de chans à chercher)
+
+	* vote.c: finalisation du vote
+
+2002-12-04  Progs <Progs@coderz.info>
+
+	* vote.c: ajout de vote.c, commande vote (sous=new,proposition,clore,results) et voter, write_vote et load_vote.
+
+*** VERSION 1.1.0
+
+2002-12-03  Progs <Progs@coderz.info>
+
+	* serveur.c: dans m_burst: lorsqu'un chan se fait niker car plus jeune que celui de l'autre
+	réseau, mise à chaques users du salon is_op=0 is_voice=0 car on sait qu'ils vont se faire de
+	toute façon deop et devoice si ils l'étaient pas déjà
+
+2002-12-02  Progs <Progs@coderz.info>
+
+	* nickserv.c: dans register et newnick, empeche de prendre un username qui comporte des chars
+	illégaux (usernames qui seraient tronqués ou refusés en tant que nick par l'ircd)
+
+	* nickserv.c: ajout du myprotect (nick->protect) (si activé: auto kill/svsnick en cas de prise
+	de l'username comme nick) et changement de la fonction de setkill: dit si on veut que ça svsnick
+	ou kill.
+
+2002-12-01  Progs <Progs@coderz.info>
+
+	* del_info.c: bug laissé par cesar: lorsque la struct nickinfo ou userinfo, à cause du system
+	(c) cesar qui met la nouvelle struct en premier, lors de la suppression du denier user ou du
+	dernier username, le prog plante
+
+	* serveur.c: prise en charge du changement d'host en login.HIDDEN_HOST si actif (doit aussi
+	l'etre sur l'ircd).
+
+2002-11-2?  Cesar <cesar@ircube.org>
+
+	* serveur.c: prise en charge du join 0 comme un partall
+
+	* timers.c: debug du kill global qui ne mettait pas a 0 l'auth
+
+	* chanserv.c: ajout de -flags pour la commande acces et changemetn des prop de getoption
+
+	* serveur.c: nettoyage de lautoop
+
+	* ban.c: correction d'un bug de la banlist
+
+	* del_info.c: optimisations des del_* et des linked listes
+
+	* chanserv.c: ajout d'une confirmation pour l'unreg
+
+	* admin_chan.c: ajout du support du suspsend  d'acces par chan
+
+2002-11-24  Progs <Progs@coderz.info>
+
+	* outils.c: correction d'un bug dans le putchan : si on mettait deux %s après la commande
+	utilisée le bot plante. putchan ne prend plus de valist (putchan(const char *buf))
+
+	* serveur.c: parsage des modes salons :
+	parse_cmode(aChan *chan, char *modes, char *limit, char	*key);
+	(reprit tu parse_umode (c) cesar).
+
+	* cs_cmds.c: Changement de csmode(char *chan, char *modes, ...); en
+	csmode(aChan *chan, char *modes, ...);
+
+	* serveur.c: écriture dans chan->mode lors de la reception de burst, de MODE ou envoi de MODE.
+
+	* admin_cmds.c: réunissage des commandes global amsg et anotice dans une commande GLOBAL avec
+	sous commandes: wall msg et cnotice.
+
+2002-11-23  cesar <cesar@ircube.org>
+
+	* ajout du support du spsend par chan
+
+	* add_info.c: reecriture, ajout d'outils d'alert, de nettoyage, et d'optimisations
+
+	* nickserv.c: correction d'un bug dans le newnick
+
+	* cs_cmds.c: changement de csntc, passage de la structure desormais
+
+	* chanserv.c: oubli dun ! dans le okaccess
+
+	* nombreuses optimisations au point de vue des loop inutiles un peu partout
+
+2002-11-23  Progs <Progs@coderz.info>
+
+	* admin_cmds.c: correction d'un bug sur le chcomname : changement du nom de la commande n°i! (et
+	i est la dernière commande, cad \0 (voir la déclaration de cs_cmds dans main.h)
+
+	* opdeop.c: correction d'un bug sur deop/voice/devoice où la var qui contenait les nicks non
+	connectés n'était pas initialisé (oubli)
+
+2002-11-21  Progs <Progs@coderz.info>
+
+	* ban.c: modification de getbanmask() pour la prise en charge du nouveau cryptage des ips qui
+	fait de l'host une non ip (ex: 192.F13D59C8) et cherche si l'host donnée est une ip crypté pour
+	bannir suivant la norme
+
+2002-11-21  kouak <kouak@kouak.org>
+
+	* ban.c: Correction d'un bug dans clearbans (manquait un ban = ban->next;)
+
+*** VERSION 1.0.4
+
+2002-11-18  Progs <Progs@coderz.info>
+
+	* serveur.c: prise en charge du nouveau cryptage des *ips* uniquement (garde que la première
+	partie: 192.168.0.45 devient 192.D1FBB30D)
+
+	* opdeop.c: correction de la faille du !op 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18... qui
+	envoyait plein de notices (au lieu de là qui en envoi une maximum) pour le op/deop/voice/devoice
+
+	* serveur.c: reopage automatique du robot lors d'un deop pdt un burst (reop en theorie
+	superflu, bien qu'utile si jamais des problèmes ses posent)
+
+2002-11-1?  Cesar <cesar@ircube.org>
+
+	* del_info.c: correction du bug qui fait ecrire la chan list avant le del_chan dans le unreg et
+	le check_account
+
+	* fichiers.c: le write_chans marche maintenant comme c'etait prevu
+
+	* serveur.c: optimisation du delnick lors d'un split
+
+	* serveur.c: parse_umode reecrit
+
+	* fichiers.c: changements de la db chan
+
+2002-11-16  Progs <Progs@coderz.info>
+
+	* nickserv.c: ajout du WaitAccess pour les users (user->wahead). Lors d'un adduser, l'access
+	s'ajoute à une liste d'attente de l'user qui doit confirmer ou rejeter l'access. Ce n'est pas
+	sauvegardé dans les fichiers
+
+	* admin_chan.c: ajout de CHAN NEWOWNER <nouvel owner> pour mettre un owner à un salon qui n'en a
+	pas (on est pas à l'abri sur bug sur Z :p)
+
+*** VERSION 1.0.3
+
+2002-11-11  Progs <Progs@coderz.info>
+
+	* serveur.c: correction du bug pour les hosts (crypt=NULL), du à un SETHOST de l'ircd vide
+	(j'pige pas pk il send ça)
+
+2002-11-??  Cesar <cesar@ircube.org>
+
+	* serveur.c: gros bug de memoire supprime dans m_nick
+
+	* ban.c: check_bans n'ecrit le fichier de ban que une fois pour le chan et non plus a chaque ban
+
+	* ns_register.c: nettoyage et supression d'un overflow dans ch_username (merci progs...)
+	(de rien)
+
+	* timers.c: correction du bug du purge chan et user del
+
+	* flood.c: wallops lors d'un flood sur le cs
+
+	* timers.c: debugage de la purge  optimisation
+
+	* admin_cmds.c: plus de writeall au die/restart
+
+	* timers.c: les admins ne sont plus concernes par la purge
+
+	* suppresion de deux commandes inutiles
+
+	* main.h: optimisation complete de main.h et de ses variables
+
+	* serveur.c: suppression d'une gors pb de cpu dans m_privmsg
+
+2002-11-08  Progs <Progs@coderz.info>
+
+	* fichiers.c: ajout du write_bans(aChan *chan) (j'ai pas pigé la syntax des param dans TODO:
+	char *chan, struct baninfo *banactuel)
+
+2002-11-06  Progs <Progs@coderz.info>
+
+	* chanopt.c: par pur hasard, j'ai découvert LE bug qui supprimait les salons
+	(strncpy(chan->chanurl[100], 200, ...);))
+
+2002-11-0?  Cesar <cesar@ircube.org>
+
+	* memoserv.c: ajout des ifdef MEMOSERV pour reellement proposer les memos/notes en option
+
+	* ptit pb de memoire repares
+
+	* ajout de const char
+
+	* fichiers.c: Opimisations majeures pour write_achan/user et les function() avec ajout de la
+	struct chan
+
+2002-11-01  Keeo
+
+	* admin_cmds.c: ajout de la commande global qui permet d'envoyer une notice à l'ensemble des
+	utilisateurs connectés
+
+	* admin_cmds.c: ajout des commandes anotice et amsg qui permettent d'envoyer une notice ou un
+	message sur l'ensemble des salons enregistrés
+
+*** VERSION 1.0.2
+
+2002-11-01  Progs <Progs@coderz.info>
+
+	* nickserv.c: ajout de newnick pour se changer son username
+
+	* moduser.c: dans moduser autoop/autovoice, si le mec s'auth moduser (par !autoop ou
+	!autovoice), si son nivo est trop petit, il é rejeté
+
+	* moduser.c: niveaux autorisés dans moduser level entre 5 et 449
+
+	* demande de mise de : devant les msgs de say, do, send et cswall (pour un disfonctionnement en theorie normal venant de l'ircd (/z fonctionne comme PRIVMSG)
+
+2002-10-31  Progs <Progs@coderz.info>
+
+	* serveur.c: correction d'un énorme bug ke cesar nous a foutu dans m_mode: il getnickinfo en
+	utilisant une num alors ke la fonction demande un nick ! (j'me demandais pk ça buggait :p)
+
+2002-10-29  Progs <Progs@coderz.info>
+
+	* structs.h: ajout d'une struct chaninfo dans la struct access (access->chan = access->c->chan)
+
+	* serveur.c: mise du whois au niveau 0
+
+	* chanopt.c: ajout de chanurl
+
+2002-10-28  Progs <Progs@coderz.info>
+
+	* serveur.c: correction d'un bug lors du parsage du sethost et du setident
+
+2002-10-??  Cesar <cesar@ircube.org>
+
+	* correctiosn et optimisations des fichiers les moins lu.. le mien est de lire le cvs web :)
+
+	* ptits bugs de UserNick
+
+	* suppression de mauvais malloc et ajout de free()
+
+	* changement de fct de char * en void, ca economise des buffers
+
+	* outils.c: reordonnage
+
+	* track.c: avancement du track
+
+*** VERSION 1.0.1
+
+2002-10-??  Cesar <cesar@ircube.org>
+
+	* chaninfo.c: debugage du motd ds le chaninfo
+
+	* suppresion de UserNick (memory leak: malloc sans free > progs est fou?:))
+
+	* admin_chan.c: ajout de chan join/part pour les CS Admins
+
+	* chanserv.c: debugage du kickban sur le CS
+
+	* main.h: nettoyage de main.h (FALSE/TRUE date() wsntc() etc)
+
+	* serveur.c: bug sur le /version
+
+	* main.h: reduction de servtab a 64 arrays
+
+	* main.c: ajout d'un free pour bottime
+
+	* nickserv.c: ajout d'une verif sur les badnick lors du reg d'un nick
+
+	* memoserv.c: ajout d'une protect sur le flood de memos, il y a desormais un nb max de memos
+	par envoyeurs et nono plus par receveur
+
+	* del_info.c: ajout de qq free ds del_info pour les pb de memoires
+
+2002-10-24  Progs <Progs@coderz.info>
+
+	* correction de bugs pour les levels (entre cmds chans et admin)
+
+	* nickserv.c: protection sur le drop
+
+	* chanserv.c: ajout de la commande renchan
+
+	* correction de bugs et ajout du motd
+
+2002-10-21  Progs <Progs@coderz.info>
+
+	* admin_cmds.c: system pour changer le nom du fichier d'aide et de syntax d'une cmd lors d'un
+	chcomname (change aussi "lastcmd" en "newcmd" dans le fichier)
+
+	* admin_cmds.c: ajout de la commande disable pour activer/desactiver une cmd
+
+	* nickserv.c: reprogrammation complète de recover: un non auth peut l'utilisé et ça
+	kill/svsnick l' users dont le pseudo est user->nick + l'user qui est auth dessus
+
+2002-10-20  Cesar <cesar@ircube.org>
+
+	* serveur.c: Debug dans le m_version
+
+	* cs_register.c: Ajout dune notice pour chan reg
+
+	* memoserv.c: petits changements dans memoserv
+
+	* suppresion des fuites de memoires
+
+2002-10-20  Progs <Progs@coderz.info>
+
+	* serveur.c: correction d'un bug lors d'un -I (pour le MODE)
+
+	* nickserv.c: ajout de la commande oubli (change le pass et l'envoi par mail)
+
+2002-10-19  Cesar <cesar@ircube.org>
+
+	* main.h: ajout de DEFRAISON
+
+	* ptit changements mineurs un peu partout
+
+	* cs_cmds.c: ajout de cskick
+
+	* main.h: Ajout d'un Define pour les hosts cryptees (activation/desactivation)
+
+2002-10-19  Progs <Progs@coderz.info>
+
+	* ban.c: ajout du nickban
+
+	* chanopt.c: ajout du chanopt bantype, et du load/write du bantype dans fichiers, et dit le
+	bantype dans chaninfo
+
+2002-10-17  Progs <Progs@coderz.info>
+
+	* outils.c: correction d'un pb de buffer dans get_time
+
+	* ban.c: lors d'un banlist, suppression des bans expirés (si non fait à cause d'un checkban
+	déplacé), et plus de souplesse pour clearbans (pas de banhead tout le temps)
+
+	* main.h:system de suppression des logs au bout d'un certain temps
+
+2002-10-15  Progs <Progs@coderz.info>
+
+	* suppression de tous les warnings
+
+2002-10-14  Progs <Progs@coderz.info>
+
+	* maintient de l'uptime lors d'un restart
+
+	* mise en place de plusieurs fichiers de logs (erreurs, parses, failed admin auth, chans, cmds)
+
+	* serveur.c: protection interne aux services pour les commandes.secure = 1.
+
+	* serveur.c: transformation de /msg %s en /s (pour la compatibilité à ircprogs)
+
+2002-10-13  Progs <Progs@coderz.info>
+	* mise en place d'un system cvs
+
+2002-10-??  Cesar <cesar@ircube.org>
+
+	* main.h: rationalisation des buffer pour les hosts, defini dynamiquement selon
+	HOSTLEN+USERLEN+NICKLEN
+
+	* main.h: ajout de USERLEN (ya plus que CHANLEN a mettre;))
+
+	* cs_cmds.c: changement ds topic() et cstopic, limitation des buffers a TOPICLEN et suppresion
+	de var transitoires
+
+	* admin_user.c: change de la commande admin user, options stats avec nombreuses sous options
+
+	* reecriture de coundots  rapide
+
+	* suppresion des derniers warnings (value computed not used)
+
+	* outils.c: rearrangement de outils.c nettoyages des fonctions
+
+	* del_info.c: suppression de 2 pbs de memoire
+
+	* cs_cmds.c: ajout de csmode() de cstopic() et de csmap()
+
+	* timers.c: changement des proc delimination de timers, plus econome en cpu (var intermediaire)
+
+	* ban.c: changement du banmask
+
+	* serveur.c: ajout de .used pour compter le nb dutilisation des commandes
+
+	* ban.c: renommage de bancmp() en match()
+
+	* proto.h: nettoages de proto.h vieilles proc
+
+2002-10-07  Progs <progs@ir3.org>
+
+	* serveur.c: correction d'un bug dans le m_privmsg et exec_cmd : check_flood était executé
+	dans les deux, donc deux fois
+
+	* outils.c: mise de l'heure donnée par get_time en français
+
+	* nickserv.c: correction d'un p'tit bug sur l'ignore: lors d'un check ignore, si le mec é ignoré
+	mé ke le temps d'ignore est expiré, on unignore
+
+	* moduser.c:ajout des commande "protect" "autoop" et "autovoice" pour se paramétrer soit même
+	sur un salon
+
+2002-10-06  Progs <progs@ir3.org>
+
+	* ban.c: permet l'unban de plusieurs bans en même temps avec bancmp
+
+	* mkpasswd.c: deleted cryptkey
+
+	* ban.c: envoi un MODE -b dans le unban (quel regretable oubli)
+
+2002-10-??  Cesar <Cesar@ircube.org>
+
+	* nickserv.c: ajout du maxlastseen dynamique
+
+	* serveur.c: ajout du changenick dynamique+debug du kill (ghost)+pb ds chkkill
+
+2002-10-??  Progs <progs@ir3.org>
+
+	* admin_chan.c: ajout d'une description (optionnel) pour l'adminreg
+
+	* flood.c: ajout de qq options de flood.c (locale)
+
+	* admin_cmds.c: ajout de restart (et ça marche cesar, j'veux mon bonbon)
+
+	* serveur.c: modification du cryptage: la clef est la première partie de l'host (si
+	host=="irc.inter-system.net", alors key="irc")
+
+	* chanserv.c: ajout de check_account et correction d'un gros bug dans le unreg (il del le
+	compte et vérifi APRES les comptes ke l'user avait...d'après une source ki existe pas !)
+
+2002-09-??  kouak <kouak@kouak.org>
+
+	* nickserv.c: Ajout de la commande deauth
+
+	* outils.c: Ajout de la fonction getgloballevel qui renvoie le level de qqun en fonction
+	d'un aNick
+
+	* outils.c: Ajout de la fonction strip_lastword et utilisation dans le chaninfo et le m_privmsg
+
+	* nickserv.c: Correction d'un bug dans le ns_drop
+
+	* ban.c: Ajout des bantypes (commande getbanmask)
+
+	* nickserv.c: Ajout du check flood et du recover
+
+2002-09-??  Progs <progs@ir3.org>
+
+	* correction de kelkes petits pbs enjendrés par une programmation pas très structuré de cesar
+
+	* serveur.c: support du /msg z@services.inter-system.net (va en avoir besoin avec la dernière
+	version de l'ircd)
+
+	* serveur.c: correction d'un bug lors d'un -b, c pas bien de vouloir racourcir à ce point
+
+	* chanserv.c: suppresion d'un gros bug pour le defmodes, les '-' sont desormais interdits
+
+	* nickserv.c: ajout de recover
+
+	* serveur.c: suppression d'un pb sur les badnick
+
+	* nickserv.c: changement du logage
+
+	* structs.h: ajout de la var away dans nickinfo, et parsage du away, ainsi que envoi des memos
+	que si away == 0
+
+2002-09-??  Cesar <Cesar@ircube.org>
+
+	* serveur.c: les admins peuvent desormais moduser a 500+
+
+	* chanserv.c: les admins peuvent desormais moduser a 500+
+
+	* fichiers.c: optimisation (buffers inutiles)
+
+	* serveur.c: ajout d'un outil de stats de burst
+
+	* outils.c,divers.c,serveur.c: nettoyage
+
+	* outils.c: debugage majeur du un pb de srpintf() avec les %*
+
+	* chanserv.c: lors du deftopic le topic actuel est maintenant enregistre (pr le chaninfo)
+
+	* welcome.c: le welcome n'est plus envoye si vide
+
+	* Nombreuses ameliorations au niveau des buffers/gestion de la memoire (en test, a users
+	constant 1%de ram > 0.4%)
+
+	* ban.c: debuggage du kickban usr une host non resolue
+
+	* ban.c: suppresion dun bug du clearbans (boucle folle)
+
+	* serveur.c: suppression de pb avec les strCASEcmp avec les num >> strcmp
+
+	* chanopt.c: debugage du autoop/voice
+
+	* chanserv.c: reformatage du showcommands (encore)
+
+	* showcommands.c: reformatage du showcommands (encore)
+
+	* admin_user.c: ajout dune commande pour monitirer lutilisation de la memoire
+
+	* serveur.c: reformatage
+
+	* ban.c: ajout de lexpiration des bans et debugage du clearbans
+
+	* chaninfo.c: reformatage du chaninfo
+
+	* chanserv.c: creation de la alist
+
+	* ban.c: ajout d une recherche par mask ds le banlist
+
+	* serveur.c: ajout dun reop auto si le bot est deope
+
+	* mhmhm1ere release donc forcement decouverte de pas mal de bugs corriges.. :)
+
+	* chanserv.c: debug du deluser si owner
+
+	* chanserv.c: Ajoute de defmodes deftopic welcome description en alias du chanopt, debugage du
+	defmodes pour +lk, +obv et +O
+
+2002-09-20  Progs <progs@headfucking.net>
+
+	* serveur.c: correction d'un bug qui ne réenvoyait pas les chans après une deconnexion du
+	serveur
+
+2002-09-??  Cesar <Cesar@ircube.org>
+
+	* serveur.c: Mis a jour du lastseen lors du join d'un chan (ca coute rien)
+
+	* serveur.c: Indentation corrigee
+
+	* add_info.c: Nettoyage du add_join ds addinfo.c
+
+	* serveur.c: Ajoute de la protection complete lors d'un /kick normal (deop si pa sle s droits)
+
+	* outils.c: debug du get_time()
+
+	* outils.c: suppression du bug majeur du putserv (buffer trop court  ne se vidait pas)
+
+	* admin_cmds.c: ajout de chmail et suspendme  suspension globale des users
+
+	* chanserv.c: prise en charge du noops
+
+	* admin_cmds.c: ajout d'une raison ds le die
+
+	* outils.c: parvmsg reecrite (sans var globale)
+
+	* serveur.c: nettoyage et optimisation du m_privmsg
+
+	* admin_chan.c: support du chan suspend (suspendlist etc)
+
+	* serveur.c: envoie de l'infoline
+
+	* ban.c: ajout dune verification sur la presence d'un ban avant de l'ajouter
+
+	* structs.h: changemetn des structure bot
+
+	* chanserv.c: ajout de toutes les fct de base et avances du cs  leur optimisation
+
+	* serveur.c: parsage du ACCOUNT
+
+	* nickserv.c: les failed login sur les username admin provoque l'envoit d'une notice aux admin
+	logués
+
+	* serveur.c: si le setkill est actif, le changement de nick marche maintenant correctement
+	et la valeur est definissable ds main.h
+
+	* modifications/optimisation de bcp de fct (a peu pres toutes)
+
+	* chanserv.c: bug du deluser par les csa supprimer
+
+	* ban.c: ajout du ban tps pour le kickban
+
+	* ban.c: debgugage du ban temps
+
+	* serveur.c: ajout de l'enforce des bans on join
+
+	* chanserv.c: protection des opers/csa au kick/deop/enforce
+
+	* chanserv.c: ajout de noban noops locktopic
+
+	* serveur.c: Ajout du parsage de TOPIC et KILL
+
+	* Optimisation de tout le code en particulier, outils.c (break et return) serveur.c tellement
+	de taf.. et add_info
+
+	* opdeop.c: Ajout de nombreux commandes:
+	opall/deopall/op/deop/kick/kickban/verify/chanopt/moduser/chan */user */info/rdef*
+
+	* Suppresion de qq dizaine d'overflow
+
+	* main.h: Ajout DE NICKLEN et TOPICLEN
+
+	* structs.h: Ajoute la struct baninfo
+
+	* CHANGEMENT UNIQUE MAIS MAJEUR (toutes les modifs ne sont donc pas listees) passage a UN bot.
+
+2002-08-26  Progs <progs@headfucking.net>
+
+	* serveur.c: suppression du killinfo quand un user change son nick ou qu'il quit
+
+2002-08-25  Progs <progs@headfucking.net>
+
+	* nickserv.c: ajout des functions add_badnick, del_badnick, load_badnicks et write_badnicks
+
+	* outils.c: ajout des functions IsBadNick(char *) et getbadnick(char *)
+
+	* structs.h: ajout des commandes add_badnick, del_badnick et list_badnicks, et ajout de la
+	struct badnicks
+
+	* nickserv.c: l'auto kill est crée
+
+	* serveur.c: m_nick envoi une notice aux users qui prennent un nick reg, et ajout d'un param
+	dans la conf (KILLNICK) pour l'interval de kill
+
+	* structs.h: ajout de la struct killinfo, et functions add_killinfo and del_killinfo
+
+	* serveur.c: ajout du parsage de m_sethost et m_setident pour changer l'host et l'ident si
+	l'user utilise SETHOST ou SETIDENT
+
+	* serveur.c: ajout du parsage m_away pour mettre un user away
+
+	* serveur.c: ajout de la commande away (pas de cmd deauth)
+
+	* fichiers.c: ajout des fonctions load_welcome et write_welcome
+
+	* serveur.c: envoi le welcome si setwelcome et welcome != NULL
+
+	* welcome.c: ajout des cmds set_welcome et new_welcome
+
+	* welcome.c: ajout des cmds welcome_privmsg et see_welcome
+
+2002-08-23  Progs <progs@headfucking.net>
+
+	* welcome.c: ajout des var welcome, setwelcome et priv_welcome.
+
+2002-08-22  Progs <progs@headfucking.net>
+
+	* welcome.c: ajout du welcomeserv
+
+	* admin_cmds.c: les badchans sont vérifiés maintenants comme des bans, avec des wildcards
+
+	* admin_cmds.c: correction d'un bug: avec adminlvl, addadmin et deladmin, il envoi un memo to
+	sender->nick et pas admin->nick.
+
+2002-08-21  Progs <progs@headfucking.net>
+
+	* add_info.c: ajout de base64 dans la struct nickinfo, et dans add_nickinfo.
+
+2002-08-20  Progs <progs@headfucking.net>
+
+	* admin_cmds.c: ajout des commandes deladmin et adminlvl pour remettre un user au niveau 1 ou
+	modifier le niveau d'un admin entre 2 et 4
+
+	* admin_cmds.c: ajout de la commande addadmin sur nickserv pour faire d'un user admin (avec le
+	niveau de user->level)
+
+	* chanserv.c: ajout de la commande access sur chanserv et reprise de quelques fonctions
+	(bancmp.c)
+
+	* nickserv.c: ajout de la commande hello sur nickserv pôur reg l'owner
+
+	* chanserv.c: ajout de load_chans(). Yeah ! ChanServ est opérationnel (bien que pauvre) !
+	(gestion par files et structs)
+
+	* serveur.c: maintenant les access sont vérifiés: si cmd.level <= 4, vérifier avec user->level,
+	sinon si cmd.level >= 5, vérifier avec user->access->level (fonction ChanCheck)
+
+	* database.c: ajout de write_chanlist(),write_achan(), write_chans() et correction d'un bug
+	lors d'un write_chans()
+
+	* chanserv.c: ajout de la commande unreg
+
+	* fichiers.c: écriture et ouverture des fichiers
+
+	* del_info.c: ajout de del_access et del_chan (pour structs)
+
+	* add_info.c: ajout de add_access et add_chan (pour structs)
+
+	* struct.h: ajout de la struct anUser->access struct pour les access salons
+
+	* struct.h: ajout de la struct chaninfo
+
+	* serveur.c: ajout d'une replique lors d'un WHOIS
+
+	* fichiers.c: ajout d'un paramètre dans la conf (CHAR) pour les commandes salons
+
+	* serveur.c: le cs lis les commandes sur les salons
+
+	* chanserv.c: ajout de la commande register_chan
+
+	* chanserv.c: ajout du IsBadChan (ce n'est pas un exploi)
+
+	* admin_cmds.c: ajout du list_badchans
+
+	* admin_cmds.c: ajout de del_badchan (cmd), del_abadchan (pour la struct) et getbadchan
+
+	* add_info.c: ajout de add_abadchan (pour la struct, pas la commande) et load_badchans
+
+	* fichiers.c: ajout de addbadchan, write_badchans et check_chan
+
+	* structs.h: ajout de la struct struct badchans
+
+	* chanserv.c: ajout de chanserv
+
+2002-08-19  Progs <progs@headfucking.net>
+
+	* nickserv.c: ajout de la commande newpass sur nickserv et d'une protection dans le msg_chan
+	(pour les pass)
+
+	* serveur.c: le parsage pour le cs supporte les levels + syntax + secure
+
+	* README: création du fichier
+
+	* serveur.c: utilisation des bursts pour joindre le msg_chan
+
+	* aide/: création des fichiers d'aide et de syntax
+
+	* serveur.c: dans le parsage des commandes ns, sans la cmd register, les commandes sécurisés
+	retournent le nom de l'username d'un user (pour login maintenant, et pour d'autres après...)
+
+	* aide.c: ajout des aides commandes et fonction qui retourne la syntax d'une commande
+
+	* serveur.c: ajout de needarg dans les structs des commandes (nombre d'arg requis)
+
+	* serveur.c: ajout du burst et map infos, et la commande map
+
+2002-08-18  Progs <progs@headfucking.net>
+
+	* admin_cmds.c: ajout des commandes admin
+
+	* fichiers.c: ajout d'un paramètre dans la conf (CHANHELP) pour le salon d'aide
+
+	* struct.h: ajout des typedef pour les structs nickinfo memos et userinfo
+
+	* showcommands.c: classage des commandes par nom, suppression du code superflu
+
+2002-08-06  Progs <progs@headfucking.net>
+
+	* structs.h: ajout des structures chan & memo
+
+	* memoserv.c: ajout de memoserv
+
+2002-07-2?  Progs <progs@headfucking.net>
+
+	* serveur.c: ajout des commandes de parsage
+
+	* structs.h: ajout des structures nicks & users & commandes
+
+	* nickserv.c: Ajout de nickserv
+
+2002-07-2?  Progs <progs@headfucking.net>
+
+	* Début des services, avec rien du tout.

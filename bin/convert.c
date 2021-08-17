@@ -1,5 +1,5 @@
 /* bin/convert.c : convert mIRC color codes to html tag
- * Copyright (C) 2002-2004 Inter System (Cesar@Inter-System.Net)
+ * Copyright (C) 2002-2007 David Cortier <Cesar@ircube.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,13 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: convert.c,v 1.1.1.1 2004/04/17 01:07:45 bugs Exp $
+ * $Id: convert.c,v 1.3 2007/03/15 13:41:54 romexzf Exp $
  */
 
 #include <stdio.h>
 #include <stdlib.h>
-
-#define HAVEDEBUG
+#include <string.h>
+#include <stdarg.h>
+#include <ctype.h>
+//#define HAVEDEBUG
 
 #ifdef HAVEDEBUG
 #   define DEBUGF(x) pDebug x
@@ -38,15 +40,11 @@ static inline int pDebug(const char *fmt, ...)
     return 0;
 }
 
-/*
- * TODO: Find better html color, more accurate ones
- */
-
-static char *GetHtml(const short ctrl)
+static const char *GetHtml(const short ctrl)
 {
-	static const char *html[16] = { "white", "black", "navy", "green", "red",
-		"maroon", "purple", "olive", "yellow", "lime", "aqua", "fuschia",
-		"blue", "teal", "gray", "silver" };
+	static const char *html[16] = { "FFFFFF", "000000", "00007F", "009300", "FF0000",
+		"7F0000", "9C009C", "FC7F00", "FFFF00", "00FC00", "009393", "00FFFF",
+		"0000FC", "FF00FF", "7F7F7F", "D2D2D2" };
 
 	DEBUGF(("GetHtml: color #%d -> [%s]\n", ctrl, html[ctrl&15]));
 	return html[ctrl&15];
@@ -62,7 +60,6 @@ static inline int AddToBuf(char **buf, const char *add, const int size)
 
 /*
  * TODO: protect from buffer overflow
- * TODO: support or at least drop background color
  */
 
 char *ConvertToHtml(const char *input)
@@ -131,11 +128,12 @@ char *ConvertToHtml(const char *input)
 		{
 			/* if end of color area or change of color in a color area,
 			 * we need to cancel old area! */
-			if(IsColor()) AddToBuf(&out, "</font>", 7);
+			if(IsColor()) AddToBuf(&out, /*"</font>"*/"</span>", 7);
 
-			if(!isdigit(p[1])) ClrColor(); /* next char isn't a digit, end of color !*/
+			if(!isdigit((unsigned char) p[1])) ClrColor(); /* next char isn't a digit, end of color !*/
 			else
 			{
+#if 0
 				/* Ok, try to grap next two char to extract color number..*/
 				char *endptr = NULL;
 				char tmp[3] = { p[1], p[2], 0};
@@ -145,10 +143,42 @@ char *ConvertToHtml(const char *input)
 				{
 					/* convert it to html tag */
 					DEBUGF(("color detected %i | %i\n", color, color & 15));
-					out += sprintf(out, "<font color=%s>", GetHtml(color));
+					out += sprintf(out, "<font color='#%s'>", GetHtml(color));
 					/* jump .. (don't forget normal loop will drop one char too)*/
 					p += endptr - &tmp[0];
 				}
+#endif
+
+				/* Ok, try to grap next two char to extract color number..*/
+				char *endptr = NULL;
+				char tmp[3] = { p[1], p[2], 0};
+				short color = (short) strtol(tmp, &endptr, 10);
+
+				if(color >= 0 && endptr != &tmp[0]) /* valid color.. */
+				{
+					/* convert it to html tag */
+					DEBUGF(("color detected %i | %i\n", color, color & 15));
+
+					out += sprintf(out, "<span style='color:#%s", GetHtml(color));
+					/* jump .. (don't forget normal loop will drop one char too)*/
+					p += endptr - &tmp[0];
+				}
+				if(p[1] == ',' && isdigit((unsigned char) p[2]))
+				{
+					++p;
+					endptr = NULL;
+					tmp[0] = p[1], tmp[1] = p[2];
+					color = (short) strtol(tmp, &endptr, 10);
+
+					if(color >= 0 && endptr != &tmp[0]) /* valid color.. */
+					{
+						/* convert it to html tag */
+						out += sprintf(out, ";background-color:#%s", GetHtml(color));
+						/* jump .. (don't forget normal loop will drop one char too)*/
+						p += endptr - &tmp[0];
+					}
+				}
+				AddToBuf(&out, "'>", 2);
 				SetColor();
 			}
 
@@ -157,8 +187,12 @@ char *ConvertToHtml(const char *input)
 		{
 			if(IsBold()) AddToBuf(&out, "</b>", 4);
 			if(IsUnder()) AddToBuf(&out, "</u>", 4);
-			if(IsColor()) AddToBuf(&out, "</font>", 7);
+			if(IsColor()) AddToBuf(&out, /*"</font>"*/"</span>", 7);
 			convert.flag = 0;
+		}
+		else if(*p == '\n')
+		{
+			AddToBuf(&out, "<br />", 6);
 		}
 		else *out++ = *p; /* copy standard char */
 
@@ -168,7 +202,16 @@ char *ConvertToHtml(const char *input)
 	/* finish all pending tag.. */
 	if(IsBold()) AddToBuf(&out, "</b>", 4);
 	if(IsUnder()) AddToBuf(&out, "</u>", 4);
-	if(IsColor()) AddToBuf(&out, "</font>", 7);
+	if(IsColor()) AddToBuf(&out, /*"</font>"*/"</span>", 7);
 
 	return buf;
+}
+
+int main(void)
+{
+	char buf[1024];
+
+	while(fgets(buf, sizeof buf, stdin))
+        puts(ConvertToHtml(buf));
+	return 0;
 }

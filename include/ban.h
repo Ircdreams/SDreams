@@ -1,10 +1,12 @@
 /* include/ban.h
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2008 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: ban.h,v 1.5 2004/11/08 14:51:18 bugs Exp $
+ * $Id: ban.h,v 1.4 2008/01/04 13:21:33 romexzf Exp $
  */
 
 #ifndef HAVEINC_ban
@@ -33,6 +35,9 @@ extern int unban(aNick *, aChan *, int, char **);
 extern int unbanme(aNick *, aChan *, int, char **);
 extern char *getbanmask(aNick *, int);
 extern aBan *is_ban(aNick *, aChan *, aBan *);
-extern char *GetBanType(aChan *);
+extern const char *GetBanType(aChan *);
 
+
+extern int ipmask_check(const struct irc_in_addr *, const struct irc_in_addr *, unsigned char );
+extern int ipmask_parse(const char *, struct irc_in_addr *, unsigned char *);
 #endif /*HAVEINC_ban*/

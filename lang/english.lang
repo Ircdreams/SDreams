@@ -11,14 +11,14 @@
 10 This nickname is owned by someone else.
 11 This email is not valid.
 12 There is already an account using this email.
-13 Warning : You are now using a forbidden nickname !
+13 Warning: You are now using a forbidden nickname!
 14 You have registered username %s with password %s and email %s.
 15 Your password as just been sent to %s.
 16 Incorrect password for %s.
 17 Password accepted for %s, you can now manage your channels, your memos and your account.
 18 You are now authed as Admin level %d.
 19 Password can't be shorter than 7 chars.
-20 Message of the day : %s
+20 Message of the day: %s
 21  Access to %s
 22  Access proposals to %s
 23  No access.
@@ -33,11 +33,11 @@
 32 %s just tryed to log in with your account with the correct password. Use '%s PASS' to change it.
 33 Change done.
 34 Unknown option: %s
-35 Warning : Nickname %s is registered, if it's yours, please log in via : /%s %s %s <your password>
+35 Warning: Nickname %s is registered, if it's yours, please log in via: /%s %s %s <your password>
 36 Nickname %s is now available.
 37  Last login %s ago. (%s)
 38 Available languages: (first is default one)
-39 I will now send my replies in english !
+39 I will now send my replies in english!
 40 %s is not an available language.
 41 This account will be destroyed unless you log in within the next %s.
 42 You must be op in %s to register it.
@@ -45,7 +45,7 @@
 44 Channel %s has been unregistered.
 45 You are already the owner of %s.
 46 Channel description can't be shorter than 12 chars.
-47 You can't unregister a channel unless you are its owner !
+47 You can't unregister a channel unless you are its owner!
 48 This level is not valid.
 49 %s is not in %s.
 50 Level must be lower than yours.
@@ -73,11 +73,11 @@
 72 Changemodeslevel on %s is now %d
 73 Bantime on %s is now %lu seconds (%s)
 74 Default ban type on %s is now: %s. (%d)
-75 Autolimit is enabled on %s (Min: %d Inc: %d).
+75 Autolimit is enabled on %s (Min: %u Inc: %u).
 76 Removing performed for %s.
 77 %s is not authed.
 78 %s's level is now %d on %s.
-79 %s's infoline is now : %s
+79 %s's infoline is now: %s
 80 List is empty.
 81 Incorrect duration, valid format is %%<XjXhXm> X is the number of corresponding units.
 82 Banlevel is %d on %s.
@@ -91,8 +91,8 @@
 90 Default topic   : %s
 91 Motd            : %s
 92 Chan URL        : %s
-93 Banlevel        : %3d    Bantype       : %s
-94 ChModesLevel    : %3d    Bantime       : %s
+93 Banlevel        : %d    Bantype       : %s
+94 ChModesLevel    : %d    Bantime       : %s
 95 Welcome         : %s
 96 Actual topic    : %s
 97 Actual modes    : %s
@@ -139,13 +139,13 @@
 138 Username: %s Level: %d
 139 Last seen: %s
 140 Last seen: currently on channel
-141 A total of %d memo%s (Type /%s %s ERASE ALL to delete them)
-142 A total of %d memo%s.
+141 A total of %d memos (Type /%s %s ERASE ALL to delete them)
+142 A total of %d memos.
 143 End of memo n°%d (Type /%s %s ERASE %d to delete it)
 144 You don't have any memo.
 145 You don't have any new memo.
 146 You don't have a memo n°%d.
-147 All your %d memos have been deleted.
+147 %d memos have been deleted.
 148 Your memo n°%d has been deleted.
 149 You can't send memo to yourself.
 150 %s doesn't accept any memo.
@@ -163,7 +163,7 @@
 162 Services are Up for %s.
 163 Help about command %s >> %s (%s Level %d)
 164 Help about command %s (%s Level %d)
-165 Please DO NOT flood me ! You are now ignored.
+165 Please DO NOT flood me! You are now ignored.
 166 [%d/%d] Too many matches found, please precise your query.
 167 Sunday
 168 Monday
@@ -184,3 +184,5 @@
 183 Manager being away for too long, this channel will be purged on %s, contact an administrator
 184 Username %s WAS suspended by %s
 185  Can't register a channel until %s.
+186 You just log out from username %s.
+187 Welcome on CoderZ Services, you can get commands' listing by typing /%s %s

@@ -1,10 +1,12 @@
 /* src/match.c - Vérification de deux masks
- * Copyright (C) 2004 ircdreams.org
+ * Copyright (C) 2002-2005 Inter System
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * contact: Progs@Inter-System.Net
+ *          Cesar@Inter-System.Net
+ *          kouak@kouak.org
+ * site web: http://coderz.inter-system.net
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * Services pour serveur IRC. Supporté sur IrcProgs et IrCoderZ
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: match.c,v 1.5 2005/05/02 11:12:52 bugs Exp $
+ * $Id: match.c,v 1.8 2005/04/20 23:19:20 romexzf Exp $
  */
 
 #include <ctype.h>
@@ -144,7 +146,7 @@ int match(const char *mask, const char *string)
         if (*m == '?' || *m == '*')
           ch = *m++;
       default:
-	if (tolower((unsigned char) *s) != tolower((unsigned char) ch))
+        if (tolower((unsigned char) *s) != tolower((unsigned char) ch))
           return 1;
       case '?':
         if (!*s++)
@@ -191,7 +193,7 @@ break_while:
         if (*m == '?' || *m == '*')
           ch = *m++;
       default:
-	if (tolower((unsigned char) *s) != tolower((unsigned char) ch))
+        if (tolower((unsigned char) *s) != tolower((unsigned char) ch))
         {
 		  /* If we've run out of string, give up */
 		  if (!*bs)

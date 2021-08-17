@@ -1,10 +1,12 @@
 /* include/chanopt.h
- * Copyright (C) 2004 ircdreams.org
+ * Copyright (C) 2002-2003 Inter System
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * contact: Progs@Inter-System.Net
+ *          Cesar@Inter-System.Net
+ *          kouak@kouak.org
+ * site web: http://coderz.inter-system.net
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * Services pour serveur IRC. Supporté sur IrcProgs et IrCoderZ
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: chanopt.h,v 1.4 2005/06/01 17:20:10 bugs Exp $
+ * $Id: chanopt.h,v 1.1 2003/12/12 17:44:58 romexzf Exp $
  */
 
 #ifndef HAVEINC_chanopt
@@ -33,7 +35,7 @@ extern int noops(aNick *, aChan *, int, char **);
 extern int activwelcome(aNick *, aChan *, int, char **);
 extern int deftopic(aNick *, aChan *, int, char **);
 extern int defmodes(aNick *, aChan *, int, char **);
-extern int theme(aNick *, aChan *, int, char **);
+extern int description(aNick *, aChan *, int, char **);
 extern int csetwelcome(aNick *, aChan *, int, char **);
 extern int banlevel(aNick *, aChan *, int, char **);
 extern int bantype(aNick *, aChan *, int, char **);

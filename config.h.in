@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Defined if admins can use REGISTER to record usernames */
+#undef ADMINREG
+
 /* prefix */
 #undef BINDIR
 
@@ -14,6 +17,9 @@
 
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
+
+/* Defined if hostname are crypted */
+#undef HAVE_CRYPTHOST
 
 /* Define to 1 if you have the <ctype.h> header file. */
 #undef HAVE_CTYPE_H
@@ -45,6 +51,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Defined if ipv6 support is enabled */
+#undef HAVE_IPV6
+
 /* Define to 1 if you have the `isascii' function. */
 #undef HAVE_ISASCII
 
@@ -64,15 +73,19 @@
 /* Define to 1 if you have the `memset' function. */
 #undef HAVE_MEMSET
 
-/* Define to 1 if you have the <mysql.h> header file. */
-#undef HAVE_MYSQL_H
-
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #undef HAVE_NETINET_IN_H
+
+/* use of oplevels */
+#undef HAVE_OPLEVELS
 
 /* Define to 1 if your system has a GNU libc compatible `realloc' function,
    and to 0 otherwise. */
 #undef HAVE_REALLOC
+
+/* Defined if ommands which requires private information are typed only in
+   form /<ROBOT> */
+#undef HAVE_SECURE
 
 /* Define to 1 if you have the `select' function. */
 #undef HAVE_SELECT
@@ -131,6 +144,9 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
 
+/* Defined if tracks are enabled */
+#undef HAVE_TRACK
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
@@ -139,6 +155,9 @@
 
 /* Define to 1 if you have the <vfork.h> header file. */
 #undef HAVE_VFORK_H
+
+/* Defined if votes module is enabled */
+#undef HAVE_VOTE
 
 /* Define to 1 if you have the `vprintf' function. */
 #undef HAVE_VPRINTF
@@ -164,8 +183,20 @@
 /* Parselog file's name */
 #undef LOG_PARSES
 
+/* Maximum memo numbers which one can send to the same person */
+#undef MAXMEMOS
+
+/* Defined if there are crypt() pass in database */
+#undef MD5TRANSITION
+
 /* Maximum length of memos */
 #undef MEMOLEN
+
+/* "Has mysql/mysql.h" */
+#undef MYSQL_HEADER_PREFIX
+
+/* Defined if ADMIN command show all admins */
+#undef OLDADMINLIST
 
 /* Name of package */
 #undef PACKAGE
@@ -185,6 +216,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* use of ircu2.10.12 */
+#undef PUREIRCU
+
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
 
@@ -196,6 +230,12 @@
 
 /* Define to the type of arg 5 for `select'. */
 #undef SELECT_TYPE_ARG5
+
+/* "Use sql logs" */
+#undef SLQLLOG
+
+/* Defined if sql logs are enabled */
+#undef SQLLOG
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
@@ -209,8 +249,20 @@
 /* System */
 #undef USEBSD
 
+/* Defined if memoserv module is enabled */
+#undef USE_MEMOSERV
+
+/* Defined if nickserv module is enabled */
+#undef USE_NICKSERV
+
+/* Defined if welcomeserv module is enabled */
+#undef USE_WELCOMESERV
+
 /* Version number of package */
 #undef VERSION
+
+/* Defined if web2cs module is enabled */
+#undef WEB2CS
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const

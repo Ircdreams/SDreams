@@ -1,10 +1,12 @@
 /* src/add_info.c - Ajout d'informations en mémoire
- * Copyright (C) 2004-2005 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2007 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: add_info.c,v 1.73 2006/03/15 17:36:47 bugs Exp $
+ * $Id: add_info.c,v 1.99 2007/12/16 20:48:15 romexzf Exp $
  */
 
 #include "main.h"
@@ -30,49 +32,47 @@
 #include "ban.h"
 #include "add_info.h"
 #include "cs_cmds.h"
-#include "del_info.h"
 #include "serveur.h"
 #include "timers.h"
 
-int add_server(const char *name, const char *num, const char *hop, const char *proto, const char *from) 
-{ 
-        aServer *links = calloc(1, sizeof *links); 
-        unsigned int servindex;
-	
-        if(!links) 
-                return Debug(W_MAX|W_WARN, "m_server, malloc() a échoué pour le Link %s", name); 
-    
-        Strncpy(links->serv, name, HOSTLEN); 
-        Strncpy(links->num, num, NUMSERV); 
-        links->maxusers = base64toint(num + NUMSERV); 
-        servindex = base64toint(links->num); 
- 
-        for(links->smask = 16;links->smask < links->maxusers; links->smask <<= 1);
-	/* we copy smask to maxusers back in case of maxusers was below 16 */ 
-        links->maxusers = links->smask--;/* on passe de 010000 à 001111 */ 
- 
-        if(serv_tab[servindex]) return Debug(W_DESYNCH|W_WARN, "m_server: collision, " 
-                                                                        "le serveur %s[%s] existe déjà?", name, links->num); 
- 
-        links->hub = num2servinfo(from); /* ptr vers son Hub */ 
-        serv_tab[servindex] = links; 
- 
-	if(!(num_tab[servindex] = calloc(1, links->maxusers * sizeof(aNick *))))
-                return Debug(W_MAX|W_WARN, "m_server, malloc() a échoué pour les %d Offsets de %s", 
-			links->maxusers, name);
-        /* 1erhub = my uplink -> je suis enregistré! */ 
-        if(atoi(hop) == 1 && strcasecmp(name, bot.server)) mainhub = links; 
- 
-        links->flag = (*proto == 'J') ? ST_BURST : ST_ONLINE;
-	
-        remove(links->serv); /* on vire l'ancien motd pour mettre le nouveau */ 
-        putserv("%s MO %s", cs.num, links->num); /* demande le MOTD du nouveau serveur */
-        return 0; 
-} 
+int add_server(const char *name, const char *num, const char *hop,
+	const char *proto, const char *from)
+{
+	aServer *links = calloc(1, sizeof *links);
+	unsigned int servindex;
 
+	if(!links)
+		return Debug(W_MAX|W_WARN, "m_server, malloc() a échoué pour le Link %s", name);
+
+	Strncpy(links->serv, name, HOSTLEN);
+	Strncpy(links->num, num, NUMSERV);
+	links->maxusers = base64toint(num + NUMSERV);
+	servindex = base64toint(links->num);
+
+	for(links->smask = 16; links->smask < links->maxusers; links->smask <<= 1);
+	/* we copy smask to maxusers back in case of maxusers was below 16 */
+	links->maxusers = links->smask--;/* on passe de 010000 à 001111 */
+
+	if(serv_tab[servindex]) return Debug(W_DESYNCH|W_WARN, "m_server: collision, "
+									"le serveur %s[%s] existe déjà?", name, links->num);
+
+	links->hub = num2servinfo(from); /* ptr vers son Hub */
+	serv_tab[servindex] = links;
+
+	if(!(num_tab[servindex] = calloc(1, links->maxusers * sizeof(aNick *))))
+		return Debug(W_MAX|W_WARN, "m_server, malloc() a échoué pour les %d Offsets de %s",
+				links->maxusers, name);
+	/* 1erhub = my uplink -> je suis enregistré! */
+	if(atoi(hop) == 1 && strcasecmp(name, bot.server)) mainhub = links;
+
+	links->flag = (*proto == 'J') ? ST_BURST : ST_ONLINE;
+	return 0;
+}
+
+#ifdef USE_MEMOSERV
 void add_memo(anUser *nick, const char *de, time_t date, const char *message, int flag)
 {
-	aMemo *memo = calloc(1, sizeof *memo), *tmp = nick->memohead;
+	aMemo *memo = calloc(1, sizeof *memo), *tmp = nick->memotail;
 
 	if(!memo)
 	{
@@ -80,65 +80,19 @@ void add_memo(anUser *nick, const char *de, time_t date, const char *message, in
 		return;
 	}
 
-	memo->next = NULL;
 	Strncpy(memo->de, de, NICKLEN);
 	memo->date = date;
 	memo->flag = flag;
 	Strncpy(memo->message, message, MEMOLEN);
 
-	if(!tmp) nick->memohead = memo;
-	else
-	{
-		for(;tmp->next;tmp = tmp->next);
-		tmp->next = memo;
-	}
+	memo->next = NULL;
+	memo->last = tmp;
+
+	if(!nick->memohead) nick->memohead = memo;
+	if(tmp) tmp->next = memo;
+	nick->memotail = memo;
 }
-
-void add_alias(anUser *user, const char *name)
-{
-        anAlias *alias = calloc(1, sizeof *alias), *tmp = user->aliashead;
-
-        if(!alias)
-        {
-                Debug(W_MAX, "add_alias, malloc a échoué pour anAlias %s (%s)", user->nick, name);
-                return;
-        }
-
-        Strncpy(alias->name, name, NICKLEN);
-
-        if(!tmp) user->aliashead = alias;
-	else
-	{
-		for(;tmp->user_nextalias;tmp = tmp->user_nextalias);
-		tmp->user_nextalias = alias;
-	}	
-	alias->user = user;
-	alias->hash_next = alias;
-	hash_addalias(alias);
-}
-
-
-aDNR *add_dnr(const char *mask, const char *from, const char *raison,
-	time_t date, unsigned int flag)
-{
-	aDNR *dnr = calloc(1, sizeof *dnr);
-	
-	if(!dnr)
-	{
-		Debug(W_MAX|W_WARN, "add_dnr: OOM for %s[%s] (%s)", mask, from, raison);
-		return NULL;
-	}
-	str_dup(&dnr->mask, mask);
-	str_dup(&dnr->raison, raison);
-	Strncpy(dnr->from, from, NICKLEN);
-	dnr->date = date;
-	dnr->flag = flag; 
-        dnr->next = dnrhead; 
-        if(dnrhead) dnrhead->last = dnr; 
-        dnrhead = dnr; 
-    
-        return dnr; 
-}
+#endif
 
 anAccess *add_access(anUser *user, const char *chan, int level, int flag, time_t lastseen)
 {
@@ -164,7 +118,8 @@ anAccess *add_access(anUser *user, const char *chan, int level, int flag, time_t
 		free(ptr);
 		return NULL;
 	}
-	ptr->c = c;
+
+ 	ptr->c = c;
 	ptr->next = user->accesshead;
 	user->accesshead = ptr;
 
@@ -176,6 +131,7 @@ anAccess *add_access(anUser *user, const char *chan, int level, int flag, time_t
 	return ptr;
 }
 
+#ifdef USE_NICKSERV
 void add_killinfo(aNick *nick, enum TimerType type)
 {
 	aKill *k = malloc(sizeof *k);
@@ -188,17 +144,18 @@ void add_killinfo(aNick *nick, enum TimerType type)
 
 	k->nick = nick;
 	k->type = type;
-	nick->timer = timer_add(kill_interval, TIMER_RELATIF, callback_kill, k, NULL);
+	nick->timer = timer_add(cf_kill_interval, TIMER_RELATIF, callback_kill, k, NULL);
 
 	k->last = NULL;
 	if(killhead) killhead->last = k;
 	k->next = killhead;
 	killhead = k;
 }
+#endif
 
 void add_join(aNick *nick, const char *chan, int status, time_t timestamp, aNChan *netchan)
 {
-	aJoin *join = calloc(1, sizeof *join);
+	aJoin *join = malloc(sizeof *join);
 	anAccess *a = NULL;
 	aLink *lp;
 	aBan *ban = NULL;
@@ -210,18 +167,20 @@ void add_join(aNick *nick, const char *chan, int status, time_t timestamp, aNCha
 		return;
 	}
 
-	if(!netchan) /* empty channel, should be from m_create */ 
-        {
+	if(!netchan) /* empty channel, should be from m_create */
+	{
 		if(!(status & (J_BURST|J_CREATE)))
-                        Debug(W_DESYNCH|W_WARN, "add_join: Join of %s on empty channel %s ?", nick->nick, chan);
-                netchan = new_chan(chan, timestamp); 
-                /* find out if it's registered */ 
-                if((netchan->regchan = getchaninfo(chan))) netchan->regchan->netchan = netchan;
-        }
+			Debug(W_DESYNCH|W_WARN, "add_join: Join of %s on empty channel %s ?", nick->nick, chan);
+		netchan = new_chan(chan, timestamp);
+		/* find out if it's registered */
+		if((netchan->regchan = getchaninfo(chan))) netchan->regchan->netchan = netchan;
+	}
+#ifdef HAVE_OPLEVELS /* join, it can't be a zannel anymore, let it get back to a channel! */
+	else DelZannel(netchan);
+#endif
+	c = netchan->regchan; /* trust netchan->regchan if it comes from m_burst/m_join */
 
-        c = netchan->regchan; /* trust netchan->regchan if it comes from m_burst/m_join */ 
-    
-        join->chan = netchan; 
+	join->chan = netchan;
 	join->status = (status & ~(J_BURST|J_CREATE));
 	join->nick = nick;
 	join->next = nick->joinhead; /* insert at top of the linked list */
@@ -232,32 +191,32 @@ void add_join(aNick *nick, const char *chan, int status, time_t timestamp, aNCha
 	if(netchan->members) netchan->members->last = lp;
 	lp->last = NULL;
 	lp->next = netchan->members; /* insertion du link dans les chan members */
-	netchan->members = lp; 
-        ++netchan->users; 
- 
-        if(!c || IsSuspend(c)) return; /* channel not registered or suspended, nothing more to do */ 
-	
+	netchan->members = lp;
+	++netchan->users;
+
+	if(!c || CSuspend(c)) return; /* channel not registered or suspended, nothing more to do */
+
 	if(!CJoined(c)) /* Channel was empty [left, not joined] */
-	{       /* if it's a J(oin) and I left on admin request : just stay out. */
+	{	/* if it's a J(oin) and I left on admin request : just stay out. */
+#ifndef HAVE_OPLEVELS
+		if(!(status & (J_BURST|J_CREATE))) return; /* J_BURST means Burst outside mine */
+#endif
 		csjoin(c, JOIN_FORCE);
 	}
 
-	if(nick->flag & N_HIDE) return; /* oper totalement invisible */
-
 	/* check bans if not a burst join */
-	if(!(status & J_BURST) && !IsOperOrService(nick) && !IsAnAdmin(nick->user) && !IsAnHelper(nick->user)
+	if(!(status & J_BURST) && !IsOperOrService(nick) && !IsAnAdmin(nick->user)
 		&& (ban = is_ban(nick, c, NULL)))
 	{
-			csmode(c, MODE_OBVH, "+b $", ban->mask);
-			cskick(chan, nick->numeric, "Enforce: $", ban->raison);
-			return; /* just got banned, nothing more to do ! */
+		csmode(c, MODE_OBV, "+b $", ban->mask);
+		cskick(chan, nick->numeric, "Enforce: $", ban->raison);
+		return; /* just got banned, nothing more to do ! */
 	}
-
 	/* Ok, he is not banned, perform join */
 
 	/* he has an access, mark him as on channel (bursting or not) */
-	if(nick->user && (a = GetAccessIbyUserI(nick->user, c)) && !ASuspend(a)) a->lastseen = 1; 
-        else a = NULL; 
+	if(nick->user && (a = GetAccessIbyUserI(nick->user, c)) && !ASuspend(a)) a->lastseen = 1;
+	else a = NULL;
 
 	if(status & J_BURST) return; /* it's a Burst, nothing more to do.. */
 
@@ -266,37 +225,35 @@ void add_join(aNick *nick, const char *chan, int status, time_t timestamp, aNCha
 
 	if(!a) /* he has no access, and it's outside a burst */
 	{	/* if he had created this channel because I wasn't in, he doesn't deserve its +o */
-		if(status & J_OP) csmode(c, MODE_OBVH, "-o$ $ $", CAutoVoice(c) ? "+v" : "", nick->numeric, CAutoVoice(c) ? nick->numeric : "");
+		if(status & J_OP) csmode(c, MODE_OBV, "-o $", nick->numeric);
 		DeOp(join);
-		if (CAutoVoice(c)) {
-			if(!status & J_OP) csmode(c, MODE_OBVH, "+v $", nick->numeric);
-			DoVoice(join);
-		}
 		return; /* remove it and return */
 	}
 
 	/* Perform priviledged(access-ed) user checks */
-	enforce_access_opts(c, nick, a, join); /* auto op/halfop/voice */
+	enforce_access_opts(c, nick, a, join); /* auto op/voice */
 
 	if(!CNoInfo(c) && a->info
-		&& (!HasMode(netchan, C_MAUDITORIUM) || join->status)) /* finally, send infoline */
+		&& (!HasMode(netchan, C_MDELAYJOIN) || join->status)) /* finally, send infoline */
 		putserv("%s "TOKEN_PRIVMSG" %s :[\2%s\2] %s", cs.num, chan, nick->user->nick, a->info);
 }
 
-void add_ban(aChan *chan, const char *mask, const char *raison, const char *de,
-	time_t debut, time_t fin, int level)
+aBan *ban_create(const char *mask, const char *raison, const char *de,
+			time_t debut, time_t fin, int level)
 {
 	aBan *ban = calloc(1, sizeof *ban);
-        char *ptr2; 
-	
+	char *ptr2;
+
 	if(!ban)
 	{
-		Debug(W_MAX|W_WARN, "add_ban, malloc a échoué pour aBan %s sur %s de %s (%s)",
-			mask, chan->chan, de, raison);
-		return;
+		Debug(W_MAX|W_WARN, "ban_create, malloc a échoué pour aBan %s de %s (%s)",
+			mask, de, raison);
+		return NULL;
 	}
+
 	str_dup(&ban->mask, mask);
-	for(ptr2= ban->nick;*mask;++mask) /* explode the mask in nick,user,host */
+
+	for(ptr2 = ban->nick; *mask; ++mask) /* explode the mask in nick,user,host */
 		if(*mask == '!' && !*ban->user) *ptr2 = 0, ptr2 = ban->user;
 		else if(*mask == '@' && !*ban->host) *ptr2 = 0, ptr2 = ban->host;
 		else *ptr2++ = *mask;
@@ -305,16 +262,32 @@ void add_ban(aChan *chan, const char *mask, const char *raison, const char *de,
 	if(*ban->nick == '*' && !ban->nick[1]) ban->flag |= BAN_ANICKS;
 	if(*ban->user == '*' && !ban->user[1]) ban->flag |= BAN_AUSERS;
 	if(*ban->host == '*' && !ban->host[1]) ban->flag |= BAN_AHOSTS;
-	
-	str_dup(&ban->raison, raison); 
-        Strncpy(ban->de, de, NICKLEN); 
-        ban->debut = debut;
-        ban->fin = fin ? debut + fin : 0;
-        ban->level = level;
-	ban->timer = fin ? timer_add(ban->fin, TIMER_ABSOLU, callback_ban, chan, ban) : NULL;
-        ban->last = NULL;
+
+	if(ipmask_parse(ban->host, &ban->ipmask, &ban->cbits)) ban->flag |= BAN_IP;
+
+	str_dup(&ban->raison, raison);
+	Strncpy(ban->de, de, NICKLEN);
+	ban->debut = debut;
+	ban->fin = fin ? debut + fin : 0;
+	ban->level = level;
+	ban->timer = NULL;
+	ban->last = ban->next = NULL;
+	return ban;
+}
+
+void ban_add(aChan *chan, aBan *ban)
+{
+	ban->timer = ban->fin ? timer_add(ban->fin, TIMER_ABSOLU, callback_ban, chan, ban) : NULL;
 
 	if(chan->banhead) chan->banhead->last = ban;
 	ban->next = chan->banhead;
 	chan->banhead = ban;
+}
+
+void ban_load(aChan *chan, const char *mask, const char *raison, const char *de,
+			time_t debut, time_t fin, int level)
+{
+	aBan *ban = ban_create(mask, raison, de, debut, fin, level);
+
+	if(ban) ban_add(chan, ban);
 }

@@ -1,10 +1,13 @@
 /* src/lang.h - Gestion du multilangage
- * Copyright (C) 2004-2006 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://www.ircdreams.org
+ * Copyright (C) 2002-2007 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -18,19 +21,23 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: lang.h,v 1.15 2006/03/15 06:43:23 bugs Exp $
+ * $Id: lang.h,v 1.24 2007/12/01 02:22:31 romexzf Exp $
  */
 
-#define LANGMSGNB 186 /* nombre total de messages (dans le langage par défaut) */
+#define LANGMSGNB 188 /* nombre total de messages (dans le langage par défaut) */
 
 #define LANGMSGMAX 150 /* longueur max d'un message si supérieure,
  						  le message est tronqué (pb possible avec les formateurs */
 
 #define LANG_PATH "lang" /* path à partir de BINDIR dans lequel se trouvent
  							les fichiers .lang */
+
 extern struct Lang *lang_isloaded(const char *);
 extern int lang_add(char *);
 extern int lang_clean(void);
+extern int lang_check_default(void);
+
+extern int LangCount;
 
 #define L_NOSUCHUSER 			0
 #define L_NOSUCHCHAN 			1
@@ -218,3 +225,5 @@ extern int lang_clean(void);
 #define L_CHANNELPURGEWARN 		183
 #define L_UWASSUSPEND 			184
 #define L_CANTREGCHAN 			185
+#define L_JUSTLOGOUT 			186
+#define L_SERVICESWELCOME 		187

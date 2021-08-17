@@ -1,10 +1,12 @@
-/* src/mystring.c - Fonction manipulant les strings
- * Copyright (C) 2004-2006 ircdreams.org
+/* src/mystrings.c - Fonction manipulant les strings
  *
- * contact: bugs@ircdreams.org
- * site web: http://www.ircdreams.org
+ * Copyright (C) 2002-2008 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,16 +21,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: mystring.c,v 1.2 2006/03/15 06:43:23 bugs Exp $
+ * $Id: mystring.c,v 1.6 2008/01/20 13:50:39 romexzf Exp $
  */
 
 #include <ctype.h>
 #include "main.h"
 #include "debug.h"
 
-void Strlwr(char *buf)
+void strupr(char *buf)
 {
-        for(; *buf; ++buf) *buf = tolower((unsigned char) *buf);
+	for(; *buf; ++buf) *buf = toupper((unsigned char) *buf);
+}
+
+void strlwr(char *buf)
+{
+	for(; *buf; ++buf) *buf = tolower((unsigned char) *buf);
 }
 
 int count_char(const char *str, int c)
@@ -47,7 +54,7 @@ void strip_newline(char *string)
 
 int is_num(const char *num)
 {
-   while(*num) if(!isdigit(*num++)) return 0;
+   while(*num) if(!isdigit((unsigned char) *num++)) return 0;
    return 1;
 }
 
@@ -59,9 +66,17 @@ int Strtoint(const char *str, int *to, int min, int max)
 	return (!ptr || !*ptr) && (*to = i) <= max && i >= min;
 }
 
-int fastfmtv(char *buf, const char *fmt, va_list vl)
+int HasWildCard(const char *str)
+{
+	while(*str && *str != '*' && *str != '?') ++str;
+
+	return *str;
+}
+
+size_t fastfmtv(char *buf, const char *fmt, va_list vl)
 {
 	const char *s = buf;
+
 	while(*fmt)
 	{
 		if(*fmt == '$')
@@ -76,15 +91,15 @@ int fastfmtv(char *buf, const char *fmt, va_list vl)
 	return buf - s;
 }
 
-int fastfmt(char *buf, const char *fmt, ...)
+size_t fastfmt(char *buf, const char *fmt, ...)
 {
 	va_list vl;
-	int i;
+	size_t len;
 
 	va_start(vl, fmt);
-	i = fastfmtv(buf, fmt, vl);
+	len = fastfmtv(buf, fmt, vl);
 	va_end(vl);
-	return i;
+	return len;
 }
 
 char *str_dup(char **to, const char *from)
@@ -115,9 +130,9 @@ char *Strtok(char **save, char *str, int sep) /* fonction tirée d'ircu, simplifi
 
 	if(str) pos = str; 	/* new string scan */
 
-	while(pos && *pos && sep == *pos) pos++; /* skip leading separators */
+	while(pos && *pos && sep == *pos) ++pos; /* skip leading separators */
 
-	if (!pos || !*pos) return (pos = *save = NULL); /* string contains only sep's */
+	if(!pos || !*pos) return (pos = *save = NULL); /* string contains only sep's */
 
 	tmp = pos; /* now, keep position of the token */
 
@@ -147,9 +162,10 @@ int split_buf(char *buf, char **parv, int size)
 	return parc;
 }
 
-void parv2msgn(int parc, char **parv, int base, char *buf, int size)
+void parv2msgn(int parc, char **parv, int base, char *buf, size_t size)
 {
-	int i = base, toksize, written = 0;
+	int i = base;
+	size_t toksize, written = 0;
 
 	for(; i <= parc; ++i)
 	{
@@ -173,9 +189,10 @@ void parv2msgn(int parc, char **parv, int base, char *buf, int size)
 	return;
 }
 
-char *parv2msg(int parc, char **parv, int base, int size)
+char *parv2msg(int parc, char **parv, int base, size_t size)
 {
-	int i = base, toksize, written = 0;
+	int i = base;
+	size_t toksize, written = 0;
 	static char buf[512];
 
 	if(size > sizeof buf) size = sizeof buf;
@@ -202,7 +219,12 @@ char *parv2msg(int parc, char **parv, int base, int size)
 	return buf;
 }
 
-int myvsnprintf(char *buf, size_t size, const char *format, va_list vl)
+/* Simple and fast vsnprintf:
+ * it handles only basic but most used (>99% of Z *snprintf calls) specifiers:
+ * %s %c %d without any other flags (width, padding, precision)
+ * Nevertheless, if such a specifier is matched, original vsnprintf is called. */
+
+size_t myvsnprintf(char *buf, size_t size, const char *format, va_list vl)
 {
 	register char *p = buf;
 	register const char *fmt = format;
@@ -222,8 +244,9 @@ int myvsnprintf(char *buf, size_t size, const char *format, va_list vl)
 			}
 			if(t == 'd')
 			{
-				int tmpi = va_arg(vl, int), pos = 31;
-				char bufi[32];
+				int tmpi = va_arg(vl, int);
+				char bufi[20]; /* 2^64 is 3*6+2 char long */
+				unsigned int pos = sizeof bufi -1; /* index of last index from bufi */
 
 				if(tmpi <= 0)
 				{
@@ -243,6 +266,88 @@ int myvsnprintf(char *buf, size_t size, const char *format, va_list vl)
 				while(pos < sizeof bufi -1 && p < end) *p++ = bufi[++pos];
 				continue;
 			}
+			if(t == 'U')
+			{
+				unsigned long tmpi = va_arg(vl, unsigned long);
+				char bufi[20]; /* 2^64 is 3*6+2 char long */
+				unsigned int pos = sizeof bufi - 1; /* index of last index from bufi */
+
+				if(!tmpi)
+				{
+					*p++ = '0';
+					continue;
+				}
+				while(tmpi) /* on converti une int en base 10 en string */
+				{		/* écriture dans l'ordre inverse 51 > '   1' > '  51'*/
+					bufi[pos--] = '0' + (tmpi % 10);
+					tmpi /= 10;
+				}
+				while(pos < sizeof bufi -1 && p < end) *p++ = bufi[++pos];
+				continue;
+			}
+			if(t == 'T')
+			{
+				time_t time_tmp = va_arg(vl, time_t);
+				char bufi[20]; /* 2^64 is 3*6+2 char long */
+				unsigned int pos = sizeof bufi -1; /* index of last index from bufi */
+
+				if(time_tmp <= 0)
+				{
+					if(!time_tmp)
+					{
+						*p++ = '0';
+						continue;
+					}
+					*p++ = '-';
+					time_tmp = -time_tmp;
+				}
+				while(time_tmp) /* on converti une int en base 10 en string */
+				{		/* écriture dans l'ordre inverse 51 > '   1' > '  51'*/
+					bufi[pos--] = '0' + (time_tmp % 10);
+					time_tmp /= 10;
+				}
+				while(pos < sizeof bufi -1 && p < end) *p++ = bufi[++pos];
+				continue;
+			}
+			if(t == 'x' || t == 'X')
+			{
+				static char dec2hex[2][17] = { "0123456789abcdef", "0123456789ABCDEF" };
+				unsigned long tmpi = va_arg(vl, unsigned long);
+				char bufi[10], *convert = dec2hex[(t == 'x') ? 0 : 1];
+				unsigned int pos = sizeof bufi - 1; /* index of last index from bufi */
+
+				if(!tmpi)
+				{
+					*p++ = '0';
+					continue;
+				}
+				while(tmpi)
+				{
+					bufi[pos--] = convert[tmpi & 0xF];
+					tmpi >>= 4;
+				}
+				while(pos < sizeof bufi -1 && p < end) *p++ = bufi[++pos];
+				continue;
+			}
+			if(t == 'u')
+			{
+				unsigned int tmpi = va_arg(vl, unsigned int);
+				char bufi[20]; /* 2^64 is 3*6+2 char long */
+				unsigned int pos = sizeof bufi -1; /* index of last index from bufi */
+
+				if(!tmpi)
+				{
+					*p++ = '0';
+					continue;
+				}
+				while(tmpi) /* on converti une int en base 10 en string */
+				{		/* écriture dans l'ordre inverse 51 > '   1' > '  51'*/
+					bufi[pos--] = '0' + (tmpi % 10);
+					tmpi /= 10;
+				}
+				while(pos < sizeof bufi -1 && p < end) *p++ = bufi[++pos];
+				continue;
+			}
 			if(t == 'c')
 			{
 				*p++ = (char) va_arg(vl, int);
@@ -251,7 +356,7 @@ int myvsnprintf(char *buf, size_t size, const char *format, va_list vl)
 			if(t != '%')
 			{	/* on sous traite le reste à vsnprintf (-2 because of the %*)
 					on laisse vsnprintf écrire le \0 d'où le + 1 */
-				int i = vsnprintf(p, end - p + 1, fmt - 2, vl);
+				size_t i = vsnprintf(p, end - p + 1, fmt - 2, vl);
 				p += i < end - p ? i : end - p; /* si i >= size : overflow bloqué */
 				break;
 			}
@@ -263,13 +368,13 @@ int myvsnprintf(char *buf, size_t size, const char *format, va_list vl)
 	return p - end + size - 1; /* on ne retourne que la taille effectivement utilisée */
 }
 
-int mysnprintf(char *buf, size_t size, const char *format, ...)
+size_t mysnprintf(char *buf, size_t size, const char *format, ...)
 {
 	va_list vl;
-	int i;
+	size_t len;
 
 	va_start(vl, format);
-	i = myvsnprintf(buf, size, format, vl);
+	len = myvsnprintf(buf, size, format, vl);
 	va_end(vl);
-	return i;
+	return len;
 }

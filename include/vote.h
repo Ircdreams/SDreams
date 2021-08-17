@@ -1,10 +1,12 @@
 /* include/vote.h
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2006 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@kouak.org>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IrcProgs et IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: vote.h,v 1.7 2005/10/18 15:33:28 bugs Exp $
+ * $Id: vote.h,v 1.9 2006/08/11 23:22:01 romexzf Exp $
  */
 
 #ifndef HAVEINC_vote
@@ -28,9 +30,9 @@
 #define MAXVOTEPROP 20
 #define VOTE_FILE DBDIR"/votes.db"
 
-#define CanVote(user)   (Vote.actif && (user)->level >= Vote.level \
-				&& (user)->reg_time <= Vote.start_time \
-				&& !UVote(user) && !UNoVote(user))
+#define CanVote(user) 	(Vote.actif && (user)->level >= Vote.level \
+							&& (user)->reg_time <= Vote.start_time \
+							&& !UVote(user) && !UNoVote(user))
 
 struct votes {
 	char prop[MEMOLEN + 1];
@@ -43,6 +45,7 @@ struct Vote {
 	int level;
 	int nbprop;
 	time_t start_time;
+	Timer *timer_end;
 };
 
 extern struct votes vote[];
@@ -56,4 +59,3 @@ extern int voter(aNick *, aChan *, int, char **);
 extern int do_vote(aNick *, aChan *, int, char **);
 
 #endif /*HAVEINC_vote*/
-

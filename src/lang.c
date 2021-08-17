@@ -1,10 +1,12 @@
 /* src/lang.c - Gestion du multilangage
- * Copyright (C) 2004-2006 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://www.ircdreams.org
+ * Copyright (C) 2002-2007 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +21,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: lang.c,v 1.7 2006/03/15 06:43:23 bugs Exp $
+ * $Id: lang.c,v 1.16 2007/12/01 02:22:31 romexzf Exp $
  */
 
 #include "main.h"
 #include "outils.h"
 #include "debug.h"
+#include "mylog.h"
 
 int LangCount = 0;
 
@@ -42,7 +45,7 @@ int lang_add(char *name)
 	char path[501];
 	int items = 0, i = 0;
 
-	Strlwr(name);
+	strlwr(name);
 
 	if(!lang) /* This language was not loaded yet */
 	{
@@ -69,7 +72,8 @@ int lang_add(char *name)
 	mysnprintf(path, sizeof path, LANG_PATH "/%s.lang", name);
 	if(!(f = fopen(path, "r")))
 	{
-		Debug(W_TTY, "lang: fichier %s.lang non trouvé à '%s'", name, path);
+		log_write(LOG_MAIN, LOG_DOTTY|LOG_DOWALLOPS,
+			"lang: fichier %s.lang non trouvé à '%s'", name, path);
 		return -1;
 	}
 
@@ -83,21 +87,26 @@ int lang_add(char *name)
 
 		if(!Strtoint(path, &msgid, 0, LANGMSGNB-1)) /* < 0 || >= LANGMSGNB */
 		{
-			Debug(W_TTY, "lang: ID de msg %s inconnu lors du chargement du langage %s",
+			log_write(LOG_MAIN, LOG_DOTTY|LOG_DOWALLOPS,
+				"lang: ID de msg %s inconnu lors du chargement du langage %s",
 				path, name);
 			continue;
 		}
 		strip_newline(msg);
+		++items; /* increment here otherwise it'll spam upon rehash */
+
 		/* no change since last load */
 		if(lang->msg[msgid] && !strcmp(msg, lang->msg[msgid])) continue;
 
 		size = strlen(msg);
 		if(size > LANGMSGMAX)
 		{
-			Debug(W_TTY, "lang: langage %s: msg %d trop long (%d) a été tronqué,"
+			log_write(LOG_MAIN, LOG_DOTTY|LOG_DOWALLOPS,
+				"lang: langage %s: msg %d trop long (%d) a été tronqué,"
 				"cela peut causer des erreurs au runtime", name, msgid, size);
 			size = LANGMSGMAX;
 		}
+
 		if(lang != DefaultLang && lang->msg[msgid] == DefaultLang->msg[msgid])
 			lang->msg[msgid] = NULL; /* it's an alias to the default one if was missing. */
 
@@ -108,12 +117,13 @@ int lang_add(char *name)
 			return -1;
 		}
 		Strncpy(lang->msg[msgid], msg, size);
-		++items;
 	}
 
-	if(items < LANGMSGNB) /* hum uncomplet language set.. */
+	if(items < LANGMSGNB) /* hum incomplete language set.. */
 	{
-		Debug(W_WARN, "lang: langage %s est incomplet (%d/%d messages)", name, items, LANGMSGNB);
+		log_write(LOG_MAIN, LOG_DOTTY|LOG_DOWALLOPS,
+			"lang: langage %s est incomplet (%d/%d messages)", name, items, LANGMSGNB);
+
 		for(; i < LANGMSGNB; ++i)
 			/* .. alias all missing replies to default language. */
 			if(!lang->msg[i]) lang->msg[i] = DefaultLang->msg[i];
@@ -128,10 +138,12 @@ int lang_clean(void)
 	Lang *lang = DefaultLang, *lang_t;
 	int i;
 
-	if(DefaultLang->next) /* remove all alias to Default Language to avoid multiple free() */
+	/* remove all alias to Default Language to avoid multiple free() */
+	if(DefaultLang->next)
 		for(lang = DefaultLang->next; lang; lang = lang->next)
 			for(i = 0; i < LANGMSGNB; ++i)
 				if(lang->msg[i] == DefaultLang->msg[i]) lang->msg[i] = NULL;
+
 	/* now free all rows */
 	for(lang = DefaultLang; lang; lang = lang_t)
 	{
@@ -139,5 +151,23 @@ int lang_clean(void)
 		for(i = 0; i < LANGMSGNB; ++i) free(lang->msg[i]);
 		free(lang);
 	}
+
 	return 0;
+}
+
+int lang_check_default(void)
+{
+	int i = 0;
+
+	if(!DefaultLang) return 0;
+
+	for(; i < LANGMSGNB; ++i)
+		if(!DefaultLang->msg[i])
+		{
+			log_write(LOG_MAIN, LOG_DOTTY, "lang: langage par défaut incomplet"
+				" (msgid %d manquante)", i);
+			return 0;
+		}
+
+	return 1;
 }

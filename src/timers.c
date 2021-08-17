@@ -1,10 +1,12 @@
 /* src/timers.c - fonctions de controle appellées periodiquement
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2008 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: timers.c,v 1.52 2006/03/01 19:28:19 bugs Exp $
+ * $Id: timers.c,v 1.79 2008/02/09 19:45:49 romexzf Exp $
  */
 
 #include "main.h"
@@ -27,39 +29,33 @@
 #include "outils.h"
 #include "hash.h"
 #include "del_info.h"
-#include "divers.h"
 #include "fichiers.h"
 #include "cs_cmds.h"
 #include "debug.h"
-#include "template.h"
 #include "timers.h"
-#include <errno.h>
+#include "mylog.h"
+
+Timer *Timers = NULL; /* Our head */
 
 void check_accounts(void)
 {
 	anUser *u, *u2;
 	int i = 0;
-	char memo[MEMOLEN +1];
 
-	for(;i < USERHASHSIZE;++i) for(u = user_tab[i];u;u = u2)
+	for(; i < USERHASHSIZE; ++i) for(u = user_tab[i]; u; u = u2)
 	{
 		u2 = u->next;
 		if(u->lastseen + cf_maxlastseen < CurrentTS && !IsAdmin(u) && !UNopurge(u))
-		{
 			cswallops("Purge de l'username %s (Lastseen %s)",
 				u->nick, duration(CurrentTS - u->lastseen));
-			snprintf(memo, MEMOLEN, "Suite a votre inactivitée, votre username a été effacé (Dernier login: %s)", duration(CurrentTS - u->lastseen));
-			tmpl_mailsend(&tmpl_mail_memo, u->mail, u->nick, NULL, NULL, cs.nick, memo);
-		}
 		else if(UFirst(u) && (u->lastseen + cf_register_timeout) < CurrentTS)
 			cswallops("Purge de l'username %s par register timeout", u->nick);
 		else
 		{
 			if(u->n) u->lastseen = CurrentTS;
-			if(u->cantregchan > 0 && u->cantregchan < CurrentTS) u->cantregchan = -1;
 			continue; /* user is ok, go on without purging it. */
 		}
-		del_regnick(u, 0, "Purge de l'username de l'owner");
+		del_regnick(u, HF_LOG, "Purge de l'username de l'owner");
 	}
 }
 
@@ -67,64 +63,51 @@ void check_chans(void)
 {
 	aChan *c, *next;
 	int i = 0;
-	char raison[300], memo[MEMOLEN + 1];
+	char raison[TOPICLEN+1];
 
-	for(;i < CHANHASHSIZE;++i) for(c = chan_tab[i];c;c = next)
+	for(; i < CHANHASHSIZE; ++i) for(c = chan_tab[i]; c; c = next)
 	{
 		next = c->next;
 
+		if(!CSuspend(c) && CJoined(c) && c->netchan->users == 0 /* empty */
+		&& !HasMode(c->netchan, C_MKEY|C_MINV) && CurrentTS - c->lastact > cf_chanmaxidle)
+			cspart(c, "Idle");
+
 		if(!c->access || !c->owner)
-			Debug(W_WARN, "chan_check: Channel %s has no %s -- Why ?!",
+			log_write(LOG_MAIN, 0, "chan_check: Channel %s has no %s -- Why ?!",
 				c->chan, c->owner ? "access" : "owner");
-		else if(!AOnChan(c->owner) && !UNopurge(c->owner->user))
+
+		else if(!AOnChan(c->owner) && !UNopurge(c->owner->user) && !IsAdmin(c->owner->user))
 		{
 			if(c->owner->lastseen + cf_maxlastseen < CurrentTS)
 			{
-				snprintf(raison, sizeof raison, "Pas de visite de l'owner depuis \2%s",
+				mysnprintf(raison, sizeof raison, "Pas de visite de l'owner depuis \2%s",
 					get_time(NULL, c->owner->lastseen));
-				snprintf(memo, MEMOLEN, "Votre salon %s a été effacé. Pas de visite depuis le %s",
-					c->chan, get_time(NULL, c->owner->lastseen));
-				tmpl_mailsend(&tmpl_mail_memo, c->owner->user->mail, c->owner->user->nick, NULL, NULL, cs.nick, memo);
-				del_chan(c, 0, raison);
+				del_chan(c, HF_LOG, raison);
 			}
-			else if(c->owner->lastseen + cf_maxlastseen - cf_warn_purge_delay < CurrentTS 
-                                   && !CWarned(c)) 
-                        { 
-                                c->flag |= C_LOCKTOPIC|C_WARNED;
-				snprintf(raison, TOPICLEN, "Le salon sera purgé le %s pour absence de "
-					"l'owner, contactez un administrateur",
+			else if(c->owner->lastseen + cf_maxlastseen - cf_warn_purge_delay < CurrentTS
+				&& !CWarned(c))
+			{
+				c->flag |= C_LOCKTOPIC|C_WARNED;
+				mysnprintf(raison, TOPICLEN, GetUReply(c->owner->user, L_CHANNELPURGEWARN),
 					get_time(NULL, c->owner->lastseen + cf_maxlastseen));
-				snprintf(memo, MEMOLEN, "Votre salon %s semble inactif et sera effacé le %s. Pour annuler cette procédure: identifiez-vous et rejoiniez votre salon !",
-					c->chan, get_time(NULL, c->owner->lastseen + cf_maxlastseen));
-				tmpl_mailsend(&tmpl_mail_memo, c->owner->user->mail, c->owner->user->nick, NULL, NULL, cs.nick, memo);  
-                                if(CJoined(c)) cstopic(c, raison); 
-                                else strcpy(c->deftopic, raison); 
-                        }
-                }
-		else if(!IsSuspend(c) && CJoined(c) && c->netchan->users == 0 /* empty */
-		&& !HasMode(c->netchan, C_MKEY|C_MINV) && CurrentTS - c->lastact > cf_chanmaxidle)
-			cspart(c, "Inactif");
+
+				if(CJoined(c)) cstopic(c, raison);
+				else strcpy(c->deftopic, raison);
+			}
+		}
 	} /* for() */
 }
 
 #ifdef TDEBUG
 #	define TDEBUGF(x) timer_debug x
-static int timer_debug(const char * fmt, ...)
+void timer_debug(const char *fmt, ...)
 {
-	FILE *fd = fopen("logs/timers.log", "a");
 	va_list vl;
 
-	if(!fd) return Debug(W_WARN, "Error while opening timers log file : %s", strerror(errno));
-
 	va_start(vl, fmt);
-	fputs(get_time(NULL, CurrentTS), fd); /* TimeStamp */
-	fputc(' ', fd);
-	vfprintf(fd, fmt, vl);
-	fputc('\n', fd);
-	fclose(fd);
-
+	log_writev(LOG_RAW, 0, fmt, vl);
 	va_end(vl);
-	return 0;
 }
 #else
 #	define TDEBUGF(x)
@@ -134,12 +117,8 @@ Timer *timer_add(time_t delay, enum TimerType type, int (*callback) (Timer *),
 				void *data1, void *data2)
 {
 	Timer *timer = calloc(1, sizeof *timer);
-#ifdef TDEBUG
-        static int timer_id = 0;
-	timer->id = timer_id++;
-#endif
 
-	TDEBUGF(("Adding timer #%d %d (delay=%ld) d1=[%s] d2=[%s]", timer->id, type, delay, data1, data2));
+	TDEBUGF(("Adding timer %d (delay=%ld) d1=[%s] d2=[%s]", type, delay, data1, data2));
 
 	if(!timer)
 	{
@@ -147,7 +126,6 @@ Timer *timer_add(time_t delay, enum TimerType type, int (*callback) (Timer *),
 			delay, type);
 		return NULL;
 	}
-
 
 	timer->delay = delay;
 	timer->callback = callback;
@@ -181,7 +159,7 @@ Timer *timer_enqueue(Timer *timer)
 		return NULL;
 	}
 
-	for(;tmp && timer->expire >= tmp->expire; last = tmp, tmp = tmp->next);
+	for(; tmp && timer->expire >= tmp->expire; last = tmp, tmp = tmp->next);
 
 	timer->last = last;
 	timer->next = tmp;
@@ -189,8 +167,8 @@ Timer *timer_enqueue(Timer *timer)
 	if(last) last->next = timer;
 	else Timers = timer;
 
-	TDEBUGF(("Queueing Timer %p (#%d), (delay=%ld/%ld exp: %ld) ->last=%p ->next=%p",
-		(void *) timer, timer->id, timer->delay, timer->expire, timer->expire - CurrentTS,
+	TDEBUGF(("Queueing Timer %p, (delay=%ld/%ld exp: %ld) ->last=%p ->next=%p",
+		(void *) timer, timer->delay, timer->expire, timer->expire - CurrentTS,
 		(void *) timer->last, (void *) timer->next));
 
 	return timer;
@@ -198,14 +176,14 @@ Timer *timer_enqueue(Timer *timer)
 
 void timer_free(Timer *timer)
 {
-	TDEBUGF(("Freeing Timer %p (#%d), ->last=%p ->next=%p", (void *) timer, timer->id,
+	TDEBUGF(("Freeing Timer %p, ->last=%p ->next=%p", (void *) timer,
 		(void *) timer->last, (void *) timer->next));
 	free(timer);
 }
 
 void timer_dequeue(Timer *timer)
 {
-	TDEBUGF(("Dequeueing Timer %p (#%d), ->last=%p ->next=%p", (void *) timer, timer->id,
+	TDEBUGF(("Dequeueing Timer %p, ->last=%p ->next=%p", (void *) timer,
 		(void *) timer->last, (void *) timer->next));
 
 	if(timer->next) timer->next->last = timer->last;
@@ -223,20 +201,31 @@ void timer_remove(Timer *timer)
 
 void timers_run(void)
 {
-	Timer *timer = Timers, *tmp;
+	Timer *timer = Timers;
 
-/*	TDEBUGF(("Running Timers ! ! !")); */
+	TDEBUGF(("Running Timers ! ! !"));
 
-	for(;timer && timer->expire <= CurrentTS;timer = tmp)
+	for(; (timer = Timers) && timer->expire <= CurrentTS;)
 	{
-		tmp = timer->next;
-
-		TDEBUGF(("Running Timer %p (#%d), ->last=%p ->next=%p (%ld)", (void *) timer,
-			timer->id, (void *) timer->last, (void *) timer->next, timer->expire));
+		TDEBUGF(("Running Timer %p, ->last=%p ->next=%p (%ld)", (void *) timer,
+			(void *) timer->last, (void *) timer->next, timer->expire));
 
 		timer_dequeue(timer);
-		if(timer->callback(timer)) timer_free(timer);
+		if(timer->callback(timer)) timer_free(timer); /* callback asks for removall */
+		else timer_enqueue(timer); /* otherwise it's a periodic timer, re-add it to pending list */
 	}
+}
+
+void timer_clean(void)
+{
+	Timer *timer = Timers, *tnext;
+
+	for(; timer; timer = tnext)
+	{
+		tnext = timer->next;
+		free(timer);
+	}
+	Timers = NULL;
 }
 
 int callback_ban(Timer *timer)
@@ -244,13 +233,14 @@ int callback_ban(Timer *timer)
 	aBan *ban = timer->data2;
 	aChan *chan = timer->data1;
 
-	ban->timer = NULL; /* prevent del_ban from clearing it too */
+	ban->timer = NULL; /* prevent ban_del from clearing it too */
 
-	csmode(chan, MODE_OBVH, "-b $", ban->mask);
-	del_ban(chan, ban);
+	csmode(chan, MODE_OBV, "-b $", ban->mask);
+	ban_del(chan, ban);
 	return 1;
 }
 
+#ifdef USE_NICKSERV
 int callback_kill(Timer *timer)
 {
 	aKill *kill = timer->data1;
@@ -267,25 +257,24 @@ int callback_kill(Timer *timer)
 	}
 	else
 	{
-		putserv("%s "TOKEN_KILL" %s :%s (Pseudo enregistré)",
+		putserv("%s "TOKEN_KILL" %s :%s (Pseudo enregistré/Registered Nick)",
 			cs.num,	kill->nick->numeric, cs.nick);
 		del_nickinfo(kill->nick->numeric, "timer kill");
 	}
 	kill_free(kill);
 	return 1;
 }
+#endif
 
 int callback_check_accounts(Timer *timer)
 {
 	check_accounts();
-	timer_enqueue(timer);
 	return 0;
 }
 
 int callback_check_chans(Timer *timer)
 {
 	check_chans();
-	timer_enqueue(timer);
 	return 0;
 }
 
@@ -293,24 +282,8 @@ int callback_write_dbs(Timer *timer)
 {
 	db_write_chans();
 	db_write_users();
-	write_maxuser();
 	CurrentTS = time(NULL); /* because db writing can take a lot */
-	timer_enqueue(timer);
 	return 0;
-}
-
-int callback_unsuspend(Timer *timer)
-{
-	struct suspendinfo **suspend = timer->data1;
-
-	(*suspend)->expire = -1;
-	(*suspend)->timer = NULL; /* clean up ! */
-	if((*suspend)->data)
-	{
-		aChan *chan = (*suspend)->data;
-		if(!CJoined(chan)) csjoin(chan, 0);
-	}
-	return 1;
 }
 
 int callback_fl_update(Timer *timer)
@@ -326,21 +299,23 @@ int callback_fl_update(Timer *timer)
 
 	if(CFLimit(c) && CJoined(c)) /* floating limit */
 	{
-		int newlimit = netchan->users + 1 + c->limit_inc, dif = newlimit - netchan->modes.limit;
-		if(dif < 0) dif = -dif;
+		unsigned int newlimit = netchan->users + 1 + c->limit_inc;
+		unsigned int dif = newlimit > netchan->modes.limit ?
+					newlimit - netchan->modes.limit :
+					netchan->modes.limit - newlimit;
+
 		/* only updates the limit if it is worst (dif >= grace) */
 		if(netchan->modes.limit != newlimit && dif >= c->limit_min)
 		{
 			netchan->modes.limit = newlimit;
 			if(!HasMode(netchan, C_MLIMIT)) netchan->modes.modes |= C_MLIMIT;
-			putserv("%s "TOKEN_MODE" %s +l %d", cs.num, c->chan, newlimit);
+			putserv("%s "TOKEN_MODE" %s +l %u", cs.num, c->chan, newlimit);
 		}
 	}
 	else /* not on chan or FL not active => remove timer */
 	{
-		c->timer = NULL;
+		c->fltimer = NULL;
 		return 1;
 	}
-	timer_enqueue(timer);
 	return 0;
 }

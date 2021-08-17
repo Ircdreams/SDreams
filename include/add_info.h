@@ -1,10 +1,12 @@
 /* include/add_info.h - Ajout d'informations en mémoire
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://www.ircdreams.org
+ * Copyright (C) 2002-2007 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,22 +21,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: add_info.h,v 1.13 2006/01/06 23:12:59 bugs Exp $
+ * $Id: add_info.h,v 1.10 2007/12/16 20:48:15 romexzf Exp $
  */
 
 #ifndef HAVEINC_add_info
 #define HAVEINC_add_info
 
+#ifdef USE_MEMOSERV
 extern void add_memo(anUser *, const char *, time_t, const char *, int);
+#endif
+#ifdef USE_NICKSERV
 extern void add_killinfo(aNick *, enum TimerType);
+#endif
 
 extern int add_server(const char *, const char *, const char *, const char *, const char *);
-extern aDNR *add_dnr(const char *, const char *, const char *, time_t, unsigned int);
 extern anAccess *add_access(anUser *, const char *, int, int, time_t);
-
 extern void add_join(aNick *, const char *, int, time_t, aNChan *);
-extern void add_ban(aChan *, const char *, const char *, const char *, time_t, time_t, int);
+extern void ban_load(aChan *, const char *, const char *, const char *, time_t, time_t, int);
+extern aBan *ban_create(const char *, const char *, const char *, time_t, time_t, int);
+extern void ban_add(aChan *, aBan *);
 
-extern void add_alias(anUser *, const char *);
 
 #endif /*HAVEINC_add_info*/

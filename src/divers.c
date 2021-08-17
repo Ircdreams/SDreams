@@ -1,10 +1,13 @@
 /* src/divers.c - Diverses commandes
- * Copyright (C) 2004-2005 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2008 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
+ *
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,226 +22,172 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: divers.c,v 1.65 2006/03/15 19:04:42 bugs Exp $
+ * $Id: divers.c,v 1.68 2008/01/05 01:24:13 romexzf Exp $
  */
 
 #include "main.h"
-#include "config.h"
-#include "crypt.h"
-#include "debug.h"
+#include "version.h"
 #include "divers.h"
+#include "config.h"
 #include "outils.h"
 #include "hash.h"
+#include "mylog.h"
 #include "cs_cmds.h"
 #include "admin_manage.h"
-#include "admin_user.h"
-#include "add_info.h"
+#include "flood.h"
+#include "showcommands.h"
+#include "aide.h"
+#include "data.h"
+#include "dnr.h"
+#include "timers.h"
 #include "template.h"
-#include "version.h"
-#include <errno.h>
+#include "socket.h"
 
 int uptime(aNick *nick, aChan *chan, int parc, char **parv)
 {
-	return csreply(nick, GetReply(nick, L_UPTIME), duration(CurrentTS - bot.uptime));
+	return csntc(nick, GetReply(nick, L_UPTIME), duration(CurrentTS - bot.uptime));
 }
 
-int ctcp_ping(aNick *nick, aChan *chan, int parc, char **parv)
+int ctcp_ping(aNick *nick, aChan *chaninfo, int parc, char **parv)
 {
-	if(parc) csreply(nick, "\1PING %s", parv[1]);
+	if(parc) csntc(nick, "\1PING %s", parv[1]);
 	return 1;
 }
 
 int ctcp_version(aNick *nick, aChan *chan, int parc, char **parv)
 {
-    csreply(nick, "\1VERSION Services SDreams [" SPVERSION "] © IrcDreams.org (Compilé le " __DATE__ " "__TIME__ ")\1");
+    csntc(nick, "\1VERSION Services SDreams " SPVERSION " (Rev:" REVDATE ") "
+    	"http://www.bugsounet.fr/ (Build " __DATE__ " "__TIME__ ")\1");
+    csntc(nick, "\1VERSION Copyright (C) 2021 @bugsounet\1");
 	return 1;
-}
-
-int version(aNick *nick, aChan *chan, int parc, char **parv)
-{
-	csreply(nick, "Services SDreams [" SPVERSION "] © IrcDreams.org (Compilé le " __DATE__ " "__TIME__ ")");
-        return 1;
 }
 
 int lastseen(aNick *nick, aChan *chan, int parc, char **parv)
 {
 	anUser *u = getuserinfo(parv[1]);
 
-	if(!u) csreply(nick, GetReply(nick, L_NOSUCHUSER), parv[1]);
-	else if(u->n && !IsHiding(u->n)) csreply(nick, GetReply(nick, L_ELSEALREADYLOG));
-	else csreply(nick, GetReply(nick, L_FULLLASTSEEN), u->nick,
-                        duration(CurrentTS - u->lastseen), get_time(nick, u->lastseen));
-
+	if(!u) csntc(nick, GetReply(nick, L_NOSUCHUSER), parv[1]);
+	else if(u->n) csntc(nick, GetReply(nick, L_ELSEALREADYLOG));
+	else csntc(nick, GetReply(nick, L_FULLLASTSEEN), u->nick,
+				duration(CurrentTS - u->lastseen), get_time(nick, u->lastseen));
 	return 1;
 }
 
 int show_admins(aNick *nick, aChan *chan, int parc, char **parv)
 {
 	int i = 0;
+#ifdef OLDADMINLIST
 	anUser *u;
-	csreply(nick, "\2Présent  Niveau  Username       Pseudo\2");
-	for(;i < USERHASHSIZE;++i) for(u = user_tab[i];u;u = u->next)
-		if(IsAdmin(u)) csreply(nick, "\2\003%s\2\3      %d       %-13s  \0032%s\3",
-				(u->n && !IsHiding(u->n)) ? (IsAway(u->n) || UIsBusy(u)) ? "14ABS" : "3OUI" : "4NON",
-				u->level, u->nick, (u->n && !IsHiding(u->n))  ? u->n->nick : "");
-	return 1;
-}
+	csntc(nick, "\2Présent  Niveau  Username       Pseudo\2");
+	for(; i < USERHASHSIZE; ++i) for(u = user_tab[i]; u; u = u->next)
+		if(IsAdmin(u)) csntc(nick, "\2\003%s\2\3      %d       %-13s  \0032%s\3",
+				u->n ? IsAway(u->n) ? "14ABS" : "3OUI" : "4NON",
+				u->level, u->nick, u->n ? u->n->nick : "");
+#else
+	aNick *n = NULL;
+	char nicks[205] = {0};
+	size_t size = 0;
 
-int show_helper(aNick *nick, aChan *chan, int parc, char **parv)
-{
-        int i = 0, nb = 0;
-        anUser *u;
-        csreply(nick, "\2Présent  Username       Pseudo\2");
-        for(;i < USERHASHSIZE;++i) for(u = user_tab[i];u;u = u->next)
-                if(u->level == 2) {
-			csreply(nick, "\2\003%s\2\3      %-13s  \0032%s\3",
-                                (u->n && !IsHiding(u->n)) ? (IsAway(u->n) || UIsBusy(u)) ? "14ABS" : "3OUI" : "4NON",
-                                u->nick, (u->n && !IsHiding(u->n)) ? u->n->nick : "");
-			++nb;
-		}
-	if (!nb) csreply(nick,"Aucun Agent d'aide a été défini");
-        return 1;
-}
+	for(; i < adminmax; ++i)
+	{
+		size_t tmps = size;
+		if(!(n = adminlist[i]) || UIsBusy(n->user) || IsAway(n)) continue;
 
-int show_ignores(aNick *nick, aChan *chan, int parc, char **parv)
-{
-	struct ignore *i= ignorehead;
-	int c = 0;
-
-	if(!ignorehead) return csreply(nick, GetReply(nick, L_NOINFOAVAILABLE));
-
-	csreply(nick, "Liste des Ignorés:");
-	for(;i;i = i->next)
-		csreply(nick,"\002%d\2. \2%s\2 Expire dans %s", ++c, GetIP(i->host), duration(i->expire - CurrentTS)); 
-
+		size += strlen(n->nick);
+		if(size >= sizeof nicks - 5) break; /* He gets enough admins to be helped.. */
+		strcpy(&nicks[tmps], n->nick);
+		nicks[size++] = ' ';
+		nicks[size] = 0; /* note that all bytes are set to 0 but.. */
+	}
+	if(!*nicks) return csntc(nick, GetReply(nick, L_NOADMINAVAILABLE));
+	csntc(nick, GetReply(nick, L_ADMINAVAILABLE));
+	csntc(nick, "  %s", nicks);
+#endif
 	return 1;
 }
 
 int verify(aNick *nick, aChan *chan, int parc, char **parv)
 {
-        aNick *n;
+	aNick *n;
 
-        if(!strcasecmp(parv[1], cs.nick)) return csreply(nick, "Yeah, c'est bien moi :)");
-        if(!(n = getnickbynick(parv[1])) || (IsHiding(n) && !IsAnAdmin(nick->user))) return csreply(nick, GetReply(nick, L_NOSUCHNICK), parv[1]);
-        if(!n->user) return csreply(nick, GetReply(nick, L_NOTLOGUED), n->nick);
+	if(!strcasecmp(parv[1], cs.nick)) return csntc(nick, "Yeah, c'est bien moi :)");
+	if(!(n = getnickbynick(parv[1]))) return csntc(nick, GetReply(nick, L_NOSUCHNICK), parv[1]);
+	if(!n->user) return csntc(nick, GetReply(nick, L_NOTLOGUED), n->nick);
 
-        csreply(nick, "%s est logué sous l'username %s%s%s%s",
-                (IsAnAdmin(nick->user) || n == nick) ? GetNUHbyNick(n, 0) : n->nick, n->user->nick,
-                IsAdmin(n->user) ? " - Administrateur des Services" : "", IsOper(n) ? " - IRCop" : "",
-		IsHelper(n) ? " - Agent d'Aide du Réseau" : "");
-        return 1;
-}
-
-int swhois(aNick *nick, aChan *chan, int parc, char **parv)
-{
-        anUser *u;
-        char *arg = parv[1], *swhois = parv2msg(parc, parv, 2, SWHOISLEN), memo[MEMOLEN + 1];
-
-        if(strlen(swhois) > SWHOISLEN)
-        	return csreply(nick, "La longueur du SWHOIS est limitée à %d caractères.", SWHOISLEN);
-
-	if(!(u = ParseNickOrUser(nick, arg))) return 0;
-
-	if(strcasecmp(u->nick, nick->user->nick) && IsAdmin(u) && u->level >= nick->user->level && nick->user->level < MAXADMLVL)
-        	return csreply(nick, "L'user \2%s\2 est un Admin de niveau supérieur au votre.", u->nick);
-
-	if(u->swhois && (!strcmp(swhois, u->swhois))) return csreply(nick, "Ce SWHOIS est déjà mis en place.");
-
-	str_dup(&u->swhois, swhois);
-
-        if(!strcmp(swhois, "none")) {
-               	csreply(nick, "Le SWHOIS de %s a été annulé", u->nick);
-                DelUSWhois(u);
-                if (u->n) {
-			putserv("%s " TOKEN_SWHOIS " %s", bot.servnum, u->n->numeric);
-			csreply(u->n, "Votre SWHOIS a été annulé par %s", nick->user->nick);
-			if(u->swhois) free(u->swhois), u->swhois = NULL;
-		}
-		snprintf(memo, MEMOLEN, "Votre SWHOIS a été annulé par %s.", nick->user->nick);
-        }
-        else {
-		csreply(nick, "Le SWHOIS de %s (%s) a été mis en place.", u->nick, u->swhois);
-               	SetUSWhois(u);
-		if (u->n) {
-			putserv("%s " TOKEN_SWHOIS " %s :%s", bot.servnum, u->n->numeric, u->swhois);
-			csreply(u->n, "Votre SWHOIS (%s) a été mis en place par %s.", u->swhois, nick->user->nick);
-		}
-		snprintf(memo, MEMOLEN, "Votre SWHOIS (%s) a été mis en place par %s.", u->swhois, nick->user->nick);
-	}
-	add_memo(u, cs.nick, CurrentTS, memo, MEMO_AUTOEXPIRE);
-	if(!UNoMail(u)) tmpl_mailsend(&tmpl_mail_memo, u->mail, u->nick, NULL, NULL, cs.nick, memo);
+	csntc(nick, "%s est logué sous l'username %s %s %s",
+		(IsAnAdmin(nick->user) || n == nick) ? GetNUHbyNick(n, 0) : n->nick, n->user->nick,
+		IsAdmin(n->user) ? "- Administrateur des Services" : "", IsOper(n) ? "- IRCop" : "");
 	return 1;
 }
 
-int sethost(aNick *nick, aChan *chan, int parc, char **parv)
+void CleanUp(void)
 {
-        anUser *u,*who;
-        char *arg = parv[1], *host = parv[2], memo[MEMOLEN + 1];
+	aChan *c, *ct;
+	anUser *u, *ut;
+	aHashCmd *cmd, *cmd2;
+	int i = 0;
 
-        if(strlen(host) > HOSTLEN)
-               	return csreply(nick, "La longueur du host est limitée à %d caractères.", HOSTLEN);
+	free(cf_quit_msg);
+	free(cf_mailprog);
+	free(cf_pasdeperm);
 
-        if (!IsValidHost(host))
-               	return csreply(nick, "Le host n'est pas valide.");
+	socket_close();
+	purge_network(); /* nicks(+joins) + netchans + servers */
 
-	if(!(u = ParseNickOrUser(nick, arg))) return 0;
-	
-	if(strcasecmp(u->nick, nick->user->nick) && IsAdmin(u) && u->level >= nick->user->level && nick->user->level < MAXADMLVL)
-               	return csreply(nick, "L'user \2%s\2 est un Admin de niveau supérieur au votre.", u->nick);
+	for(i = 0; i < CHANHASHSIZE; ++i) for(c = chan_tab[i]; c; c = ct)
+	{
+		aLink *lp = c->access, *lp_t = NULL;
+		aBan *b = c->banhead, *bt = NULL;
 
-	if(u->vhost && !strcmp(host, u->vhost)) return csreply(nick, "Ce vhost est déjà mis en place.");
+		ct = c->next;
+		/* Access links */
+		for(; lp; free(lp), lp = lp_t) lp_t = lp->next;
+		/* Bans */
+		for(; b; free(b->raison), free(b->mask), free(b), b = bt) bt = b->next;
 
-	if((who = GetUserIbyVhost(host))) return csreply(nick, "Ce vhost est déjà utilisé par %s.",who->nick);
-
-        if(!strcmp(host, "none")) {
-               	csreply(nick, "Le vhost de %s a été annulé", u->nick);
-                DelUVhost(u);
-		Strncpy(u->vhost, "none", HOSTLEN);
-		hash_delvhost(u);
-                if (u->n && UVhost(u)) {
-			putserv("%s SVSHOST %s %s.%s", bot.servnum, u->n->numeric, u->nick, hidden_host);
-			csreply(u->n, "Votre VHOST a été annulé par %s", nick->user->nick);
-			nick->flag = parse_umode(nick->flag, "-H");
-		}
-		snprintf(memo, MEMOLEN, "Votre VHOST a été annulé par %s.", nick->user->nick);
+		if(c->suspend) data_free(c->suspend);
+		free(c->motd);
+		free(c);
 	}
-        else {
-		csreply(nick, "Le vhost de %s (%s) a été mis en place.", u->nick, host);
-		switch_vhost(u,host);
-		DelURealHost(u);
-		DelUWantX(u);
-                SetUVhost(u);
-		if (u->n) {
-			putserv("%s SVSHOST %s %s", bot.servnum, u->n->numeric, u->vhost);
-			csreply(u->n, "Votre VHOST (%s) a été mise en place par %s.", u->vhost, nick->user->nick);
-			nick->flag = parse_umode(nick->flag, "+H");
-		}
-		snprintf(memo, MEMOLEN, "Votre VHOST (%s) a été mise en place par %s.", u->vhost, nick->user->nick);
+	for(i = 0; i < USERHASHSIZE; ++i) for(u = user_tab[i]; u; u = ut)
+	{
+		anAccess *a = u->accesshead, *at = NULL;
+#ifdef USE_MEMOSERV
+		aMemo *m = u->memohead, *mt = NULL;
+		for(; m; free(m), m = mt) mt = m->next;
+#endif
+		ut = u->next;
+		/* Access */
+		for(; a; free(a->info), free(a), a = at) at = a->next;
+
+		if(u->suspend) data_free(u->suspend);
+		if(u->cantregchan) data_free(u->cantregchan);
+		if(u->nopurge) data_free(u->nopurge);
+		free(u->cookie);
+		free(u->lastlogin);
+		free(u);
 	}
-	add_memo(u, cs.nick, CurrentTS, memo, MEMO_AUTOEXPIRE);
-	if(!UNoMail(u)) tmpl_mailsend(&tmpl_mail_memo, u->mail, u->nick, NULL, NULL, cs.nick, memo);
-	return 1;
+
+	for(i = 0; i < CMDHASHSIZE; ++i) for(cmd = cmd_hash[i]; cmd; cmd = cmd2)
+	{
+		int j = 0, h = 0;
+		cmd2 = cmd->next;
+		for(; j < LangCount ; ++j, h = 0)
+		{
+			if(!cmd->help[j]) continue; /* no help (ping etc.) */
+			for(; h < cmd->help[j]->count; ++h) free(cmd->help[j]->buf[h]);
+			free(cmd->help[j]->buf);
+			free(cmd->help[j]);
+		}
+		free(cmd->help);
+		free(cmd);
+	}
+
+	tmpl_clean();
+	lang_clean();
+	ignore_clean();
+	timer_clean();
+	dnr_clean();
+	log_clean(0);
 }
 
-int show_country(aNick *nick, aChan *chan, int parc, char **parv)
-{
-   struct cntryinfo *cntry;
-   char *country = parv[1];
-
-   if(*country && *country == '.') country++;
-   cntry = cntryhead;
-   while(cntry != NULL)
-   {
-      if(!strcasecmp(country, cntry->iso))
-      {
-         return csreply(nick,"Le code de pays \2%s\2 est \2%s\2", country, cntry->cntry);
-      }
-      cntry = cntry->next;
-   }
-   return csreply(nick,"Le code de pays \2%s\2 n'a pas été trouvé.", country);
-}
-
-int myinfo(aNick *nick, aChan *chan, int parc, char **parv)
-{
-	return show_userinfo(nick, nick->user, 0, 1);
-}

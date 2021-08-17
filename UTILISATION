@@ -1,0 +1,728 @@
+
+			-- [ -> SCODERZ <- ] --
+					version 1.3.2
+		--< GUIDE D'UTILISATION >--
+
+Dernière mise à jour :
+$Id: UTILISATION,v 1.12 2007/03/15 13:41:53 romexzf Exp $
+(Il est à noter que si la date de la dernière modification est trop lointaine, il est probable
+que le fichier ne soit pas pleinement fiable. L'aide (/z aide) est toujours plus sûre et plus maintenue)
+
+Bienvenue dans le guide d'utilisation d'SCoderZ. Ce fichier peut vous servir après le
+lancement d'SCoderZ, pour son utilisation.
+ATTENTION: Ceci n'aide en aucun cas à connaître les commandes et leur utilité. Il vous
+aidera à effectuer certaines opérations. Si vous voulez de l'aide sur une commande, tapez
+/<robot> aide <commande>
+
+AVANT TOUTE CHOSE:
+
+	Nous allons considerer que votre robot se nomme Z, la commande sécurisée
+	étant donc /Z.
+	Il est aussi à rappeler que, lorsque l'on vous montrera des syntaxes, les mots entre
+	<> sont des arguments obligatoires et que les mots entre [] sont des arguments
+	facultatifs. Leur contenu explique le mot ou les mots que vous devrez placer.
+
+
+Sommaire:
+1. Le premier lancement
+2. Les accounts
+3. Les admins
+4. Les memos
+5. Les options des accounts
+6. La commande USER
+7. Les bases des salons
+8. Les votes
+9. WEB2CS (ou parler à scoderz depuis un site web)
+10. Conclusion
+
+1. Le premier lancement
+=======================
+	Pour commencer, vérifiez bien qu'il a été lancé en tapant :
+	> /map
+
+	Si le nom du serveur que vous avez paramétré à scoderz est dans la liste, c'est qu'il
+	a été lancé convenablement.
+	Tapez:
+	> /z register <pseudo> <email> <email> <pass>
+	Par exemple:
+	> /z register Progs progs@headfucking.net progs@headfucking.net pupuce
+
+	ATTENTION: Si scoderz ne répond pas, c'est peut-être que vous utilisez un ircd non compatible
+	avec scoderz, ou que vous utilisez ircu2.10 et que vous n'avez pas activé --enable-ircu dans
+	le ./configure: > ./configure --enable-ircu [...]
+	Une réponse erronée peut être la cause d'un disfonctionnement. Si vous vous êtes effectivement
+	trompé, killez scoderz depuis ssh, relancez le script ./configure, configurez convenablement,
+	recompilez avec make, puis enfin relancez scoderz. Si ceci ne vous a pas aidé, contactez-nous.
+
+	Maintenant Z a normalement rejoin le salon paramétré dans scoderz.conf par misc_conf/help_chan.
+	Vous aurrez remarqué aussi qu'il se trouve sur le salon que vous avez paramétré dans
+	scoderz.conf par csbot/chan.
+	Dans ce salon là sera envoyé toutes les commandes envoyées à Z. Par exemple, tapez :
+	> /z showcommands
+
+	Vous allez déjà voir sur le salon quelque chose ressemblant à ceci :
+	<@Z> [14:54:17] showcommands par Progs`@Progs
+
+	Vous pouvez constater qu'il a indiqué l'heure, le nom de la commande et il a spécifié le pseudo
+	que vous possédez plus l'username sur lequel vous êtes logué. Ceci permettra d'identifier plus
+	rapidement un user.
+	Ensuite vous recevrez la liste des commandes. Vous pouvez constater le niveau requis spécifié
+	devant. Il est aussi indiqué à qui sont adressées les commandes (users, salons, admin).
+	Vous pouvez avoir de l'aide sur chacunes des commandes avec :
+	> /z aide <commande>
+
+	Nous rappelons que par rapport aux classes de commandes, un user qui a un certain niveau dans
+	cette classe peut utiliser les commandes de niveau inférieur de la même classe. Si un user est
+	admin niveau 3, il peut utiliser les commandes de niveau inférieur de la même classe, c'est à
+	dire le niveau 2. Si un user a un niveau 400 sur un salon, il peut utiliser les commandes de
+	niveaux inférieurs de la même classe, celle des salons, c'est à dire de 1 à 400. Il n'a en aucun
+	cas access aux commandes de niveau 2 à 4 si il n'est pas admin, celles ci faisant partie d'une
+	autre classe.
+
+	Nous allons décortiquer les différents niveaux utilisateurs:
+	- Le niveau 0 est le niveau des commandes accessibles à tous le monde, même ceux qui n'ont pas
+	d'username sur Z ou qui ne sont pas logués.
+	- Le niveau 1 contient les commandes que tous les users peuvent utiliser une foi logués. C'est
+	généralement des commandes de paramétrage de leur username, ou d'autres modules comme memoserv,
+	vote.
+	- Les niveaux de 2 à 4 sont les niveaux admins. Vous qui êtes le propriétaire de Z, avez le
+	niveau 4.
+	Vous pouvez voir là les différentes commandes possibles à chaques niveaux.
+
+	Il y a maintenant les niveaux des commandes salons:
+	Ils vont de 1 à 500 contiennent les commandes salons. Il ne peut y avoir qu'un seul
+	user ayant le niveau 500 dans un salon, ce dernier montrant que c'est bel et bien lui son
+	propriétaire.
+
+	Allez dans le salon paramétré avec misc_conf/help_chan. Vous allez y trouver Z. Tapez ceci :
+	> !showcommands
+
+	Vous verrez que Z répond. En effet, Z reconnait les commandes de cette manière ci aussi sur tous
+	les salons où il se trouve, vous pouvez taper ça. Mais dans cette documentation nous allons
+	continuer d'utiliser /z, qui est plus sécurisé (seul Z le voit ça). Vous verrez aussi que, si
+	vous avez activé l'option --enable-secure dans le ./configure, les commandes demandant des
+	informations privées sont à taper avec /z uniquement. Lors de l'appel d'une telle commande, les
+	informations privées ne seront PAS affichées dans le salon CHAN (vous regrettez ?:p).
+
+2. Les accounts
+===============
+	Chaque user pourra enregistrer UN account sur ces services. Pour ça, ils devront taper :
+	> /z register <username> <email> <email>
+	Par exemple:
+	> /z register Cesar Cesar@ircube.org Cesar@ircube.org
+
+	Un mot de passe va être constitué et envoyé à Cesar@ircube.org. Il pourra l'utiliser
+	pour s'identifier par la suite.
+
+	ATTENTION: Si vous avez activé l'option --enable-adminreg dans le ./configure, les admins
+	pourront enregistrer des accounts supplémentaires, avec la commande suivante :
+	> /z register <username> <email> <email> <pass>
+	Le pseudo sera alors instantanément enregistré et pret à l'emploi.
+
+	Pour s'identifier, il suffit de taper:
+	> /z login <username> <pass>
+	Par exemple:
+	> /z login Cesar uJsJZGyYivc
+
+	Vous pouvez changer votre mot de passe, celui envoyé par mail étant peut être un peu trop dur à
+	retenir:
+	> /z set pass <nouveau pass> <nouveau pass>
+	Par exemple:
+	> /Z set pass cesarion cesarion
+
+	D'autres options d'accounts seront vu dans le chapitre 5.
+
+	Pour supprimer un account, utilisez:
+	> /z DROP <pass> CONFIRME
+	Par exemple:
+	> /Z DROP cesarion CONFIRME
+	ATTENTION: cette opération est irréversible.
+
+3. Les admins
+=============
+	Bien entendu, pour faire marcher ce bel étalage de services, il faut des admins pour aider les
+	users et gérer tout ça. Vous pouvez avoir leur liste avec :
+	> /z admin
+
+	Vous verrez Z vous répondre quelque chose comme :
+	-Z-  Administrateurs des Services actuellement disponibles:
+	-Z-   Progs
+
+	Vous pouvez constater que vous êtes le seul admin. Il est à noter qu'il faut être présent (pas
+	/away), et ne pas avoir le flag BUSY (/z set busy). L'affichage peut etre différent si vous avez
+	activé l'option --enable-oldadminlist dans ./configure.
+	Les niveaux des administrateurs vont de 2 à 4.
+	Vous êtes pour le moment le seul admin sur Z. Pour en ajouter un autre, tapez ceci :
+	> /z adminlvl <username> <niveau2-4>
+	Par exemple:
+	> /z adminlvl Cesar 3
+
+	ATTENTION: Il faut bien entendu que celui ci ait un username enregistré sur Z, et vous devez spécifier
+	ce dernier.
+
+	Maintenant Cesar devrait être dans la liste (vous pouvez vérifier).
+	Si il tape /z showcommands il verra affiché ça :
+	-Z- Commandes User
+	-Z- Niveau   0: sendpass register recover oubli login showcommands verify help aide admin
+	-Z-           : seen uptime
+	-Z- Niveau   1: voter memos myaccess drop results set regchan
+	-Z- Commandes Administrateur
+	-Z- Niveau   2: user ignorelist inviteme chan write whoison whois say global do
+	-Z- Niveau   3: dnruser dnrchan vote
+	(plus les commandes chans qu'on verra plus tard).
+
+	Vous constatez donc qu'un user, lorsqu'il tape /z showcommands, ne voit QUE les commandes
+	auxquelles il a access. Comme il est admin, il a access à TOUTES les commandes chans, donc
+	il les voit aussi.
+
+	Examinons un peu ces commandes admins (c'est un petit bricabrac rapide):
+	user est un ensemble de sous commandes permettant d'avoir des actions sur les usernames.
+	inviteme sert à se faire inviter sur le chan csbot/chan.
+	chan est un ensemble de sous commandes permettant d'avoir des actions sur les salons.
+	write permet d'écrire la base de donnée.
+	whoison affiche la liste des users d'un salon
+	say et do pour, respectivement, faire dire un message ou une action au robot
+	global pour envoyer des messages ou memos globaux
+	dnruser pour gérer la liste des pseudos interdits
+	dnrchan pour gérer la liste des salons interdits
+	vote pour gérer les votes
+
+	Ceci est une description rapide, vous pouvez utiliser l'aide pour avoir plus d'informations
+	sur une commande.
+	Nous allons maintenant essayer de changer le niveau de Cesar, avec la commande :
+	> /z adminlvl <username> <niveau>
+	Par exemple:
+	> /z adminlvl Cesar 4
+
+	Si vous regardez la liste des admins, le niveau admin de Cesar est passé à 4.
+	Maintenant essayons de supprimer son access admin. Nous avons vu tout à l'heure que le niveau 1
+	représente le niveau d'admin par default.
+	Nous allons donc faire :
+	> /z adminlvl Cesar 1
+
+	Vérifiez la liste des Administrateurs, Cesar n'y apparait plus.
+
+4. Les memos
+============
+	Ceci nécessite d'avoir activé le module MEMOSERV. Si ce n'est pas le cas, veuillez passer au
+	chapitre suivant.
+
+	Les memos sont une forme simple de se laisser des messages, entre users.
+	L'unique commande de gestion des memos est MEMO.
+	Pour envoyer un memo à un autre user:
+	> /z memos send <destinataire> <message>
+	Par exemple:
+	> /z memos send Cesar Salut bibiche
+
+	ATTENTION: Ceci peut vous parraitre inutile, mais le message doit être précédé de ':'.
+	Si quelqu'un est logué sur l'username Cesar, il va recevoir la notice:
+	-Z- Memo de Progs: Salut bibiche
+
+	Sinon le memo sera stocké et Cesar recevra une notice lors du LOGIN lui disant le nombre de
+	memos dans sa boite. Il pourra alors les lire avec:
+	> /z memos lire all
+
+	Là tous les memos seront affichés. Pour les supprimer ou en supprimer un en particulier il
+	utilisera:
+	> /z memos suppr <n° du memo|ALL>
+	Par exemple:
+	> /z memos suppr 1
+	pour effacer le memo n° 1, ou alors:
+        Ou:
+	> /Z memos del 1-3,7,9
+	pour supprimer les mémos 1 à 3, 7 et 9
+	> /z memos suppr all
+	pour effacer tous les memos.
+
+	Je vous ai dis qu'il n'y avait qu'une seul commande. C'est à peu près faux. Les admins peuvent
+	envoyer un memo à tous les users, ou à certains niveaux, avec:
+	> /Z GLOBAL MEMO [-min <niveau minimum>] [-max <niveau maximum>] :<message>
+
+	-min est un paramètre facultatif pour donner le niveau minimum que chaques users doivent avoir
+	pour recevoir le message que j'envoi.
+	-max est un paramètre facultatif pour donner le niveau maximum que chaques users doivent avoir
+	pour recevoir le message que j'envoi.
+	Le niveau part de 1 à 4.
+
+5. Les options des accounts
+===========================
+	Chaque user peut paramétrer son account grâce à la commande SET. Voici les options:
+	MAIL		 Pour changer son email
+	PASS		 Pour changer son mot de passe
+	PROTECT		 Pour activer la protection du pseudo
+	USERNAME	 Pour changer son username
+	AUTOHIDE	 Pour que Z vous donne le mode +x automatiquement à votre LOGIN.
+	ACCESS		 Pour changer sa politique face aux propositions d'accès
+	NOMEMO		 Pour ne pas recevoir de memos
+	LANG		 Pour définir la langue
+
+	Ceci peut vous paraitre flou, mais nous allons étudier chacunes des options les unes après
+	les autres.
+
+	Si vous avez, par exemple, changé de fournisseur d'access à internet, que vous avez quitté aol
+	pour wanadoo parce que wanadoo pu moin que aol, vous n'avez plus votre mail aol (moi@aol.com)
+	mais vous avez maintenant un mail wanadoo, ce qui ne vous honorise pas plus (moi@wanadoo.fr).
+	Vous allez donc devoir le changer dans Z, avec:
+	> /z SET MAIL <nouveau mail>
+	Donc:
+	> /z SET MAIL moi@wanadoo.fr
+
+	Vous vous êtes brouillé avec un ami qui connaissait votre mot de passe. Vous avez peur qu'il
+	ne s'identifie sur votre account pour foutre la merde. Vous allez donc avoir plutot envie
+	d'éviter ça et de changer votre mot de passe:
+	> /z SET PASS <nouveau pass> <nouveau pass>
+	Donc:
+	> /z SET PASS tumauraspas tumauraspas
+	(Cet exemple prouve qu'il est plutot conseillé de ne communiquer votre mot de passe à PERSONNE,
+	pas même à un admin, qui n'en a pas besoin).
+
+	Vous êtes le fils de Bill Gates et vous avez envi d'être propriétaire, comme votre père, et donc
+	de garder votre pseudonyme pour vous. Vous pouvez le faire en activant l'option PROTECT.
+	Il faut définir un "niveau" de protection tel que :
+	0 = aucune protection, 1 = changement de pseudo, 2 = kill
+	Pour qu'il change le pseudo de ce monstre en <CHNICKRAND><nbaléatoire> (ex. Jeux35384147):
+	> /Z SET PROTECT 1
+	Pour qu'il kill ce fils de judas parce qu'il a osé marcher sur vos plates bandes:
+	> /z SET PROTECT 2
+
+	Vous constatez maintenant que votre pseudonyme n'est pas en mesure de votre esprit si génial,
+	vous voulez le changer en quelque chose de mieu (par exemple passer du pseudo WINDOWS200 en
+	WINDOWSXP), il vous suffit de:
+	> /z SET USERNAME <nouveau pseudo>
+	Par exemple:
+	> /z SET USERNAME WINDOBEXP
+
+
+	Vous avez enfin constaté que wanadoo c'est aussi à chier, vous en avez honte, alors vous voulez
+	cacher votre host en abo.wanadoo.fr, rien de plus simple avec SCoderZ ! Grâce à l'option
+	AUTOHIDE, le mode +x vous sera mis automatiquement au LOGIN, changeant votre host en
+	<login>.<HIDDEN_HOST> (faut l'activer dans scoderz.conf) avec:
+	> /z SET AUTOHIDE ON
+	L'host sera, par exemple, WINDOBEXP.users.ircube.org et plus F668B380.abo.wanadobe.fr et vous en
+	êtes content.
+
+	L'option ACCESS sera vue plus tard.
+
+	Vous en avez marre de ces crétins qui vous bourre votre boite à memo avec la pub pour Linux, fier
+	au travail de votre papa microsoft, vous pouvez bloquer votre boite à memo, n'autorisant que
+	les admins à pouvoir vous y en mettre:
+	> /z SET NOMEMO ON
+
+6. La commande USER
+===================
+	Cette commande permet aux admins de gérer les users, et de les aider. Voici les différentes
+	sous commandes:
+
+	INFO     <username/*/*motclef*> <-arg1 -arg2..>
+	les arguments de recherche sont:
+		-auth: ne liste que les usernames sur lesquels quelqu'un est auth
+		-suspend: ne liste que les usernames suspendus
+		-count <nombre> : ne liste que <nombre> entrees
+		-seen <nombre>: ne liste que les usernames dont le dernier login date de moins de <nombre> secs
+		-date <Tps Unix>: ne liste que les usernames dernieremnt logue qu'avant cette date
+		-mail <mask-de-mail>: ne liste que les usernames dont le mail correspond
+	Affiche les infos d'un/de plusieurs usernames (les options sont cumulables a souhait)
+	SUSPEND  <username> <on/off>    (De)Suspend un username
+	DEL      <username>             Supprime un username
+	MAIL     <e@mail>               Modifie le mail d'un username
+	NEWPASS  <pass>                 Modifie le pass d'un username
+	NEWNICK  <username> <nouveau>   Change l'username d'un user
+	STATS [-all] [-mem] [-cmds [mask]] [-user]
+	LIST [-user] [-chan] [-purge]
+
+	Nous allons voir plus approfondiquement chacunes des sous commandes:
+
+	Vous pouvez voir les informations sur les usernames de la façon suivante:
+	> /z USER INFO <username/mask> [-auth] [-suspend] [-count <nb>] [-seen <nb>] [-date <tmp unix>]
+	                  [-mail <mask>]
+	Ceci peut vous parraitre compliqué. Pour l'explication des arguments, lisez ci dessus.
+	Voici des exemples:
+	> /Z USER INFO * -auth -count 15
+	liste tous les usernames qui ont quelqu'un de logués dessus et en affiche que les 15 premiers
+	> /z USER INFO *r* -suspend
+	liste tous les usernames contenant 'r' et qui sont suspendus
+	> /z USER INFO *Progs* -count 3
+	list tous les enfoirés qui ont osé prendre mon nick dans leurs usernames
+
+	Pour suspendre quelqu'un utilisez:
+	> /z USER SUSPEND <username> <on/off>
+	Par exemple:
+	> /z USER SUSPEND caca-progs-caca ON
+	suspend l'user qui a osé enregistré cet username à la con (non j'fais pas comme ça dans la
+	réalité ne vous inquiétez pas, j'supprime tout court)
+
+	Justement, en parlant de ça, pour supprimer définitivement un username sans confirmation,
+	utilisez :
+	> /z USER DEL <username>
+	Par exemple:
+	> /z USER DEL caca-progs-caca
+	supprime définitivement l'username caca-progs-caca :)
+
+	Si jamais un user a un nouveau mail et qu'il peut pas le modifier soit même (trop con, ou son
+	username match *ADSL*):
+	> /z USER MAIL <username> <email>
+	Par exemple:
+	> /z USER MAIL ADSL_MAN jemappeladslman@neuneuland.net
+
+	Au cas où un type ait oublié son pass et qu'il n'arrive pas à utiliser RECOVER (ça arrive, dans
+	le même cas que la cmd précédente):
+	> /z USER NEWPASS <username> <pass>
+	Par exemple:
+	> /z USER NEWPASS ADSL_MAN boulet
+
+	Pour changer l'username d'un user qui est toujours dans la même situation que précédement:
+	> /z USER NEWNICK <username> <nouveau username>
+	Par exemple:
+	> /z USER NEWNICK ADSL_MAN 4D5|_-M4|\|
+	(oui ça fait plus esthetique pour lui j'pense, mais moi j'y vois plus rien)
+
+	Sous commande qui n'a à peu près RIEN à voir avec les users (on se demande ce qu'elle fout là,
+	hin cesar), elle permet d'avoir des statistiques à propos de plusieurs sujet:
+	> /z USER STATS [-all] [-mem] [-cmds [mask]] [-user]
+	-all: montre toutes les statistiques
+	-mem: montre l'utilisation de la mémoire
+	-cmds [mask]: permet de connaitre le nombre de fois que les commandes vérifiant le mask donné a
+	été utilisée
+	-user: je n'ai strictement aucune idée de son utilité
+	Par exemple:
+	> /z USER STATS -mem
+	> /z USER STATS -cmds *op*
+	nb de fois qu'on a utilisé les cmds contenant "op" (op/deop/opall/deopall)
+
+	Il peut y avoir quelques problèmes de suppression de salons ou d'users (niveau fichier). Même si
+	ils ne sont pas dans la mémoire du robot, leurs fichiers sont présents et ça peut encombrer.
+	Cette commande vérifi les fichiers, si ils sont bien réellement existant.
+	Syntax:
+	> /z USER LIST [-user] [-chan] [-purge]
+	-user: pour les users
+	-chan: pour les chans
+	-purge: supprimer les fichiers d'usernames ou de chans non réellement existants.
+	(si l'option -purge n'est pas spécifié, Z dira just le nb de fichier chan et/ou de fichier user
+	non chargés)
+	Exemple:
+	> /z USER LIST -user -purge
+	purge tous les fichiers users non chargés
+
+7. Les bases des salons
+=======================
+	Une énorme fonction de scoderz est bien évidemment de gérer les salons. Nous verrons dans cette
+	section comment les users peuvent les enregistrer et les supprimer, et les commandes de bases.
+
+	Lorsqu'un user a rencontré d'autres personnes, il aimerait peut être (j'en sais rien moi) parler
+	avec eux sur un sujet commun. Le sujet peut être un point en commun, une passion (ma petite
+	soeur aurrait pu créer le chan #laurie). Enfin bref, tout ça peut être réglé grace à l'IRC et
+	notre brave scoderz. L'user, ayant un username sur Z, va pouvoir joindre le salon qu'il va
+	vouloir créer.
+	Imaginons dans le cadre actuel que le salon soit #star-academy et que ce soit moi qui suis l'user
+	(dur à imaginer ça). Il est à noter que tout les commentaires que je vais faires seront bien
+	entendu ce que penserait l'user ayant enregistré le salon #star-academy.
+	Pour commencer je join le salon avec :
+	> /join #star-academy
+	Le salon étant vide, je me retrouve OP et tout seul. Mais pour être bien certain que ce soit le
+	mien officiellement, j'vais l'enregistrer sur Z:
+	> /z register <salon> <description>
+	Donc dans notre cas:
+	> /z register #star-academy C'est jean pascal qui va gagner !
+	(bien évidement j'en sais rien du tout ne suivant pas l'emission, ne prennez pas ça en compte).
+
+	Bien, maintenant que Z a rejoin mon salon, j'suis content, j'vais pouvoir paramétrer le topic
+	pour attirer l'attention du salon dans la /list des salons :
+	> /z topic #star-academy Le salon officiel de star academy, la meilleur emission de TF1 !
+	bon bien sur ce n'est pas vrai dans le premier cas, mais si je regarde cette émission c'est
+	normal que je sois un peu incultivé. Au deuxième cas, c'est vrai que quand on regarde les autres
+	emissions de TF1 on se dit que c'est pas la pire.
+	Il est à noté que, comme je l'ai spécifié au début de ce fichier, j'aurrai pu taper dans le salon
+	#star-academy ceci:
+	> !topic Le salon officiel de star academy, la meilleur emission de TF1 !
+	Vous avez constaté qu'on n'est pas obligé de donner le nom du salon, Z prenant en compte celui
+	dans lequel vous avez tapé la commande. Vous pouvez tout de même en spécifier un si vous voulez
+	utiliser la commande sur un autre salon. Ceci ne marche que pour les commandes en rapport aux
+	salons. Mais les autres commandes peuvent aussi être appelées sur les salons (j'ai pas été clair
+	là j'pense).
+	Mais dans le cadre de ce fichier je me contenterai d'utiliser /z.
+
+	Ça y est, y a d'autres imbeciles qui m'ont rejoin sur mon salon (faut dire que ce qui marche le
+	plus de nos jours c'est les conneries..). Tous le monde se dispute, certain disent que c'est
+	effectivement jean pascal qui va gagner, d'autres disent que ça va être philipe, d'autres encore
+	disent que ça va être christine (à cause de son beau cul là j'pense). Tout ça part en couille,
+	les insultes se balancent (c'est tous ce qu'ils apprennent cette année dans leurs collèges). Tout
+	cela dégénère, il faut que j'excluse des personnes:
+	> /z kick <salon> <pseudo> [raison]
+	Dans le cas actuel, c'est ADSL_MAN qui a dit :
+	<ADSL_MAN> LoOoOoOoOl c'est que des conneries expdrrr bande de fils de pute c jean pascal mouaha!
+	Bien que je suis de son avis il a pas à insulter la mère des autres, surtout qu'il ne les connait
+	pas, nos mères (je kick surtout parce qu'il parlait à tous le monde et que j'en fais partit, moi
+	aussi j'insulte les autres, mais dès qu'on m'insulte faut tout de suite punir).
+	> /z kick #star-academy ADSL_MAN Tu as insulté nos mère sniiiif
+
+	Maintenant il revient à la charge avec son super auto rejoin on kick. Il continu il répète
+	plusieurs fois à la suite la phrase pour laquelle j'ai du le kicker. C'en est trop, j'veux plus
+	le voir.
+	> /z kickban <salon> [niveau] <pseudo> [temps] [raison]
+	Cette commande permet de bannir l'user et de l'éjecter pour l'empecher de revenir pendant un
+	certain temps si c'est indiqué, ou alors jusqu'à que quelqu'un enlève le ban.
+	[niveau]: ceci est le niveau salon minimum requis pour enlever ce ban.
+	[temps]: ceci est la durée du ban. Se présente sous forme "%XjXhXm" exemple "%3j2h".
+	Nous allons maintenant punir celui qui nous embete:
+	/z kickban #star-academy ADSL_MAN %3h Veuillez ne pas répéter et ne pas insulter des
+	personnes que tu connais pas de pute :(
+	Maintenant ADSL_MAN a 3 heures à attendre avant de fouler son nick de mon salon.
+
+	Tous ces imbeciles qui prétendent savoir qui va gagner me fatiguent à gérer, surtout que mon
+	forfait	est uniquement de 20 heures par mois, que j'en suis à 17 heures depuis que le forfait
+	s'est renouvelé y a 3 jours (c'est bien évidemment des heures perdus sur l'IRC), et que ma maman
+	m'a demandé de m'arrêter. Il faut que quelqu'un puisse gérer les 13 cons de mon salons. Je vais
+	donc déleguer ceci à mon ami ADSL_MAN qui s'est calmé, qui m'a promis de me filer taxi 3 gratos
+	avant sa sortie et qui a beaucoup de points en commun avec moi (il aime loftstory, popstar,
+	starac, et pense que c'est jean pascal qui va gagner). Il a bien enregistré un username sur
+	scoderz, j'vais pouvoir lui ajouter un access:
+	> /z adduser <salon> <username> <niveau>
+	Le niveau part de 5 à 499. Vous pouvez voir avec SHOWCOMMANDS les commandes par niveaux. Comme
+	pour les commandes admins, un user d'un tel niveau peut utiliser les commandes des niveaux
+	inférieurs.
+	Comme mon nouveau cyber-pote a l'air d'être de confiance et hyper trop sympat (ouai j'le connais
+	depuis plus de 2 heures !!), j'vais lui donner un access de 450 (il m'a promis le divx du film
+	pokemon avant sa sortie au japon (c'est domage c'est en japonais mais comme toute façon même en
+	français on comprend pas grand chose..)):
+	> /z adduser #star-academy 4DS|_-M4|\| 450
+	Nous avons maintenant proposé un access à ADSL_MAN.
+
+	Lorsque nous avons vu la commande SET (chapitre 2), nous avons sauté la sous commande ACCESS.
+	Nous allons ici voir ce que c'est.
+	Vous pouvez avoir trois formes de reception d'access. Voici la syntax:
+	> /Z SET ACCESS <0/1/2>
+	Si vous mettez 0, refuse automatiquement tous les access proposés
+	Si vous mettez 1, requiert l'utilisation de la commande OKACCESS pour accepter ou refuser un
+	                  access manuellement.
+	Si vous mettez 2, accepte automatiquement tous les access proposés.
+
+	Retournons maintenant au cas de l'ajout d'un access à ADSL_MAN dans mon salon.
+	Si il a le paramètre ACCESS=0, vous recevrez une notice disant que ADSL_MAN refuse tous les
+	                               access.
+	Si il a le paramètre ACCESS=2, l'access sera directement accepté et il aurra access dès
+	                               maintenant au salon.
+	Si il a le paramètre ACCESS=1, il a besoin d'utiliser la commande OKACCESS pour accepter ou
+	                               refuser l'access.
+		(Si ADSL_MAN est offline parce qu'il n'a plus assez d'heures sur son forfait aol, lors de
+		sa connexion il recevra une notice l'avertissant, sinon il la recevra tout de suite).
+		> /z OKACCESS <salon> <oui/non>
+		Imaginons (c'est facile à faire ça) qu'il veuille bien de son access sur mon salon, il
+		tapera:
+		> /z OKACCESS #star-academy oui
+		Sinon:
+		> /z OKACCESS #star-academy non
+		Si il a accepté, il aurra dès maintenant access au salon, sinon l'access sera rejeté.
+
+	Je suis maintenant obligé d'aller à mon super collège où j'ai plein d'amis qui parlent que de
+	loftstory et de starac, je dois me déconnecter (je pleure pendant les quelques secondes
+	avant d'y aller, ayant peine à appuyer sur le bouton "Deconnexion"). Le soir, lorsque je rentre,
+	je me rue sur mon pc, je l'allume, je dois attendre au moin 5 minutes devant l'écran "WINDOWS
+	98", pour que ça se charge. Tout de suite après le lancement, mirc, qui est dans le menu
+	Programmes/Démarrage, donc qui est ouvert automatiquement à l'allumage de windows (désolé j'ai du
+	mal mais j'evite les répétitions), je lance la connexion à internet, je vais dans mirc et je vais
+	dans mon salon #star-academy. Là je dois me loguer, une foi fait, pour me mettre opérateur je
+	tape ceci:
+	> /z op <salon> [users]
+	Dans mon cas:
+	> /z op #star-academy
+	(j'ai rien spécifié, donc ça m'op moi).
+
+	Je vois que ADSL_MAN, pendant mon absence, a opé d'autres personnes, j'vais faire:
+	> /z DEOP <salon> [users]
+	Donc:
+	> /z DEOP #star-academy Bugmaster kouak {Tr|sTaN}
+	(oui il aime ça le bugmaster, starac)
+
+	Comme je ne trouve pas de cas de figure pour les commandes voice/devoice/opall/deopall, j'vais
+	vous les expliquer simplement:
+	> /z VOICE <salon> [users]		:me voice ou voice les users spécifiés
+	> /z DEVOICE <salon> [users]		:me devoice ou devoice les users spécifiés
+	> /z OPALL <salon>			:op tous le monde
+	> /z DEOPALL <salon>			:deop tous le monde
+	> /z VOICEALL <salon>			:voice tout le monde
+	> /z DEVOICEALL <salon>			:devoice tout le monde
+
+	Tous le monde parle trop, je veux que seul certaines personnes (les voicés et les ops) parlent.
+	Je vais mettre le mode +m, par Z:
+	> /z MODE <salon> <modes>
+	Donc:
+	> /z MODE #star-academy +m
+	Pour enlever
+	> /z MODE #star-academy -m
+	Je ne dis rien sur les modes, prenant en compte que c'est en rapport à l'IRC et non à scoderz et
+	que vous devriez les connaître.
+
+	Starac ne m'interresse plus, je décide de changer le nom du salon en #popstar (oui ils chantent
+	mieu j'trouve):
+	> /z RENCHAN <salon> <nouveau nom>
+	Donc:
+	> /Z RENCHAN #star-academy #popstar
+	Le robot part de #star-academy et join #popstar: tous les access et paramètres sont sauvegardés.
+	Vous pouvez donc changer le topic:
+	> /z TOPIC #popstar Salon officiel de popstar, la meilleur émission de M6
+	(oui j'manque un peu d'inventation)
+
+	Ayant découvert y a peu longtemps l'existance de la commande SHOWCOMMANDS, j'y découvris la
+	possibilité de mettre un message de bienvenue, envoyé en notice à tous les users joignant le
+	salon.
+	> /z WELCOME <salon> <message>
+	> /z WELCOME #popstar Bienvenue sur le salon officiel de popstar, la meilleur emission de M6
+	(je l'ai dis, je manque un peu d'inovation, on se demande à quoi ça me sert de répéter le topic)
+
+	Il exist une commande très importante, nommée MODUSER. Syntax:
+	> /z MODUSER <salon> <sous commande> <username> <arguments>
+
+	Voici les sous commandes :
+	-----------------------------------
+        Option   Paramètres     Description
+        -----------------------------------
+	LEVEL     <5-499>    Paramètre votre niveau d'accès au salon
+	AUTOOP    <on/off>   \n vous op lors de votre arrivée sur le salon
+	AUTOVOICE <on/off>   \n vous voice lors de votre arrivée sur le salon
+	SUSPEND   <on/off>   (De)suspend un accès
+	INFO      <infoline> Paramètre une ligne que \n envera lors de votre entrée sur le salon
+	PROTECT   <on/off>   Active/Desactive votre protection
+        -----------------------------------
+	Voici la description de chacunes d'unes:
+
+	J'ai décidé de baisser le niveau d'access de ADSL_MAN, ne m'ayant toujours pas envoyé taxi 3 et
+	pokemon. J'lui laisse une semaine. Si je l'ai toujours pas reçu il y passe.
+	> /z MODUSER <salon> LEVEL <username> <nouveau niveau>
+	> /z MODUSER #popstar LEVEL 4D5|_-M4|\| 100
+
+	J'en ai marre de venir et de taper !op à chaque foi, je suis un gros fégnant. Mais il exist une
+	solution:
+	> /z MODUSER <salon> AUTOOP <username> <on/off>
+	> /z MODUSER #popstar AUTOOP moi ON
+
+	Pareil pour un voice automatique:
+	> /z MODUSER <salon> AUTOVOICE <username> <on/off>
+	> /z MODUSER #popstar AUTOVOICE moi ON
+
+	ADSL_MAN me doit toujours taxi 3 et pokemon depuis maintenant au moin 1 semaine ! Je le suspends
+	jusqu'à qu'il me l'envoi
+	> /z MODUSER <salon> SUSPEND <username> <on/off>
+	> /Z MODUSER #popstar SUSPEND 4D5|_-M4|\|
+
+	Lors de mon join, je veux qu'on me reconnaisse, que tout le monde ait peur de moi et qu'ils
+	sachent	bien que je suis le maitre incontesté (un salon de sujet pouris qui a 10 personnes).
+	> /z MODUSER <salon> INFO <username> <texte>
+	> /z MODUSER #popstar INFO moi Je suis bien le maitre du salon, respectez moi
+	> /z MODUSER #popstar INFO 4D5|_-M4|\| Je suis le plus grand menteur de tous les temps
+	Pour supprimer une infoline:
+	> /z MODUSER #popstar INFO qqun none
+
+	Attention, je suis hyper connu, on risque d'en vouloir à ma peau, j'vais utiliser la protection
+	qui me servira de garde du corp au cas où il y aurrait un attentat au kick contre moi:
+	> /z MODUSER <salon> PROTECT <username> <on/off>
+	> /z MODUSER #popstar PROTECT moi on
+	---
+
+	Ça fait 10 jours que ADSL_MAN me doit taxi 3 et pokemon. Il m'a dit qu'il l'avait envoyé par la
+	poste ce matin, bha ce soir j'ai toujours rien reçu. Ce gros menteur m'ennuis, je ne veux plus de
+	lui:
+	> /z DELUSER <salon> <username>
+	> /z DELUSER #popstar 4D5|_-M4|\|
+
+	Ah bha merde j'ai reçu taxi 3 et pokemon le lendemain du jour où je l'ai supprimé de mon salon.
+	Bha tant pis pour lui, il avait qu'à être plus rapide. Ses excuses du genre "j'ai une connexion
+	chez aol, tu comprends qu'il faut une semaine, même en étant connecté 24/24H, pour télécharger
+	deux fichiers de 600mo quand même", ça va.
+
+	Ça y est, j'ai eu mon brevet, je suis passé au lycée, j'suis devenu beaucoup moin borné et j'ai
+	enfin découvert que popstar était vraiment nul. Je décide de supprimer mon salon.
+	> /z UNREG <salon> CONFIRME <raison>
+	> /z UNREG #popstar CONFIRME je préfer les pokemons
+
+	Et voilà mon aventure chez les bornés vénérant TF1, M6, star academy, loftstory, les films taxi
+	et les pokemons est terminé.
+
+8. Les votes
+============
+	Ceci nécessite d'avoir activé le module VOTES dans ./configure. Si ce n'est pas le cas, veuillez
+	passer au chapitre suivant.
+
+	SCoderZ possède un petit module vous permettant d'organiser des votes sur votre réseau. Ceci peut
+	avoir plusieurs buts: élections admins, sondages, etc.
+	Dans chaques cas, ça marche comme ceci:
+	Un admin organise un vote suivant un certain sujet et des propositions. Lorsqu'il est actif, seul
+	les admins peuvent voir les résultats en cours. Lorsqu'un admin déclare le vote clos, tous le
+	monde peut voir les résultats (jusqu'au lancement du prochain vote).
+
+	Je vais donc imaginer que je suis un admin de mon réseau, que je décide de faire un vote pour une
+	élection d'ircop (je précise que dans la réalité je n'aime pas ce genre de vote).
+
+	Je décide donc de créer mon vote sur SCoderZ:
+	> /z VOTE NEW <nb de propositions> <sujet>
+	J'ai 6 candidats:
+	> /z VOTE NEW 6 Élection d'un IRC Opérateur sur notre réseau
+
+	Z me répond :
+	-Z- Le vote est en cours de création.
+	-Z- Sujet: Élection IRC Opérateur sur notre réseau
+	-Z- Vous devez maintenant définir les propositions avec : /Z VOTE PROPOSITION :<nom> jusqu'à que
+	    vous ayez donné les 6 propositions
+
+	Nous allons maintenant donner chacuns des candidats avec la même commande.
+	> /z VOTE PROPOSITION :<nom>
+	Je vais donc devoir taper tout ça:
+	> /Z VOTE PROPOSITION :ADSL_MAN
+	> /z VOTE PROPOSITION :pikachuyann
+	> /z VOTE PROPOSITION :tiot
+	> /z VOTE PROPOSITION :Embryon
+	> /z VOTE PROPOSITION :Sweet_Ness
+	> /z VOTE PROPOSITION :Laurent
+	ATTENTION: Veuillez ne pas vous tromper. Une fois une proposition donnée, la prochaine utilisation
+	de la commande sera considérée comme la proposition suivante. En cas d'erreur, annulez le vote et
+	recommencez.
+
+	Après avoir donné la dernière proposition, Z vous dira ceci :
+	-Z- Le vote est maintenant ACTIF.
+	-Z- Sujet: Élection IRC Opérateur sur notre réseau
+	-Z- Propositions:
+	-Z- 1. ADSL_MAN
+	-Z- 2. pikachuyann
+	-Z- 3. tiot
+	-Z- 4. Embryon
+	-Z- 5. Sweet_Ness
+	-Z- 6. Laurent
+
+	Les users, dès leur identification, seront appelé à voter, si ce n'est pas déjà fait, pour
+	un des candidat présenté. Il pourront le faire avec:
+	> /z VOTER [n° de la proposition]
+	Par exemple:
+	> /z VOTER 4
+	Les users peuvent connaître les propositions si ils ne spécifient aucun argument.
+
+	Vous pouvez regarder les resultats avec :
+	> /z VOTE RESULTS
+	En bas sera indiqué le nombre de votes et le nombre d'users en total, et le pourcentage d'users
+	qui ont votés.
+
+	Lorsque vous penserez que le temps est venu d'arrêter le vote, tapez :
+	> /Z VOTE CLORE
+
+	Le vote sera maintenant terminé et les users pourront voir les résultats librement avec:
+	> /Z RESULTS
+
+	Si vous voulez effacer la trace du vote passé, veuillez utiliser:
+	> /z vote CLEAR
+
+	Vous pourrez ainsi recommencer à faire d'autres votes quand vous voudrez.
+
+9. WEB2CS (ou parler à scoderz depuis un site web)
+==================================================
+	Cette nouvelle fonction permet de faire communiquer un site web avec un processus scoderz.
+	Il faut prendre en compte le fait que seul le serveur du web2cs sur scoderz est disponible ici,
+	et non pas le client php que vous devrez créer vous même en vous aidant de la documentation
+	sur le web2cs. (fichier website/WEB2CS)
+
+10. Conclusion
+=============
+	J'espère que tout ce qui vous a été dévoilé dans ce fichier vous a été utile. Cette doc vous
+	permettra peut être de créer une doc pour vos users, personnalisée à vos paramètres et à vos
+	users. Si vous avez des questions, n'hesitez pas.
+
+	Bonne chance,
+
+	-Progs <Progs@coderz.info>

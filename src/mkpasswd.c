@@ -1,10 +1,12 @@
 /* src/mkpasswd.c - Cryptage des mots de pass
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2006 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@ir3.org>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +21,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: mkpasswd.c,v 1.13 2005/10/22 23:07:56 bugs Exp $
+ * $Id: mkpasswd.c,v 1.17 2006/05/12 23:20:56 romexzf Exp $
  */
 
 #include "main.h"
 #include "crypt.h"
 #include "checksum.h"
+#include "debug.h"
 #include <netinet/in.h>
 
 char *MD5pass(const char *pass, char *to)
@@ -39,7 +42,7 @@ char *MD5pass(const char *pass, char *to)
 	MD5Update(&context, (unsigned char *) pass, strlen(pass));
 	MD5Final(dig, &context);
 
-	snprintf(p, sizeof hash, "%x%x", ntohl(dig[0]) + ntohl(dig[2]), ntohl(dig[1]) + ntohl(dig[3]));
+	mysnprintf(p, sizeof hash, "%x%x", ntohl(dig[0]) + ntohl(dig[2]), ntohl(dig[1]) + ntohl(dig[3]));
 	return p;
 }
 
@@ -47,40 +50,55 @@ int checkpass(const char *pass, anUser *user)
 {
 	char *p = MD5pass(pass, NULL);
 
-	char *ptr = UMD5(user) ? p : cryptpass(pass);
-	if(!strcmp(ptr, user->passwd))
-	{
-		if(!UMD5(user)) /* password is ok, just store the new md5 hash */
-		{
-			strcpy(user->passwd, p);
-			SetUMD5(user); /* mark it as md5 */
-		}
-		return 1;
-	}
+#ifdef MD5TRANSITION
+	if(!UMD5(user) && !strcmp(cryptpass(pass), user->passwd)) /* normal check success */
+		return password_update(user, p, PWD_HASHED);
+#endif
+	if(!strcmp(p, user->passwd)) return 1;
 
 	if(UOubli(user) && !strcmp(create_password(user->passwd), pass)) /* give him another try... */
-	{
-		strcpy(user->passwd, p); /* save new pass as current */
-		SetUMD5(user); /* mark it as md5 */
-		return 1;
-	}
+		return password_update(user, p, PWD_HASHED); /* save new pass as current */
+
 	return 0; /* default: failed! */
 }
 
-char *create_password(const char *seed) 
-{ 
-        static unsigned char pwd[33]; 
-        static const char base[] = 
-                "Az0By1Cx2Dw3Ev4FuGt6HsIr8Jq9KpLoMnNm/OlPkQjRi+ShTg[Uf5VeWd7XcYbZa]"; 
-        MD5_CTX context; 
-        unsigned char *p = pwd; 
-    
-        MD5Init(&context); 
-        MD5Update(&context, (unsigned char *) seed, strlen(seed)); 
-        MD5Final((UINT4 *) pwd, &context); 
-        /* finally translate the obfuscated MD5 data into our base */
-	for(;p < &pwd[10];++p) *p = base[*p % (sizeof base -1)];
-        pwd[10] = 0; /* cut the password. */ 
-        return (char *) pwd; 
-} 
+char *create_password(const char *seed)
+{
+	static unsigned char pwd[33];
+	static const char base[] =
+		"Az0By1Cx2Dw3Ev4FuGt6HsIr8Jq9KpLoMnNm/OlPkQjRi+ShTg[Uf5VeWd7XcYbZa]";
+	MD5_CTX context;
+	unsigned char *p = pwd;
 
+	MD5Init(&context);
+	MD5Update(&context, (unsigned char *) seed, strlen(seed));
+	MD5Final((UINT4 *) pwd, &context);
+	/* finally translate the obfuscated MD5 data into our base */
+	for(; p < &pwd[10]; ++p) *p = base[*p % (sizeof base -1)];
+	pwd[10] = 0; /* cut the password. */
+	return (char *) pwd;
+}
+
+char *create_cookie(anUser *user)
+{
+	if(!user->cookie && !(user->cookie = malloc(PWDLEN + 1)))
+		Debug(W_WARN|W_MAX, "create_cookie: OOM for %s", user->nick);
+
+	else mysnprintf(user->cookie, PWDLEN + 1, "%x%x", strtoul(user->passwd, NULL, 16) + rand(),
+			strtoul(user->passwd + 8, NULL, 16) + rand());
+
+	return user->cookie;
+}
+
+int password_update(anUser *user, const char *pass, int flag)
+{
+	if(flag & PWD_HASHED) strcpy(user->passwd, pass); /* Already hashed */
+	else MD5pass(pass, user->passwd);
+
+#ifdef MD5TRANSITION
+	SetUMD5(user);
+#endif
+	/* Password just changed, update cookie */
+	if(user->cookie) create_cookie(user);
+	return 1;
+}

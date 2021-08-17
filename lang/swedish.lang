@@ -1,0 +1,181 @@
+# Translation done by [CCC]Memone@irc.jeux.fr -- Many thanks
+0 %s är inte ett registrerat användarnamn.
+1 %s är inte en registrerad kanal.
+2 %s är inte online.
+3 Information om %s:
+4 Du är bemyndigad som %s.
+5 Du kan inte använda %s två gånger.
+6 Längden på användarnamnet är begränsad till %d tecken.
+7 Längden på e-posten är begränsad till %d tecken.
+8 En kanal MÅSTE börja med #
+9 %s innehåller otillåtna tecken.
+10 Detta smeknamn är ägt av någon annan.
+11 Denna epost är inte giltig.
+12 Det finns redan ett konto som använder denna email.
+13 Varning : Du använder ett förbjudet smeknamn !
+14 Du har registrerat användarnamnet %s med lösenord %s och epost %s.
+15 Ditt lösenord har just skickats till %s.
+16 Fel lösenord för %s.
+17 Lösenord accepterat för %s, du kan nu hantera dina kanaler, dina memos och ditt konto.
+18 Du är nu bemyndigad som Admin level %d.
+19 Lösenordet får inte vara kortare än 7 tecken.
+20 Dagens meddelande : %s
+21  Tillträde till %s
+22  Förslag på tillträde till %s
+23  Inget tillträde.
+24  Inget förslag.
+25  Mail: %s (Grundad %s)
+26  Admin tillgång (%d)
+27  Val: %s
+28 %s är redan registrerat.
+29 Kommando avstängt.
+30 Är du säker på att du vill utföra det ? Specifiera 'CONFIRME' som andra argument isåfall.
+31 Någon är faktist inloggad med det här användarnamnet.
+32 %s försökte just logga in på ditt konto med rätt lösenord. Använd '%s PASS' för att ändra det.
+33 Ändring gjord.
+34 Okänt val: %s
+35 Varning : Smeknamn %s är registrerat, om det är ditt, var god logga in via : /%s %s %s <ditt lösenord>
+36 Smeknamn %s är nu tillgängligt.
+37  Senaste inloggning var %s. (%s)
+38 Tillgängliga språk: (första är standard)
+39 Jag kommer nu svara på svenska !
+40 %s är inte ett tillgängligt språk.
+41 Det här kontot kommer förstöras om du inte loggar in inom de närmaste %s.
+42 Du måste vara op i %s för att registrera det.
+43 Kanal %s är nu registrerad och tillhör dig.
+44 Kanal %s har blivit oregistrerad.
+45 Du är redan ägaren av %s.
+46 Kanal beskrivning kan inte vara kortare än 12 tecken.
+47 Du kan inte de-registrera en kanal om du inte är dess ägare !
+48 Denna nivå är inte giltig.
+49 %s är inte i %s.
+50 Nivå måste vara lägre än din.
+51 Användarnamn %s's mail är inte %s.
+52 %s är redan din epost.
+53 %s har inte tillträde till %s.
+54 Du har inte tillträde till %s.
+55 %s's nivå av tillträde är större än din.
+56 Argumentet måste vara ON eller OFF.
+57 Val %s har blivit tillgänglig för %s.
+58 Val %s har blivit otillgänglig för %s.
+59 Ingen matchande bannlysning på %s.
+60 Bannlysning %s på %s borttagen.
+61 Din nivå är för låg för att tabort %s (%d)
+62 %s är inte ett giltigt kommando.
+63 LOCKTOPIC är tillgänglig på %s.
+64 Var god medför en infoline eller nyckelord 'none' för att tabort det.
+65 Standard inställning på %s är nu: %s.
+66 Välkomsmeddelande på %s är nu: %s.
+67 Dagens meddelande på %s är nu: %s.
+68 Standard samtalsämne på %s är nu: %s.
+69 Beskrivning av %s är nu: %s.
+70 URL till %s är nu: %s.
+71 Bannlysnings nivå på %s är nu %d
+72 Changemodeslevel på %s är nu %d
+73 Längd på bannlysning för %s är nu %lu sekunder (%s)
+74 Standard bannlysning på %s är nu: %s. (%d)
+75 Autolimit är nu på för %s (Min: %u Inc: %u).
+76 Tar bort utförd för %s.
+77 %s är inte bemyndigad.
+78 %s's nivå är nu %d på %s.
+79 %s's infoline är nu : %s
+80 Listan är tom.
+81 Inkorrekt duration, giltigt format är %%<XjXhXm> X är siffran för korresponderande enheter.
+82 Bannlysnings nivå är %d på %s.
+83 NOBANS är tillgänglig på %s.
+84 Totalt %d ban%s borttagna på %s.
+85 Totalt %d ban%s på %s.
+86 %s är redan täckt på %s (%d).
+87 Ägare           : %s (Grundad %s)
+88 Beskrivning     : %s
+89 Standard modes  : %s
+90 Standard topic  : %s
+91 Motd            : %s
+92 Chan URL        : %s
+93 Banlevel        : %d    Bantype       : %s
+94 ChModesLevel    : %d    Bantime       : %s
+95 Välkommen       : %s
+96 Aktuell topic   : %s
+97 Aktuell modes   : %s
+98 Options         : %s
+99 Ban mask %s Level: %d
+100 Tillagd av %s (%s)
+101 Satt på %s, går ut på %s
+102 %s är kanalens ägare.
+103 Totalt %d matchingar funna.
+104 ChangeModesLevel är på %d.
+105 Du kan inte ändra på kanalens mode '%c'
+106 Du är redan erbjuden tillgång till %s.
+107 %s har redan tillgång till %s.
+108 %s vägrar alla tillgångs förslag automatiskt.
+109 %s har nu en tillgång på nivå %d på %s.
+110 Du erbjöd tillgång till %s till %s. Han kommer bli informerad och tillfrågad att acceptera eller neka.
+111 %s gav just dig en tillgångs nivå på %d på %s.
+112 %s erbjöd dig en tillgångs nivå på %d på %s.
+113 Du kan acceptera med /%s %s ACCEPT %s, eller neka med: /%s %s REFUSE %s
+114 %s är redan på %s.
+115 %s är bannlyst från %s, jag kan inte bjuda in honom.
+116 Pågrund av missbruk, det är inte längre möjligt att bjuda in fler användare än dig.
+117 Kanalens längd är begränsad till %d tecken.
+118 Du kan inte registrera %s på grund av följande anledning: %s
+119 Ditt smeknamn är redan %s.
+120 %s använde just återhämta, Du är inte längre identifierad.
+121 Du har inte tillgänglighets förslag på %s.
+122 Du har nu tillgång till %s.
+123 Tillgänglighets förslag för %s har nekats.
+124 Du är %s's ägare, du kan inte släppa denna tillgänglighet utan att avregistrera kanalen.
+125 Var god ändra smeknamn, annars kommer förbindelsen avbrytas inom %d sekunder.
+126 Var god byt smeknamn inom %d sekunder eller så ändrar jag det.
+127 Din tillgång till %s är tillsvidare avstängd.
+128 Din tillgångs nivå på %s är för låg för att utföra detta kommando. (Du: %d Kommando: %d)
+129 Alla tillgångs förslag kommer nu försvinna. (Nuvarande har blivit borttagna)
+130 Alla tillgångs förslag kommer nu att bli automatiskt accepterade. (Nuvarande har blivit accepterade)
+131 Du kommer att bli tillfrågad att välja hurvida du vill acceptera eller neka tillgång med /%s %s ACCEPT|REFUSE #channel.
+132 Användare Kommandon
+133 Kanal Administration Kommandon
+134 Kanal Kommandon
+135 Skriv /%s %s <kommando> för att få mer hjälp om ett kommando.
+136 Du kan få mer hjälp på %s
+137 Matchar tillgång på %s:
+138 Användarnamn: %s Nivå: %d
+139 Senast sedd: %s
+140 Senast sedd: för närvarande på kanal
+141 Totalt %d memos (Skriv /%s %s ERASE ALL för att tabort dem)
+142 Totalt %d memos.
+143 Slut på memo n°%d (Skriv /%s %s ERASE %d för att tabort den)
+144 Du har ingen memo.
+145 Du har ingen ny memo.
+146 Du har ingen memo n°%d.
+147 %d memos har tagits bort.
+148 Din memo n°%d har tagits bort.
+149 Du kan inte skicka en memo till dig själv.
+150 %s accepterar ingen memo.
+151 Memos är begränsade till %d tecken lång.
+152 Du kan inte skicka fler memos till %s (begränsad till %d)
+153 Memo skickad till %s.
+154 Memo från %s@%s: %s
+155 Välkommen %s - %s
+156 Du behöver vara en Services Administrator för att använda detta kommando.
+157 Du har %d olästa memo%s. Använd /%s %s READ <ALL|memo #index> för att läsa dem.
+158 Ingen Channel Service Administrator tillgänglig nu.
+159 Tillgängliga Channel Services Administrators är:
+160 Skriv /%s %s %s för mer hjälp.
+161 Senaste inloggning för %s %s sedan (%s)
+162 Services är Upp för %s.
+163 Hjälp om kommando %s >> %s (%s Nivå %d)
+164 Hjälp om kommando %s (%s Nivå %d)
+165 Var god flodda mig INTE ! Du är nu ignorerad.
+166 [%d/%d] För många matchingar funna, var god precisera dig.
+167 Söndag
+168 Måndag
+169 Tisdag
+170 Onsdag
+171 Torsdag
+172 Fredag
+173 Lördag
+174 Den som tar ditt nick kommer att bli tilldelat nytt nick inom %d sekunder.
+175 Den som tar ditt nick kommer att bli killed inom %d sekunder.
+176 Ditt nick är inte längre skyddat.
+177 %s kommandot kräver personlig information. Vänligen använd /%s %s %s.
+178 Please provide your new pass twice to avoid typos.
+179 The two provided passwords mismatch. Please check for typo.

@@ -1,10 +1,12 @@
 /* include/opdeop.h
- * Copyright (C) 2004 ircdreams.org
+ * Copyright (C) 2002-2003 Inter System
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * contact: Progs@Inter-System.Net
+ *          Cesar@Inter-System.Net
+ *          kouak@kouak.org
+ * site web: http://coderz.inter-system.net
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * Services pour serveur IRC. Supporté sur IrcProgs et IrCoderZ
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: opdeop.h,v 1.14 2006/02/28 06:36:46 bugs Exp $
+ * $Id: opdeop.h,v 1.1 2003/12/12 17:44:58 romexzf Exp $
  */
 
 #ifndef HAVEINC_opdeop
@@ -35,8 +37,5 @@ extern int devoiceall(aNick *, aChan *, int, char **);
 extern int voiceall(aNick *, aChan *, int, char **);
 extern int deopall(aNick *, aChan *, int, char **);
 extern int opall(aNick *, aChan *, int, char **);
-extern int halfop(aNick *, aChan *, int, char **);
-extern int dehalfop(aNick *, aChan *, int, char **);
-extern int halfopall(aNick *, aChan *, int, char **);
-extern int dehalfopall(aNick *, aChan *, int, char **);
+
 #endif /*HAVEINC_opdeop*/

@@ -1,0 +1,152 @@
+body {
+	font-family : Verdana,Helvetica,Arial,Geneva,sans-serif;
+	padding : 1em;
+	background : #fff;
+}
+
+#page {
+	border-color: #B81881;
+	background : #ffeaf8;
+	border-style : solid;
+	border-width: 2px;
+	margin : 0.4em;
+	padding : 3px;
+	height : 100%;
+}
+
+#top {
+	margin-bottom : 1em;
+	text-align : right;
+}
+
+
+#top .right {
+	width : 50%;
+}
+
+#top .left {
+	text-align : left;
+	float : left;
+	font-size : x-large;
+	color : #dd49D9;
+	width : 50%;
+}
+
+#top img {
+	border : 0;
+}
+
+#menu {
+	width : 12em;
+	float : left;
+	padding : 0.5em;
+	margin-bottom : 2em;
+	margin-left : 2px;
+	border-color: #B81881;
+	border-style: dotted;
+	background-color: #ffd6fe;
+	border-width: 1px;
+}
+
+
+#menu li {
+	list-style:none;
+
+}
+
+#menu ul {
+	display:inline;
+	list-style:none;
+	margin : 0;
+	padding : 0;
+}
+
+#menu a {
+	text-decoration : none;
+	display : block;
+	color: #B81881;
+}
+
+#menu a.lang {
+	display : inline;
+	border-width : 0px;
+	margin : 0px;
+}
+
+#menu a.lang:hover {
+	background-color: #ffd6fe;
+}
+
+#menu a:hover {
+	background : #ffeaf8;
+	text-decoration: none;
+}
+
+#content {
+	padding : 0.5em;
+	min-height : 20em;
+	border-style : solid;
+	border-width : 0 0 0 1px;
+	border-color : #B81881;
+	margin-left : 14em;
+}
+
+#content h2 {
+	margin-left : 0.2em;
+	font-family : Georgia, serif;
+	color : #dd49D9;
+}
+
+#content h3 {
+	margin : 0;
+	padding-left : 1em;
+	padding-top : 1em;
+}
+
+#content h4 {
+	margin-top : 1em;
+	margin-left : 1.5em;
+	margin-bottom : 0;
+}
+
+
+#footer {
+	background :  #fff;
+	margin : 1em 0 1px 0;
+	padding : 1px;
+	font-size : x-small;
+	text-align : center;
+}
+
+.tble {
+	border-color: #B81881;
+	border-style: dotted;
+	background-color: #ffd6fe;
+	border-width: 1px;
+}
+
+table.tble tr.titre, td.titre {
+	font-weight : bold;
+	text-decoration : underline;
+	color: #B81881;
+	font-family : Verdana,Helvetica,Arial,Geneva,sans-serif;
+	font-size : small;
+}
+
+#infoline {
+	font-weight : bold;
+	text-decoration : underline;
+	color: #B81881;
+	font-family : Verdana,Helvetica,Arial,Geneva,sans-serif;
+	font-size : small;
+}
+
+table.tble td.memo {
+	font-family : Arial, serif;
+	padding-left : 10px;
+}
+
+table.tble td {
+	font-family : Helvetica, sans;
+	font-size : x-small;
+}

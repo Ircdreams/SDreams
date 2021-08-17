@@ -1,10 +1,12 @@
 /* include/track.h
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2008 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: track.h,v 1.4 2005/10/18 15:33:28 bugs Exp $
+ * $Id: track.h,v 1.5 2008/01/05 18:34:13 romexzf Exp $
  */
 
 #ifndef HAVEINC_track
@@ -29,15 +31,15 @@ struct track {
 	aNick *tracker;
 	anUser *tracked;
 	Timer *timer;
-	time_t from;
-	time_t expire;
+	time_t from, expire;
 	struct track *next, *last;
 };
 
-extern struct track *trackhead;
+extern void track_notify(anUser *, const char *, ...);
+extern void track_admin_quit(aNick *);
+extern void del_track(struct track *);
 
 extern struct track *istrack(anUser *);
-extern void del_track(struct track *);
 extern int cmd_track(aNick *, aChan *, int, char **);
 
 #endif /*HAVEINC_track*/

@@ -1,10 +1,12 @@
 /* src/welcome.c - Diverses commandes sur le module welcome
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://www.ircdreams.org
+ * Copyright (C) 2002-2006 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@ir3.org>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +21,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: welcome.c,v 1.18 2006/03/16 07:01:03 bugs Exp $
+ * $Id: welcome.c,v 1.30 2006/12/06 23:02:48 romexzf Exp $
  */
 
 #include "main.h"
+#ifdef USE_WELCOMESERV
 #include "cs_cmds.h"
 #include "debug.h"
+#include "mylog.h"
 #include "config.h"
 #include "outils.h"
 #include "welcome.h"
@@ -45,15 +49,16 @@ static struct welcomeinfo *gwelcome_add(const char *msg)
 	Strncpy(w->msg, msg, sizeof w->msg - 1);
 	w->id = ++WelcomeCount;
 	w->view = 0;
-	w->next = welcomehead; 
-        welcomehead = w; 
+	w->next = welcomehead;
+	welcomehead = w;
 	return w;
 }
 
-/* GLOBWELCOME ADD <message>
+/* GLOBWELCOME ADD <level> <message>
  *             DEL <id>
  *             SET [ON|OFF]
  *             LIST
+ *             MOD <id> <level>
  */
 
 int global_welcome(aNick *nick, aChan *chan, int parc, char **parv)
@@ -61,7 +66,8 @@ int global_welcome(aNick *nick, aChan *chan, int parc, char **parv)
 	const char *cmd = parv[1];
 
 	if(!strcasecmp(cmd, "SET"))
-		switch_option(nick, parc > 1 ? parv[2] : NULL, "globwelcome", "le serveur", &ConfFlag, CF_WELCOME);
+		switch_option(nick, parc > 1 ? parv[2] : NULL, "globwelcome", "serveur",
+			&ConfFlag, CF_WELCOME);
 
 	else if(!strcasecmp(cmd, "ADD"))
 	{
@@ -105,12 +111,11 @@ int global_welcome(aNick *nick, aChan *chan, int parc, char **parv)
 		if(!w) return csreply(nick, "Aucun message de bienvenue.");
 
 		csreply(nick, "\2#Id View Message");
-		for(;w;w = w->next) csreply(nick, "#%d %d %s", w->id, w->view, w->msg);
+		for(; w; w = w->next) csreply(nick, "#%d %d %s", w->id, w->view, w->msg);
 
 		return 0;
 	}
 	else return csreply(nick, GetReply(nick, L_UNKNOWNOPTION), cmd);
-
 
 	write_welcome();
 	return 0;
@@ -118,16 +123,16 @@ int global_welcome(aNick *nick, aChan *chan, int parc, char **parv)
 
 void choose_welcome(const char *num)
 {
-	struct welcomeinfo *w = welcomehead;
+	static struct welcomeinfo *tmp;
 
 	if(!welcomehead) return; /* no welcome */
-	if(!w) w = welcomehead;
-	
-	++w->view;
+	if(!tmp) tmp = welcomehead;
 
-	putserv("%s %s %s :\2[Message de bienvenue #%d]\2 - %s", cs.num,
-		GetConf(CF_PRIVWELCOME) ? TOKEN_PRIVMSG : TOKEN_NOTICE, num, w->id, w->msg);
-	w = w->next;
+	++tmp->view;
+	putserv("%s %s %s :\2[Message de bienvenue #%d]\2 - %s", ws.num,
+		GetConf(CF_PRIVWELCOME) ? TOKEN_PRIVMSG : TOKEN_NOTICE, num, tmp->id, tmp->msg);
+
+	tmp = tmp->next;
 }
 
 void write_welcome(void)
@@ -135,7 +140,11 @@ void write_welcome(void)
 	FILE *fp = fopen(WELCOME_FILE, "w");
 	struct welcomeinfo *w = welcomehead;
 
-	if(!fp) return;
+	if(!fp)
+	{
+		log_write(LOG_DB, 0, "welcome::write: fopen() failed: %s", strerror(errno));
+		return;
+	}
 
 	fprintf(fp, "%d\n%s\n%s\n", GetConf(CF_WELCOME), user_motd, admin_motd);
 	for(;w;w = w->next) fprintf(fp, "%d :%s\n", w->id, w->msg);
@@ -148,7 +157,11 @@ void load_welcome(void)
 	int t = 1;
 	FILE *fp = fopen(WELCOME_FILE, "r");
 
-	if(!fp) return;
+    if(!fp)
+	{
+		log_write(LOG_DB, LOG_DOTTY, "welcome::load: fopen() failed: %s", strerror(errno));
+		return;
+	}
 
 	while(fgets(buf, sizeof buf, fp))
    	{
@@ -165,3 +178,5 @@ void load_welcome(void)
 	}
 	fclose(fp);
 }
+
+#endif

@@ -1,10 +1,12 @@
 /* include/chanserv.h - commandes pour gerer les salons
- * Copyright (C) 2004 ircdreams.org
+ * Copyright (C) 2002-2003 Inter System
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * contact: Progs@Inter-System.Net
+ *          Cesar@Inter-System.Net
+ *          kouak@kouak.org
+ * site web: http://coderz.inter-system.net
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * Services pour serveur IRC. Supporté sur IrcProgs et IrCoderZ
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +26,8 @@
 #ifndef HAVEINC_chanserv
 #define HAVEINC_chanserv
 
-#define MAXACCESSMATCHES 10 
-    
+#define MAXACCESSMATCHES 10
+
 extern int show_access(aNick *, aChan *, int, char **);
 extern void show_accessn(anAccess *, anUser *, aNick *);
 extern int add_user(aNick *, aChan *, int, char **);

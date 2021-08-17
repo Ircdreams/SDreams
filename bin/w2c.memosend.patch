@@ -1,0 +1,53 @@
+--- scoderz/src/web2cs-commands.c	2008-02-05 00:56:47.000000000 +0100
++++ scoderz-reflex/src/web2cs-commands.c	2008-02-06 14:38:36.000000000 +0100
+@@ -662,6 +662,50 @@
+ 		w2c_memolist(cl, cl->user, 0);
+ 	}
+ 
++	else if(!strcasecmp(cmd, "SEND"))
++	{
++		anUser *user = NULL;
++		aNick *who = NULL;
++		aMemo *memo = NULL;
++		char tmp[MEMOLEN+3];
++		int i = 3;
++
++		if(parc < 3)
++			return w2c_exit_client(cl, "ERROR SYS_SYNTAX");
++
++		if(!(user = getuserinfo(parv[2]))) return 0;
++
++		if(user == cl->user) return w2c_exit_client(cl, "ERROR MEMO_SELF");
++
++		if(UNoMemo(user) && !IsAdmin(cl->user)) return w2c_exit_client(cl, "ERROR MEMO_NOMEMO");
++
++		w2c_parse_qstring(tmp, sizeof tmp, parv, parc, i, &i);
++
++		if(strlen(tmp) > MEMOLEN) return w2c_exit_client(cl, "ERROR MEMO_EXCEEDLEN");
++
++		who = !user->n || IsAway(user->n) ? NULL : user->n;
++
++		if(who) csreply(who, GetReply(who, L_MEMOFROM), cl->user->nick, "Web", tmp);
++
++		for(i = 0, memo = user->memohead; memo; memo = memo->next)
++			if(!strcasecmp(memo->de, cl->user->nick)) ++i;
++
++		if(!IsAdmin(cl->user) && i >= MAXMEMOS)
++		{
++			if(who) csreply(who, GetReply(who, L_MAXMEMOWARN), MAXMEMOS, cl->user->nick);
++			else if(i == MAXMEMOS)
++			{
++				char buf[MEMOLEN + 1];
++				mysnprintf(buf, sizeof buf, GetUReply(user, L_MAXMEMOWARN),
++					MAXMEMOS, cl->user->nick);
++				add_memo(user, "Services", CurrentTS, buf, MEMO_AUTOEXPIRE);
++			}
++			return w2c_exit_client(cl, "ERROR MEMO_MAXMEMO");
++		}
++
++		add_memo(user, cl->user->nick, CurrentTS, tmp, who ? MEMO_READ : 0);
++	}
++
+ 	return w2c_exit_client(cl, "OK");
+ }
+ 

@@ -1,0 +1,8 @@
+<center><h2>Web2CS -- Passerelle Web pour Z</h2></center>
+<h3>Ouverture du pr&eacute;test du Web2CS le 16/06</h3>
+<p> Bienvenue sur l'interface Web donnant accès au robot Z.<br>
+Cette version n'est pas encore li&eacute;e au serveur principal,<br>
+vous devrez donc recr&eacute;ez votre username etc.<br>
+Si vous constatez des bugs faites nous en part sur #coderz<br>
+
+</p>

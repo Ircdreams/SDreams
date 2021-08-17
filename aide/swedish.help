@@ -1,0 +1,317 @@
+#ABAD
+         Modifies badchan/badnick lists.
+         (Unallow nick to be used or chan to be registered)
+#ACCESS
+Action: Lists chan access.
+        <mask> will only list access matching supplied mask (* allowed)
+        <, > et = will only list access with level inferior, superior, or equal
+        to supplied level.
+        Arguments are :
+         -autoop    : only list access with AUTOOP = ON
+         -autovoice : only list access with AUTOVOICE = ON
+         -protect   : only list access with PROTECT = ON
+         -suspend    : only list suspended access
+#ADDUSER
+Action: Offers an access in a registered chan.
+        Level must be between 1 and 499.
+#ADMIN
+Action: Shows Channel Service Administrators ready to help you.
+#ADMINLVL
+Action: Changes a username Admin level.
+        Level 1 is the normal user level.
+        Level 4 is the higher Admin level.
+#ADMINMOTD
+|ADMIN Modifies motd displayed when admins log in.
+|USER Modifies motd displayed when users log in.
+|LIST List motds
+#AIDE
+Action: Shows help about a command.
+#ALIST
+Action: Lists users who have an access and who are now logged in.
+#AUTOOP
+Action: (de)activates autoop of your access on #chan.
+#AUTOVOICE
+Action: (de)activates autovoice of your access on #chan.
+#BAN
+Action: Adds a mask to #chan banlist.
+        [level] is minimum level required to remove this ban.
+        [%XjXhXm] is ban timeout (Ex: %2j5m will ban 2days and 5 min)
+                  if there is a bantime, use %0 to set an infinite ban
+        [reason] Default : "Aucune"
+        <mask> must be with nick!user@host format (WildCards allowed)
+        if %nick is supplied, corresponding mask according to bantype will be banned.
+#BANLEVEL
+Action: Sets the minimum level required to add a ban in a chan.
+#BANLIST
+Action: Shows banlist of a chan (only matching [mask] if supplied).
+#BANTYPE
+Action: Sets type of mask which will be used in kickban and ban.
+          1 = *!*ident@*.host
+          2 = *!*ident@*
+          3 = *nick*!*@*
+          4 = *!*@host
+	  5 = *!*ident@host
+#CHAN
+Action: Sets or shows informations about channels.
+|LIST [mask|arg]                     Lists registered channels.
+args: -description -modes -topic -url -defmodes -count
+|SUSPEND      <#chan> [[%XjXhXm] <reason>]
+(Un)Suspends a chan.
+If "nolog" argument is supplied when unsuspending a channel, suspend won't be log.
+|SUSPENDLIST [mask|arg]              Lists suspended channels.
+arg: -from <username> only lists channels suspended by a username.
+|DEL          <#chan> [raison]   Deletes a channel.
+|REG          <#chan> <username>  Registers a channel to a username.
+|SETOWNER <#chan> <new owner> [future level of past owner] Changes a channel owner.
+#CHANINFO
+Action: Shows informations about a channel.
+#CHANOPT
+Action: Sets a channel options.
+|DEFTOPIC    <topic>      Sets default topic.
+|DEFMODES    <modes>      Sets default modes.
+|STRICTOP    <on/off>     Only users with an access can be op.
+|SETWELCOME  <on/off>     (Un)Activates the welcome message.
+|WELCOME     <message>    Sets welcome message.
+|THEME       <theme>      Sets channel's theme.
+|BANLEVEL    <niveau>     Sets default minimum level required to remove a ban.
+|NOBANS      <on/off>     Unallows bans.
+|NOOPS       <on/off>     Unallows ops.
+|LOCKTOPIC   <on/off>     Unallows topic changes.
+|BANTYPE     <number of bantype> Sets ban type (1=*!*ident@*.host, 2=*!*ident@*, 3=*nick*!*@*, 4=*!*@host, 5=*!*ident@host)
+|MOTD        <message>    Sets motd. Use "none" to remove it.
+|AUTOINVITE  <on/off>     If activated and if chan is invite only, invites users who have access to this channel when they log in.
+|BANTIME     <duree>      Sets default ban timeout. 0 means an unlimited timeout.
+|CHMODESLEVEL <level>     Sets minimum level required to change modes.
+|AUTOLIMIT [ON|OFF] [-limit_inc <number>] [-limit_min <number>] Activates or configures autolimit.
+Limit will be periodically updated to a <number of users> + <limit_inc>
+Limit will only be changed if difference between theoric limit and actual one is above or equal to <limit_min> (to avoid flood).
+#CHANURL
+Action: Sets channel homepage.
+#CHCOMNAME
+Action: Changes a command name.
+#CHLEVEL
+Action: Changes level required to use a command.
+(If -admin is supplied, command becomes an admin one.)
+#CLEARBANS
+Action: Clears a chan banlist (removes only bans matching supplied arguments, all if none supplied).
+#CLEARMODES
+Action: Clears a channel modes (can solve a takeover).
+#DEAUTH
+Action: Removes your authentification.
+#DEFMODES
+Action: Sets default chanmodes.
+#DEFTOPIC
+Action: Sets default topic.
+#DELUSER
+Action: Removes a channel access.
+#DEOP
+Action: Deops supplied nicks in a chan (if none supplied, will deop yourself).
+#DEOPALL
+Action: Deops every channel user.
+#DESCRIPTION
+Action: Sets or modifies channel's theme.
+#DEVOICE
+Action: Devoices supplied nicks in a chan (if none supplied, will devoice yourself).
+#DEVOICEALL
+Action: Devoices every channel user.
+#DIE
+Action: Makes me having suicidal tendancies (please don't !).
+#DISABLE
+Action: Disables a command.
+#DO
+Action: Makes me doing something in a channel.
+#DROP
+Action: Removes your account. Be careful, this is irreversible.
+You need to add 'confirme' as second argument, and you may precise a reason.
+#GLOBAL
+|MSG : Sends a broadcast message to every channels.
+|MEMO [-min <min level>] [-max <max level>] <message>
+    Sends a broadcast memo to every account according to supplied arguments :
+        -min <level>: min user level to receive the memo (between 1 and 4).
+        -max <level>: max user level to receive the memo (between 1 and 4).
+#GLOBWELCOME
+!Syntaxe: %s <ADD|DEL|LIST|SET|MOD>
+        Global welcome messages.
+        Subcommands : ADD, DEL, LIST, SET et MOD.
+|ADD <level> <message>
+        Add a global welcome message.
+|DEL <ID>
+        Remove a global welcome message.
+[LIST
+        Show the global welcome message list.
+|MOD <ID> <level>
+        Change a global welcome message's level.
+|SET [ON|OFF]
+        Enable or disable the global welcome system.
+#HELP
+Action: Shows help about a command.
+#IGNORELIST
+Action: Shows ignored hosts list.
+#INFO
+Action: Sets infoline which is sent when you join a chan (use "none" to remove it).
+#INVITE
+Action: Invites an user to a channel (if nick is not supplied, will invite yourself).
+#INVITEME
+Action: Invites yourself to the information channel.
+#KICK
+Action: Kicks an user or every user matching mask out of a channel with a reason.
+#KICKBAN
+Action: Kicks and bans an user from a channel.
+See BAN syntax.
+#LISTBADCHANS
+Action: Lists unallowed channel names.
+See ABAD CHAN.
+#LISTBADNICKS
+Action: Lists unallowed nicknames.
+#LOCKTOPIC
+Action: (Un)Allows topic changes in a channel.
+#LOGIN
+Action: Makes me recognizes yourself.
+#MEMOS
+|READ shows one of your memos, all of them..
+|ERASE removes one of them, all of them.
+|SEND sends a memo to someone.
+#MODE
+Action: Modifies a channel modes.
+#MODUSER
+Action: Modifies an access options.
+|AUTOOP    <on/off>   Toggles autoop on join on this access.
+|AUTOVOICE <on/off>   Toggles autovoice on join on this access.
+|SUSPEND   <on/off>   (Un)Suspends an access.
+|INFO      <infoline>   Modifies an access infoline.
+|LEVEL     <1-499>   Modifies an access level.
+|PROTECT   <on/off>   (De)Activates an access protection.
+#MOTD
+Action: Sets a message of the day to a channel, shown on logging to users who have an access to the channel.
+Note  : Use 'none' to remove it.
+#MYACCESS
+Action: Shows your accesses.
+|ACCEPT accepts an access proposal on #chan.
+|REFUSE refuses an access proposal on #chan.
+|DROP removes your access on #chan.
+|args  -access      : makes me verbose.
+       -chan <mask> : limits output to channels matching <mask>.
+#NOBANS
+Action: (Un)Allows bans in a channel.
+#NOOPS
+Action: (Un)Allows ops in a channel.
+#OP
+Action: Ops supplied nicks in a chan (if none supplied, will op yourself).
+#OPALL
+Action: Ops every channel user.
+#OUBLI
+Action: Sends a new password to user email (must be used in case of lost password).
+#PROTECT
+Action: (De)Activates your protection on a channel.
+#RDEFMODES
+Action: Resets channel modes to defmodes.
+#RDEFTOPIC
+Action: Resets channel topic to deftopic.
+#RECOVER
+Action: Makes me recognize yourself, even if someone is logged in with your username
+        Makes your username nickname free.
+#REGCHAN
+Action: Registers a channel.
+#REGISTER
+Action: Registers your nickname and create an account (username) in my database.
+        You must supply the email twice to avoid mistype errors.
+#REHASH
+Action: Rehashes service configuration file.
+#RENCHAN
+Action: Renames a channel.
+#RESTART
+Action: Restarts myself.
+#RESULTS
+Action: Shows vote results after it has been closed.
+#SAY
+Action: Makes me say something in a channel.
+#SEEN
+Action: Shows an username lastseen.
+#SET
+Action: Sets your account options.
+|MAIL Sets your email.
+|PASS Sets your password. You need to provide it twice to prevent typos.
+|PROTECT <0/1/2>
+Sets your nickname protection level :
+0 = protection free, 1 = nickname change, 2 = kill.
+|USERNAME Sets your account name.
+Warning: You can only use this command ONCE.
+|VIRTUALHOST Toggles mode +x on login.
+|ACCESS <0/1/2> Changes your policy face to access proposals.
+0 refuses any proprosal.
+1 asks for approval.
+2 accepts any proposal.
+|NOMEMO If you do not want to receive memos ...
+|LANG Changes your language preferences
+#SETWELCOME
+Action: (De)Activates welcome message on a channel.
+#SHOWCOMMANDS
+Action: Lists commands you're allowed to use (on a specific channel if supplied).
+#SHOWCONFIG
+Action: Shows my internal variables.
+#STRICTOP
+Action: (Un)Allows users who don't have access to a channel to be op.
+#TOPIC
+Action: Changes a channel topic.
+#TRACK
+Action: Adds/Lists/Deletes users who are being tracked.
+|ADD <username> [expiration]  Adds a tracked user.
+|LIST [mask]                  Lists tracked users according to supplied mask.
+|DEL <username>               Removes a tracked user.
+#UNBAN
+Action: Removes a ban from a channel.
+if a %nick is supplied all bans matching nick are removed.
+#UNBANME
+Action: Removes bans matching you on a channel.
+#UNREG
+Action: Deletes your channel.
+#UPTIME
+Action: Shows my uptime.
+#USER
+Action: Modifies or shows informations about an username.
+|INFO     <username/*/*keyword*> <-arg1 -arg2..>
+          Search arguments are :
+          -auth: only lists username on which someone is logged in.
+          -suspend: only lists suspended usernames.
+          -count <num> : only lists <num> entries.
+          -seen <nombre>: only lists usernames which lastseen is shorter than <num> secs.
+          -date <unix time>: only lists usernames logged before this date.
+          -mail <mask>: only lists usernames which mail matches <mask>
+        Shows informations about usernames according to supplied restrictions.
+|SUSPEND  <username> [[%XjXhXm] <reason>]
+(Un)Suspends an account (for some time).
+|DEL      <username>             Removes an account.
+|MAIL     <em@il>               Changes an account email.
+|NEWPASS  <pass>                 Changes an account password.
+|NEWNICK  <username> <nouveau>   Changes an account name.
+|STATS -all -mem -cmds [mask] -user
+Lists differents statistics.
+|MATCH [+|-][mnughcCas] [args...]
+Searches connected users who are according to all supplied restrictions.
+n(=nick) u(=userident) h(=realhost) g(=realname) C(=crypthost) c(=chan) a(=account) m(=modes) s(=server)
+|CANTREGCHAN [%XjXhXm]
+(De)Activates a restriction to an username to avoid him from registering a channel.
+|NOPURGE <username> (De)Activates protection for purge for an account.
+#VERIFY
+Action: Shows the account name of an user, and wether he is Admin or not.
+#VOICE
+Action: Voices supplied nicks in a chan (if none supplied, will voice yourself).
+#VOICEALL
+Action: Voices every channel user.
+#VOTE
+Action: Shows and modifies informations about polls.
+|NEW <num> <subject>    Creates a new poll named <subject> with <num> options.
+|PROPOSITION <proposition>   To submit a poll option after having created it.
+|RESULTS                     Shows poll results.
+|CLORE                       Ends the poll.
+|CLEAR                       Clear results.
+#VOTER
+Action: Submits your vote to the <num> option of a poll. If none supplied, will show poll status.
+#WELCOME
+Action: Sets a channel welcome message.
+#WHOIS
+Action: Shows informations about an user.
+#WHOISON
+Action: Lists users in a channel.
+#WRITE
+Action: Makes me write my database.

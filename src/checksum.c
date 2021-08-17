@@ -1,10 +1,12 @@
 /* src/checksum.c - md5 & md2 routines
- * Copyright (C) 2004-2005 Ircdreams.org
+ * Copyright (C) 2002-2005 Inter System
  *
- * contact: bugs@ircdraems.org
- * site web: http://ircdreams.org
+ * contact: Progs@Inter-System.Net
+ *          Cesar@Inter-System.Net
+ *          kouak@kouak.org
+ * site web: http://coderz.inter-system.net
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V2
+ * Services pour serveur IRC. Supporté sur IrcProgs et IrCoderZ
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,11 +21,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: checksum.c,v 1.10 2005/10/04 05:23:51 bugs Exp $
+ * $Id: checksum.c,v 1.6 2005/01/16 21:29:21 romexzf Exp $
  */
 
 #include "main.h"
-#include <sys/types.h>
 #include "checksum.h"
 
 /* Copyright (C) 1991, RSA Data Security, Inc. All rights reserved.
@@ -290,6 +291,7 @@ static void Decode(UINT4 *output, unsigned char *input, unsigned int len)
 			(((UINT4)input[j+2]) << 16) | (((UINT4)input[j+3]) << 24);
 }
 
+#ifdef HAVE_CRYPTHOST
 /* MD2START */
 static void MD2Transform(unsigned char *, unsigned char *, unsigned char *);
 
@@ -363,7 +365,7 @@ void MD2Update(MD2_CTX *context, unsigned char *input, unsigned int inputLen)
 
 		index = 0;
 	}
-	else  i = 0;
+	else i = 0;
 
 	/* Buffer remaining input */
 	memcpy(&context->buffer[index], &input[i], inputLen-i);
@@ -378,10 +380,10 @@ void MD2Final(UINT4 *digest, MD2_CTX *context)
 
 	/* Pad out to multiple of 16. */
 	padLen = 16 - context->count;
-	MD2Update (context, PADDING[padLen], padLen);
+	MD2Update(context, PADDING[padLen], padLen);
 
 	/* Extend with checksum */
-	MD2Update (context, context->checksum, 16);
+	MD2Update(context, context->checksum, 16);
 
 	/* Store state in digest */
 	memcpy(digest, context->state, 16);
@@ -424,4 +426,4 @@ static void MD2Transform(unsigned char *state, unsigned char *checksum, unsigned
 	/* Zeroize sensitive information. */
 	memset(x, 0, sizeof x);
 }
-
+#endif

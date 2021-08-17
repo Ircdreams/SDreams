@@ -1,10 +1,13 @@
 /* include/main.h - Déclarations principales
- * Copyright (C) 2004-2006 ircdreams.org
  *
- * contact: bugs@ircdreams.org
+ * Copyright (C) 2002-2008 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
+ *
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
  * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +22,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: main.h,v 1.225 2006/03/15 06:43:23 bugs Exp $
  */
 
 #include <stdio.h>
@@ -27,108 +29,127 @@
 #include <string.h>
 #include <time.h>
 #include <stdarg.h>
+#include <errno.h>
 #include "mystring.h"
+
 #include "../config.h"
 
 #ifdef USEBSD
-#       include <sys/types.h>
-#	include <sys/select.h>
+#	include <sys/types.h>
 #endif
 
 #include "lang.h"
 
-/* Variables */
+/*#define OLDADMINLIST*/
+/*#define HAVE_IPV6*/
 
+#ifdef WEB2CS
+#	define SPVERSION "2.0.0-DEV(Web)"
+#	ifdef USEBSD
+#		include <sys/select.h>
+#	endif
+#else
+#	define SPVERSION "2.0.0-DEV"
+#endif
+
+#define NNICK "AA"
 #define CTCP_DELIM_CHAR '\001'
-#define NICKLEN 45
-#define TOPICLEN 250
-#define HOSTLEN 63
-#define REALEN 50
-#define USERLEN 10
-#define KEYLEN 23
-#define CHANLEN 200
-#define REGCHANLEN 100
-#define DESCRIPTIONLEN 80
-#define CMDLEN 14
-#define SYNTAXLEN 100
-#define NUHLEN (NICKLEN + USERLEN + HOSTLEN + 3)
-#define MAILLEN 70
-#define PWDLEN 16
-#define TIMELEN 40 /* wednesday, 2000-12-12 12:12:12 */
-#define RAISONLEN 300
-#define SWHOISLEN 50
-#define URLLEN                  80
-#define LANGLEN                 15
 
-#define DOTTEDIPLEN      15
-#define BASE64LEN        6
+#define NICKLEN 		30
+#define TOPICLEN 		250
+#define HOSTLEN 		63
+#define REALEN 			50
+#define USERLEN 		10
+#define KEYLEN 			23
+#define CHANLEN 		200
+#define REGCHANLEN 		30 /* Max length in use is 22... */
+#define DESCRIPTIONLEN 	80
+#define CMDLEN 			14
+#define SYNTAXLEN 		100
+#define NUHLEN 			(NICKLEN + USERLEN + HOSTLEN + 3) /* 3 stands for '!' + '@' + '\0' */
+#define MAILLEN 		70 /* should be enough.. */
+#define PWDLEN 			16 /* Our MD5 hash length */
+#define TIMELEN 		40 /* wednesday, 2000-12-12 12:12:12 */
+#define RAISONLEN 		300
+#define URLLEN 			80
+#define LANGLEN 		15
+
+#ifdef HAVE_IPV6
+#	define DOTTEDIPLEN 	45
+#	define BASE64LEN 	25
+#else
+#	define DOTTEDIPLEN 	15
+#	define BASE64LEN 	6
+#endif
 
 #define MAXADMLVL 	7 /* level max des admins */
 #define ADMINLEVEL 	3 /* level min des admins, level entre USER&ADMIN LEVEL ~= Helpers? */
 #define HELPLEVEL	2
 
-#define OWNERLEVEL 500 /* vous pouvez définir le niveau max dans un salon, mais, après ne le changer pas
-						si vous avez une db active !! vous feriez ignorer tous les accès owner. */
+#define OWNERLEVEL 500 /* Vous pouvez modifier ici le niveau du propriétaire des salons
+						* mais ne le changez plus une fois que vous avez une DB active,
+						* vous perderiez tous les salons */
 
-/*si vous ne voulez pas tout logger, mettez rien entre les "" des différents fichiers*/
 #define DNR_FILE DBDIR"/dnr.db"
 #define CMDS_FILE DBDIR"/cmds.db"
-#define SDREAMS_PID "sdreams.pid" /* fichier où sera stocké le n° de pid de sdreams */
+#define SDREAMS_PID "sdreams.pid" /* fichier où sera stocké le n° de pid de scoderz */
+#define PURGEDELAY 86400 /* Temps entre deux purges des users/chans */
 
-#define DBUSERS "users.db" 
-#define DBCHANS "channels.db"
-#define MAXUSER "maxuser.db"
+#define	DBUSERS "users.db"
+#define	DBCHANS	"channels.db"
 
 #define WAIT_CONNECT 10 /* Temps qu'attend le serveur avant de retenter une connexion */
 
-#define MODE_OBVH       0x1 /* mode string is only some of +obvh */
+#define MODE_OBV 	0x1 /* mode string is only some of +obv */
 #define MODE_ALLFMT 0x2 /* needs full *snprintf formatting */
 
-#define JOIN_FORCE      0x1 /* join channel even if empty */
-#define JOIN_REG        0x2 /* this join is due to regchan */
-#define JOIN_TOPIC	0x4 /* try to reset the correct topic */
-#define JOIN_CREATE     0x8 /* create channel */
+#define JOIN_FORCE 	0x1 /* join channel even if empty */
+#define JOIN_REG 	0x2 /* this join is due to regchan */
+#define JOIN_TOPIC 	0x4 /* try to reset the correct topic */
+#define JOIN_CREATE 0x8 /* create channel */
 
-#define IsAdmin(x)              ((x)->level >= ADMINLEVEL)
-#define IsAnAdmin(x)    	((x) && IsAdmin(x)) /* x est un admin ? */
-#define IsOper(x) 		((x)->flag & N_OPER)
-#define IsService(x)		((x)->flag & N_SERVICE)
-#define IsOperOrService(x)      ((x)->flag & (N_OPER|N_SERVICE))
-#define IsAway(x) 		((x)->flag & N_AWAY)
-#define IsHelper(x)		((x)->flag & N_HELPER)
-#define IsAnHelper(x)		((x) && ((x)->level == HELPLEVEL))
-#define IsHiding(x)		((x)->flag & N_HIDE)
-#define IsHidden(x)             ((x)->flag & (N_HIDE|N_SPOOF)) /* +x || +H */
+#define IsAdmin(x) 			((x)->level >= ADMINLEVEL)
+#define IsAnAdmin(x) 		((x) && IsAdmin(x)) /* x est un admin ? */
+#define IsOper(x) 			((x)->flag & N_OPER)
+#define IsOperOrService(x) 	((x)->flag & (N_OPER|N_SERVICE))
+#define IsAway(x) 			((x)->flag & N_AWAY)
+#define IsIPv6(x) 			((x)->base64[6]) /* base64 is 6 char long */
+#define IsHidden(x) 		((x)->flag & (N_HIDE|N_SPOOF)) /* +x || +H */
+#define IsIP(x) 			((x)->flag & N_IP)
 
 #define MAXNUM 4096
 #define NUMSERV 2
 
+#ifdef PUREIRCU
+#	define OPPREFIX bot.servnum
+#else
+#	define OPPREFIX cs.num
+#endif
+
 #include <structs.h>
 
-#define AOp(x)		 ((x)->flag & A_OP)
-#define AHalfop(x)	 ((x)->flag & A_HALFOP)
-#define AVoice(x)	 ((x)->flag & A_VOICE)
-#define ASuspend(x)	 ((x)->flag & A_SUSPEND)
-#define AProtect(x)	 ((x)->flag & A_PROTECT)
-#define AWait(x)	 ((x)->flag & A_WAITACCESS)
-#define AOnChan(x)       ((x)->lastseen == 1)
-#define SetAOp(x)	 ((x)->flag |= A_OP)
-#define SetHalfop(x)	 ((x)->flag |= A_HALFOP)
-#define SetAVoice(x)	 ((x)->flag |= A_VOICE)
-#define SetAProtect(x)	 ((x)->flag |= A_PROTECT)
-#define SetASuspend(x)	 ((x)->flag |= A_SUSPEND)
-#define DelAOp(x)	 ((x)->flag &= ~A_OP)
-#define DelHalfop(x)	 ((x)->flag &= ~A_HALFOP)
-#define DelAVoice(x)	 ((x)->flag &= ~A_VOICE)
-#define DelAProtect(x)	 ((x)->flag &= ~A_PROTECT)
-#define DelASuspend(x)	 ((x)->flag &= ~A_SUSPEND)
-#define AOwner(x)        ((x)->level == OWNERLEVEL)
+#define AOp(x)		 	((x)->flag & A_OP)
+#define AVoice(x)	 	((x)->flag & A_VOICE)
+#define ASuspend(x)	 	((x)->flag & A_SUSPEND)
+#define AProtect(x)	 	((x)->flag & A_PROTECT)
+#define AWait(x) 		((x)->flag & A_WAITACCESS)
+#define AOnChan(x) 		((x)->lastseen == 1)
+#define SetAOp(x)	 	((x)->flag |= A_OP)
+#define SetAVoice(x) 	((x)->flag |= A_VOICE)
+#define SetAProtect(x) 	((x)->flag |= A_PROTECT)
+#define SetASuspend(x) 	((x)->flag |= A_SUSPEND)
+#define DelAOp(x)	 	((x)->flag &= ~A_OP)
+#define DelAVoice(x) 	((x)->flag &= ~A_VOICE)
+#define DelAProtect(x) 	((x)->flag &= ~A_PROTECT)
+#define DelASuspend(x) 	((x)->flag &= ~A_SUSPEND)
+#define AOwner(x) 		((x)->level == OWNERLEVEL)
 
 #define NRegister(x)	 ((x)->flag & N_REGISTER)
 #define SetNRegister(x)	 ((x)->flag |= N_REGISTER)
 #define DelNRegister(x)	 ((x)->flag &= ~N_REGISTER)
-#define NHasKill(x)      ((x)->timer) 
+#define NHasKill(x)  	 ((x)->timer)
 
+#ifdef USE_NICKSERV
 #define UPKill(x)	 ((x)->flag & U_PKILL)
 #define UPNick(x)	 ((x)->flag & U_PNICK)
 #define SetUPKill(x)	 ((x)->flag |= U_PKILL)
@@ -136,173 +157,153 @@
 #define DelUPKill(x)	 ((x)->flag &= ~U_PKILL)
 #define DelUPNick(x)	 ((x)->flag &= ~U_PNICK)
 #define IsProtected(x)	 ((x)->flag & (U_PNICK | U_PKILL))
+#endif /* USE_NICKSERV */
 
-#define UWantDrop(x)	 ((x)->flag & U_WANTDROP)
-#define UWantX(x)	 ((x)->flag & U_WANTX)
-#define UNopurge(x)	 ((x)->flag & U_NOPURGE)
-#define UOubli(x)	 ((x)->flag & U_OUBLI)
-#define UFirst(x)	 ((x)->flag & U_FIRST)
-#define UNoMemo(x)	 ((x)->flag & U_NOMEMO)
-#define UIsBusy(x) 	 ((x)->flag & U_ADMBUSY)
-#define UVhost(x)	 ((x)->flag & U_VHOST)
-#define USWhois(x)	 ((x)->flag & U_SWHOIS)
-#define UMD5(x)		 ((x)->flag & U_MD5PASS)
-#define UPReject(x)	 ((x)->flag & U_PREJECT)
-#define UPAccept(x) 	 ((x)->flag & U_PACCEPT)
-#define UPAsk(x) 	 ((x)->flag & U_POKACCESS)
-#define UVote(x)         ((x)->flag & U_HASVOTE)
-#define UNoVote(x)       ((x)->flag & U_NOVOTE)
-#define UPMReply(x)      ((x)->flag & U_PMREPLY)
-#define UNoMail(x)	 ((x)->flag & U_NOMAIL)
-#define UMale(x)	 ((x)->flag & U_MALE)
-#define UFemelle(x)	 ((x)->flag & U_FEMELLE)
-#define URealHost(x)     ((x)->flag & U_REALHOST)
-#define SetUWantX(x)	 ((x)->flag |= U_WANTX)
-#define SetUNopurge(x)	 ((x)->flag |= U_NOPURGE)
-#define SetUOubli(x)	 ((x)->flag |= U_OUBLI)
-#define SetUFirst(x)	 ((x)->flag |= U_FIRST)
-#define SetUNoMemo(x)	 ((x)->flag |= U_NOMEMO)
-#define SetUVhost(x)	 ((x)->flag |= U_VHOST)
-#define SetUMD5(x)	 ((x)->flag |= U_MD5PASS)
-#define SetUVote(x)      ((x)->flag |= U_HASVOTE)
-#define SetUNomail(x)	 ((x)->flag |= U_NOMAIL)
-#define SetUSWhois(x)	 ((x)->flag |= U_SWHOIS)
-#define SetUMale(x)      ((x)->flag |= U_MALE)
-#define SetUFemelle(x)   ((x)->flag |= U_FEMELLE)
-#define SetURealHost(x)  ((x)->flag |= U_REALHOST)
-#define DelUWantX(x)	 ((x)->flag &= ~U_WANTX)
-#define DelUNopurge(x)	 ((x)->flag &= ~U_NOPURGE)
-#define DelUOubli(x)	 ((x)->flag &= ~U_OUBLI)
-#define DelUFirst(x)	 ((x)->flag &= ~U_FIRST)
-#define DelUNoMemo(x)	 ((x)->flag &= ~U_NOMEMO)
-#define DelUVhost(x)	 ((x)->flag &= ~U_VHOST)
-#define DelUVote(x)      ((x)->flag &= ~U_HASVOTE)
-#define DelUMail(x)	 ((x)->flag &= ~U_NOMAIL)
-#define DelUSWhois(x)	 ((x)->flag &= ~U_SWHOIS)
-#define DelUMale(x)      ((x)->flag &= ~U_MALE)
-#define DelUFemelle(x)   ((x)->flag &= ~U_FEMELLE)
-#define DelURealHost(x)  ((x)->flag &= ~U_REALHOST)
+#define USuspend(x)	 	((x)->flag & U_SUSPEND)
+#define UWantX(x)	 	((x)->flag & U_WANTX)
+#define UNopurge(x)	 	((x)->flag & U_NOPURGE)
+#define UOubli(x)	 	((x)->flag & U_OUBLI)
+#define UFirst(x)	 	((x)->flag & U_FIRST)
+#define UNoMemo(x)	 	((x)->flag & U_NOMEMO)
+#define UIsBusy(x) 	 	((x)->flag & U_ADMBUSY)
+#define UMD5(x)		 	((x)->flag & U_MD5PASS)
+#define UPReject(x) 	((x)->flag & U_PREJECT)
+#define UPAccept(x) 	((x)->flag & U_PACCEPT)
+#define UPAsk(x) 		((x)->flag & U_POKACCESS)
+#define UVote(x) 		((x)->flag & U_HASVOTE)
+#define UNoVote(x) 		((x)->flag & U_NOVOTE)
+#define UPMReply(x) 	((x)->flag & U_PMREPLY)
+#define UChanged(x) 	((x)->flag & U_ALREADYCHANGE)
+#define UCantRegChan(x) ((x)->flag & U_CANTREGCHAN)
+#define UCantRegChan(x) ((x)->flag & U_CANTREGCHAN)
+#define UTracked(x) 	((x)->flag & U_TRACKED)
 
-#define CAutoVoice(x)           ((x)->flag & C_AUTOVOICE)
+#define SetUSuspend(x) 		((x)->flag |= U_SUSPEND)
+#define SetUChanged(x) 	 	((x)->flag |= U_ALREADYCHANGE)
+#define SetUWantX(x)	 	((x)->flag |= U_WANTX)
+#define SetUNopurge(x)		((x)->flag |= U_NOPURGE)
+#define SetUOubli(x)	 	((x)->flag |= U_OUBLI)
+#define SetUFirst(x)	 	((x)->flag |= U_FIRST)
+#define SetUNoMemo(x)	 	((x)->flag |= U_NOMEMO)
+#define SetUMD5(x)	 	 	((x)->flag |= U_MD5PASS)
+#define SetUVote(x)	 	 	((x)->flag |= U_HASVOTE)
+#define SetUCantRegChan(x)  ((x)->flag |= U_CANTREGCHAN)
+#define SetUTracked(x) 		((x)->flag |= U_TRACKED)
+
+#define DelUSuspend(x)	 	((x)->flag &= ~U_SUSPEND)
+#define DelUWantX(x)	 	((x)->flag &= ~U_WANTX)
+#define DelUNopurge(x)	 	((x)->flag &= ~U_NOPURGE)
+#define DelUOubli(x)	 	((x)->flag &= ~U_OUBLI)
+#define DelUFirst(x)	 	((x)->flag &= ~U_FIRST)
+#define DelUNoMemo(x)	 	((x)->flag &= ~U_NOMEMO)
+#define DelUVote(x) 	 	((x)->flag &= ~U_HASVOTE)
+#define DelUChanged(x) 	 	((x)->flag &= ~U_ALREADYCHANGE)
+#define DelUCantRegChan(x) 	((x)->flag &= ~U_CANTREGCHAN)
+#define DelUTracked(x) 		((x)->flag &= ~U_TRACKED)
+
 #define CSetWelcome(x)		((x)->flag & C_SETWELCOME)
-#define CJoined(x)		((x)->flag & C_JOINED)
+#define CJoined(x)			((x)->flag & C_JOINED)
 #define CStrictOp(x)		((x)->flag & C_STRICTOP)
 #define CLockTopic(x)		((x)->flag & C_LOCKTOPIC)
-#define CNoBans(x)		((x)->flag & C_NOBANS)
-#define CWarned(x)              ((x)->flag & C_WARNED)
-#define CNoOps(x)		((x)->flag & C_NOOPS)
+#define CNoBans(x)			((x)->flag & C_NOBANS)
+#define CWarned(x)			((x)->flag & C_WARNED)
+#define CNoOps(x)			((x)->flag & C_NOOPS)
 #define CAutoInvite(x)		((x)->flag & C_AUTOINVITE)
-#define CFLimit(x)		((x)->flag & C_FLIMIT)
-#define CNoInfo(x)              ((x)->flag & C_NOINFO)
-#define CNoPubCmd(x)		((x)->flag & C_NOPUBCMD)
-#define CNoVoices(x)            ((x)->flag & C_NOVOICES)
-#define CNoHalfops(x)		((x)->flag & C_NOHALFOPS)
-#define SetCAutoVoice(x)        ((x)->flag |= C_AUTOVOICE)
+#define CFLimit(x)			((x)->flag & C_FLIMIT)
+#define CNoInfo(x) 			((x)->flag & C_NOINFO)
+#define CNoVoices(x)		((x)->flag & C_NOVOICES)
+#define CSuspend(x) 		((x)->flag & C_SUSPEND)
 #define SetCSetWelcome(x)	((x)->flag |= C_SETWELCOME)
 #define SetCJoined(x)		((x)->flag |= C_JOINED)
 #define SetCStrictOp(x)		((x)->flag |= C_STRICTOP)
 #define SetCLockTopic(x)	((x)->flag |= C_LOCKTOPIC)
 #define SetCNoBans(x)		((x)->flag |= C_NOBANS)
-#define SetCWarned(x)           ((x)->flag |= C_WARNED)
+#define SetCWarned(x)		((x)->flag |= C_WARNED)
 #define SetCNoOps(x)		((x)->flag |= C_NOOPS)
-#define SetCNoInfo(x)           ((x)->flag |= C_NOINFO)
-#define SetCNoPubCmd(x)         ((x)->flag |= C_NOPUBCMD)
-#define SetCNoVoices(x)         ((x)->flag |= C_NOVOICES)
-#define SetCNoHalfops(x)	((x)->flag |= C_NOHALFOPS)
-#define DelCAutoVoice(x)        ((x)->flag &= ~C_AUTOVOICE)
+#define SetCNoInfo(x) 		((x)->flag |= C_NOINFO)
+#define SetCNoVoices(x)		((x)->flag |= C_NOVOICES)
+#define SetCSuspend(x)		((x)->flag |= C_SUSPEND)
+
 #define DelCSetWelcome(x)	((x)->flag &= ~C_SETWELCOME)
 #define DelCJoined(x)		((x)->flag &= ~C_JOINED)
 #define DelCStrictOp(x)		((x)->flag &= ~C_STRICTOP)
 #define DelCLockTopic(x)	((x)->flag &= ~C_LOCKTOPIC)
 #define DelCNoBans(x)		((x)->flag &= ~C_NOBANS)
-#define DelCWarned(x)           ((x)->flag &= ~C_WARNED)
+#define DelCWarned(x)		((x)->flag &= ~C_WARNED)
 #define DelCNoOps(x)		((x)->flag &= ~C_NOOPS)
-#define DelCNoInfo(x)           ((x)->flag &= ~C_NOINFO)
-#define DelCNoPubCmd(x)         ((x)->flag &= ~C_NOPUBCMD)
-#define DelCNoVoices(x)         ((x)->flag &= ~C_NOVOICES)
-#define DelCNoHalfops(x)	((x)->flag &= ~C_NOHALFOPS)
+#define DelCNoInfo(x) 		((x)->flag &= ~C_NOINFO)
+#define DelCNoVoices(x)		((x)->flag &= ~C_NOVOICES)
+#define DelCSuspend(x)		((x)->flag &= ~C_SUSPEND)
 
 #define IsOp(x) 		((x)->status & J_OP)
-#define IsHalfop(x)		((x)->status & J_HALFOP)
 #define IsVoice(x) 		((x)->status & J_VOICE)
 #define DoOp(x) 		((x)->status |= J_OP)
-#define DoHalfop(x)		((x)->status |= J_HALFOP)
 #define DoVoice(x) 		((x)->status |= J_VOICE)
 #define DeOp(x) 		((x)->status &= ~J_OP)
-#define DeHalfop(x)		((x)->status &= ~J_HALFOP)
 #define DeVoice(x) 		((x)->status &= ~J_VOICE)
 
-#define HasMode(chan, flag)     ((chan)->modes.modes & (flag))
-#define HasDMode(chan, flag)    ((chan)->defmodes.modes & (flag))
-#define ChanCmd(x) 		((x)->flag & CMD_CHAN)
-#define AdmCmd(x) 		((x)->flag & CMD_ADMIN)
-#define NeedNoAuthCmd(x)        ((x)->flag & CMD_NEEDNOAUTH)
-#define SecureCmd(x)            ((x)->flag & CMD_SECURE) 
-#define Secure2Cmd(x)           ((x)->flag & CMD_SECURE2) 
-#define Secure3Cmd(x)           ((x)->flag & CMD_SECURE3)
-#define HelpCmd(x)		((x)->flag & CMD_HELPER)
-#define NeedMemberShipCmd(x)    ((x)->flag & CMD_MBRSHIP)
+#define HasMode(chan, flag) 	((chan)->modes.modes & (flag))
+#define HasDMode(chan, flag) 	((chan)->defmodes.modes & (flag))
 
-#define GetConf(x) 				(ConfFlag & (x))
+#define ChanCmd(x) 				((x)->flag & CMD_CHAN)
+#define AdmCmd(x) 				((x)->flag & CMD_ADMIN)
+#define NeedNoAuthCmd(x)		((x)->flag & CMD_NEEDNOAUTH)
+#define SecureCmd(x) 			((x)->flag & CMD_SECURE)
+#define Secure2Cmd(x) 			((x)->flag & CMD_SECURE2)
+#define Secure3Cmd(x) 			((x)->flag & CMD_SECURE3)
+#define NeedMemberShipCmd(x) 	((x)->flag & CMD_MBRSHIP)
+#define DisableCmd(x) 			((x)->flag & CMD_DISABLE)
+#define IsCTCP(x) 				(*(x)->name == CTCP_DELIM_CHAR)
+
 #define ASIZE(x) 				(sizeof (x) / sizeof *(x))
-
-#define IsSuspend(x) ((x)->suspend && (!(x)->suspend->expire ||\
-				(x)->suspend->expire > CurrentTS))
-#define CantRegChan(x) (!(x)->cantregchan || (x)->cantregchan > CurrentTS)
 
 #define PLUR(x)  	((x) > 1 ? "s" : "")
 #define PLURX(x) 	((x) > 1 ? "x" : "")
 #define NONE(x) 	((x) ? (x) : "")
-#define UNDEF(x)        ((x) ? get_time(nick, (x)) : "- Non défini -")
+#define UNDEF(x) 	((x) ? get_time(nick, (x)) : "- Non défini -")
 
-#define IsBadNick(nick)                 find_dnr(nick, DNR_TYPEUSER|DNR_MASK)
-#define IsBadChan(chan)                 find_dnr(chan, DNR_TYPECHAN|DNR_MASK)
-#define HasWildCard(string) 	(strchr((string), '*') || strchr((string), '?'))
+#define UserOnChan(user, chan) 	((user)->n && GetJoinIbyNC((user)->n, (chan)->netchan))
+#define OnChanTS(user, chan) 	(UserOnChan((user), (chan)) ? 1 : CurrentTS)
 
-#define SPECIAL_CHAR "{}[]|-_\\^`.()<>"
+#define SPECIAL_CHAR "{}[]|-_\\^`"
 
 /* global vars */
+
+#ifdef USE_WELCOMESERV
+extern struct bots ws;
 extern char user_motd[];
 extern char admin_motd[];
+#endif
 extern struct robot bot;
-extern int ConfFlag;
 extern struct bots cs;
+
 extern aHashCmd *cmd_hash[];
 extern anUser *user_tab[];
 extern aChan *chan_tab[];
 extern aNChan *nchan_tab[];
 extern aNick **num_tab[];
-extern aServer *serv_tab[];
+extern aServer *serv_tab[MAXNUM];
 extern aNick *nick_tab[];
 
 extern int running;
-extern int deconnexion;
-extern int complete;
 extern time_t CurrentTS;
-extern int nbmaxuser;
-extern int nbuser;
-extern int burst;
 
+#ifdef USE_NICKSERV
 extern aKill *killhead;
-extern aDNR *dnrhead;
-extern struct ignore *ignorehead;
-extern Timer *Timers;
-extern struct nickinfo *nickhead;
-extern struct cntryinfo *cntryhead;
+#endif
 
 extern Lang *DefaultLang;
-extern int LangCount;
-extern int CmdsCount; 
 
 static inline char *GetReply(aNick *nick, int msgid)
 {
-        return nick->user ? nick->user->lang->msg[msgid] : DefaultLang->msg[msgid];
+	return nick->user ? nick->user->lang->msg[msgid] : DefaultLang->msg[msgid];
 }
 
 static inline char *GetUReply(anUser *user, int msgid)
 {
-        return user->lang->msg[msgid];
+	return user->lang->msg[msgid];
 }
+
 
 /**** CONFIGURATIONS PAR DEFAUT ****/
 /* A METTRE SOUS LA FORME: #define U|C_DEFAULT (FLAG1 | FLAG2 | ... FLAGn) */
@@ -346,4 +347,7 @@ static inline char *GetUReply(anUser *user, int msgid)
 						la mise du +x automatique au login
 */
 
-#define U_DEFAULT (U_POKACCESS | U_WANTX | U_PNICK | U_MD5PASS)
+#define U_DEFAULT (U_POKACCESS | U_MD5PASS)
+
+#define A_MANAGERLEVEL 450
+#define A_MANAGERFLAGS (A_OP|A_PROTECT)

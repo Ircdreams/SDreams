@@ -1,10 +1,12 @@
 /* include/socket.h
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2007 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: socket.h,v 1.7 2005/07/10 16:35:11 bugs Exp $
+ * $Id: socket.h,v 1.12 2007/12/01 02:22:31 romexzf Exp $
  */
 
 #ifndef HAVEINC_socket
@@ -28,17 +30,13 @@
 #define TCPWINDOWSIZE 513 /* à augmenter si le réseau augmente de taille */
 #define MAXPARA 16
 
-#define SOCK_REGISTER(fd) do { 	\
-		if((fd) > highsock) highsock = (fd); \
-		FD_SET((fd), &global_fd_set);		\
-} while(0)
-  
-extern fd_set global_fd_set; 
-extern int highsock; 
-
-
 extern void init_bot(void);
 extern int run_bot(void);
-extern void sockets_close(void);
+extern void socket_close(void);
+extern void socket_init(void);
+extern void socket_register(int);
+extern void socket_unregister(int);
+
+extern int fd_in_use(int);
 
 #endif /*HAVEINC_socket*/

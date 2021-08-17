@@ -1,10 +1,12 @@
 /* include/admin_user.h - commandes admins pour gerer les users
- * Copyright (C) 2004 ircdreams.org
  *
- * contact: bugs@ircdreams.org
- * site web: http://ircdreams.org
+ * Copyright (C) 2002-2007 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * site web: http://sf.net/projects/scoderz/
+ *
+ * Services pour serveur IRC. Supporté sur IRCoderz
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,11 +28,8 @@
 
 #define MAXMATCHES 40
 #define WARNACCESS 30
-#define WARNBAN 30
 
-extern int show_userinfo(aNick *, anUser *, int, int);
 extern int cs_whois(aNick *, aChan *, int, char **);
 extern int admin_user(aNick *, aChan *, int, char **);
-extern void show_ususpend(aNick *, anUser *);
 
 #endif /*HAVEINC_adminusr*/

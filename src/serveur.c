@@ -1,10 +1,13 @@
 /* src/serveur.c - Traitement des messages IRC
- * Copyright (C) 2004-2006 ircdreams.org
  *
- * contact: bugs@ircdreams.org
+ * Copyright (C) 2002-2008 David Cortier  <Cesar@ircube.org>
+ *                         Romain Bignon  <Progs@coderz.info>
+ *                         Benjamin Beret <kouak@kouak.org>
+ *
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
  * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IrcDreams V.2
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +22,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: serveur.c,v 1.211 2006/03/21 17:43:54 bugs Exp $
+ * $Id: serveur.c,v 1.247 2008/01/05 18:34:14 romexzf Exp $
  */
 
 #include "main.h"
@@ -33,33 +36,42 @@
 #include "config.h"
 #include "del_info.h"
 #include "debug.h"
+#include "mylog.h"
 #include "aide.h"
 #include "timers.h"
 #include <sys/time.h>
+#ifdef USE_MEMOSERV
 #include "memoserv.h"
+#endif
+#ifdef USE_WELCOMESERV
 #include "welcome.h"
+#endif
+#ifdef HAVE_TRACK
 #include "track.h"
-#include "fichiers.h"
-#include "version.h"
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <errno.h>
+#endif
 #include <ctype.h>
 
 aServer *mainhub = NULL;
+static int burst = 0;
 
-int r_motd(int parc, char **parv)
+#ifdef HAVE_OPLEVELS
+/*
+ * m_destruct SS DE # timestamp
+ */
+int m_destruct(int parc, char **parv)
 {
-	aServer *serv = num2servinfo(parv[0]);
-	FILE *fp;
+	aNChan *c;
 
-	if(!serv) return 0;
-        if(!(fp = fopen(serv->serv, "a")))
-                return Debug(W_MAX|W_WARN, "DB::Write: Impossible d'écrire la motd %s", serv->serv, strerror(errno));
-        fprintf(fp, "%s\r\n", parv[2]);
-        fclose(fp);
+	if(parc < 3) return Debug(W_DESYNCH|W_WARN, "DE: pas assez d'argument : %d args", parc);
+
+	if(!(c = GetNChan(parv[1])) || strtol(parv[2], NULL, 10) > c->timestamp
+		|| c->users || (c->regchan && CJoined(c->regchan)))
+		return 0; /* Salon non trouvé, on l'a peut être déjà supprimé ? */
+
+	del_nchan(c); /* It's really a zannel */
 	return 0;
 }
+#endif
 
 /*
  * m_clearmode SSCCC CM # mode_cleared
@@ -74,17 +86,15 @@ int m_clearmode(int parc, char **parv)
 	if(!chan) return Debug(W_DESYNCH|W_WARN, "CM %s de %s: aNChan non trouvé!", parv[1], parv[0]);
 
 	Strncpy(mode + 1, parv[2], sizeof mode -2);
-	/* string2scmode n'enleve le +k que si une key est fournie, ce *hack* joue bien le jeu*/
+	/* string2scmode n'enleve le +k que si une key est fournie, ce *hack* joue bien le jeu */
 	string2scmode(&chan->modes, mode, strchr(parv[2], 'k'), NULL);
 
 	if(strchr(parv[2], 'o')) clear |= J_OP;
-	if(strchr(parv[2], 'h')) clear |= J_HALFOP;
 	if(strchr(parv[2], 'v')) clear |= J_VOICE;
 
-	if(clear)  /* changement de +o|h|v */
-
-	for(j = chan->members;j;j = j->next)
-		 if(!(j->value.j->nick->flag & (N_SERVICE | N_GOD))) j->value.j->status &= ~clear;
+	if(clear)  /* changement de +o|v */
+		for(j = chan->members; j; j = j->next)
+			 if(!(j->value.j->nick->flag & (N_SERVICE | N_GOD))) j->value.j->status &= ~clear;
 	return 0;
 }
 
@@ -104,14 +114,14 @@ int m_mode(int parc, char **parv)
 		anAccess *a = NULL, *a2 = NULL;
 		aJoin *join = NULL;
 		aLink *j = NULL;
-		int what = 1, i = 2, l = 0, obvh = 1;
+		int what = 1, i = 2, l = 0, obv = 1;
 
 		if(!chan) return Debug(W_DESYNCH|W_WARN, "M %s de %s: aNChan non trouvé!", parv[1], parv[0]);
-		if((ch = chan->regchan) && IsSuspend(ch)) ch = NULL; /* don't handle reg stuff if suspended */
+		if((ch = chan->regchan) && CSuspend(ch)) ch = NULL; /* don't handle reg stuff if suspended */
 
-		while (*modes)
+		while(*modes)
 		{
-			switch (*modes)
+			switch(*modes)
 			{
 				case '+':
 					what = 1;
@@ -121,10 +131,17 @@ int m_mode(int parc, char **parv)
 					break;
 				case 'o':
 					param = parv[++i];
-
+#ifdef HAVE_OPLEVELS
+					if(what)
+					{
+						char *p = strchr(param, ':');
+						if(p) *p = 0;
+					}
+#endif
 					if(!(nptr = num2nickinfo(param)))
 					{
-						Debug(W_DESYNCH|W_WARN, "m_mode: aNick non trouvé pour '%s %co %s'", parv[1], what ? '+' : '-', param);
+						Debug(W_DESYNCH|W_WARN, "m_mode: aNick non trouvé pour '%s %co %s'",
+							parv[1], what ? '+' : '-', param);
 						break;
 					}
 
@@ -132,15 +149,15 @@ int m_mode(int parc, char **parv)
 					{
 						if(!what) /* -o */
 						{
-							if(nptr->user && nick /* la victime a un accès ou est protégée*/
+							if(nptr->user && nick /* la victime a un accès ou est protégée */
 							&& nick != nptr && (IsAdmin(nptr->user) || (a = GetAccessIbyUserI(nptr->user, ch))))
-							{
+							{	/* l'OP n'est pas auth ou lvl inférieur */
 								if(!nick->user || (nptr->user->level > nick->user->level ||
 								(a && AProtect(a) && !ASuspend(a) && (a2 = GetAccessIbyUserI(nick->user, ch))
-								&& !ASuspend(a2) && a2->level <= a->level)))/* ou accés inférieur/suspend*/
+								&& !ASuspend(a2) && a2->level <= a->level)))/* ou accés inférieur/suspend */
 								{
-										csmode(ch, MODE_OBVH, "+o $", nptr->numeric);
-										break;
+									csmode(ch, MODE_OBV, "+o $", nptr->numeric);
+									break;
 								}
 							}
 							else if(!strcmp(cs.num, param)) /* deop du CServ */
@@ -151,61 +168,30 @@ int m_mode(int parc, char **parv)
 						}
 						else /* +o */
 						{ /* noops ou strictop */
-							if((CNoOps(ch) 
+							if(!IsOperOrService(nptr) && (CNoOps(ch)
 							|| (CStrictOp(ch) && (!nptr->user || !(a = GetAccessIbyUserI(nptr->user, ch)) || ASuspend(a)))))
 							{
-									csmode(ch, MODE_OBVH, "-o $", param);
-									break;
+								csmode(ch, MODE_OBV, "-o $", param);
+								break;
 							}
 						}
-					}
+					} /* mise à jour du status */
 
-					/* mise à jour du status */
 					if((join = GetJoinIbyNC(nptr, chan)))
 					{
 						if(what) DoOp(join);
 						else DeOp(join);
 					}
 					break;
-				
-				case 'h':
-					param = parv[++i];
-
-					if(ch && what && CNoHalfops(ch)) {
-                                                csmode(ch, MODE_OBVH, "-h $", param);
-                                                break;
-                                        }
-
-					if(!(nptr = num2nickinfo(param)))
-                                        {
-                                                Debug(W_DESYNCH|W_WARN, "m_mode: aNick non trouvé pour '%s %co %s'", parv[1], what ? '+' : '-', param);
-                                                break;
-                                        }
-
-					/* mise à jour du status */
-                                        if ((join = GetJoinIbyNC(nptr, chan)))
-                                        {
-                                                if(what) DoHalfop(join);
-                                                else DeHalfop(join);
-                                        }
-                                        break;
 
 				case 'v':
 					param = parv[++i];
-
-					if(ch && what && CNoVoices(ch)) {
-                                                csmode(ch, MODE_OBVH, "-v $", param);
-                                                break;
-                                        }
-
-					if(!(nptr = num2nickinfo(param)))
-                                        {
-                                                Debug(W_DESYNCH|W_WARN, "m_mode: aNick non trouvé pour '%s %co %s'", parv[1], what ? '+' : '-', param);
-                                                break;
-                                        }
-
-					/* mise à jour du status */
-					if ((join = GetJoinIbyNC(nptr, chan)))
+					if(ch && what && CNoVoices(ch))
+					{
+						csmode(ch, MODE_OBV, "-v $", param);
+						break;
+					} /* mise à jour du status */
+					if((nptr = num2nickinfo(param)) && (join = GetJoinIbyNC(nptr, chan)))
 					{
 						if(what) DoVoice(join);
 						else DeVoice(join);
@@ -215,14 +201,14 @@ int m_mode(int parc, char **parv)
 				case 'b':
 					param = parv[++i]; /* grab parameter (mask) */
 					/* salon non reg, ou -b, ou service, on ignore, si ban perm, il sera enforcé */
-					if(!what || !ch || !nick || nick->flag & N_SERVICE) break;
+					if(!nick || !what || !ch || nick->flag & N_SERVICE) break;
 
 					if(!CNoBans(ch))
 					{
 						l = nick->user ? ChanLevelbyUserI(nick->user, ch) : 0;
-						if(l >= ch->banlevel)/* peut à priori bannir*/
+						if(l >= ch->banlevel)/* peut à priori bannir */
 						{
-							for(j = chan->members;j;j = j->next)
+							for(j = chan->members; j; j = j->next)
 							{	/* recherche de personnes protégées couvertes */
 								nptr = j->value.j->nick;
 								if(!nptr->user || match(param, GetNUHbyNick(nptr, 1))) continue;
@@ -233,27 +219,30 @@ int m_mode(int parc, char **parv)
 					}
 
 					if(CNoBans(ch) || ((ch->banlevel > l || a) && !IsAnAdmin(nick->user)))
-						csmode(ch, MODE_OBVH, "-b $", param);
+						csmode(ch, MODE_OBV, "-b $", param);
 					break;
 
-				default: /* other modes than OBVH! (Need Parse!) */
+				default: /* other modes than OBV! (Need Parse!) */
 					if(*modes == 'l' && what) limit = parv[++i];
 					else if(*modes == 'k') key = parv[++i];
-					obvh = 0;
+#ifdef HAVE_OPLEVELS
+					else if(*modes == 'A' || *modes == 'U') ++i; /* ignore A/U passwords */
+#endif
+					obv = 0;
 			} /* switch */
 			++modes;
 		} /* while */
 
-		/* Only if registered AND some modes other than OBVH */
+		/* Only if registered AND some modes other than OBV */
 		/* ChModesLevel check (cancel modes change if needed, a bit ugly but work) */
-		if(ch && !obvh && nick && ch->cml && (!nick->user || (!IsAdmin(nick->user)
+		if(ch && !obv && nick && ch->cml && (!nick->user || (!IsAdmin(nick->user)
 			&& (!(a = GetAccessIbyUserI(nick->user, ch)) || ASuspend(a) || a->level < ch->cml))))
-		    modes_reverse(chan, parv[2], key, limit);
-		else if(!obvh) string2scmode(&chan->modes, parv[2], key, limit); /* parse */
+			modes_reverse(chan, parv[2], key, limit);
+
+		else if(!obv) string2scmode(&chan->modes, parv[2], key, limit); /* parse */
 
 	} /* if(ch) */
 	else if(nick) nick->flag = parse_umode(nick->flag, parv[2]);
-	
 	return 0;
 }
 
@@ -271,11 +260,11 @@ int m_part(int parc, char **parv)
 	if(!(nick = GetInfobyPrefix(parv[0])))
 		return Debug(W_DESYNCH|W_WARN, "PART %s de %s: aNick non trouvé!", parv[1], parv[0]);
 
-	for(p = Strtok(&ptr, parv[1], ',');p;p = Strtok(&ptr, NULL, ',')) 
-        { 
-                if((chan = GetNChan(p))) del_join(nick, chan); 
-                else Debug(W_DESYNCH|W_WARN, "PART %s de %s: aNChan non trouvé!", parv[1], parv[0]); 
-        } 
+	for(p = Strtok(&ptr, parv[1], ','); p; p = Strtok(&ptr, NULL, ','))
+	{
+		if((chan = GetNChan(p))) del_join(nick, chan);
+		else Debug(W_DESYNCH|W_WARN, "PART %s de %s: aNChan non trouvé!", parv[1], parv[0]);
+	}
 	return 0;
 }
 
@@ -289,7 +278,7 @@ int m_kick(int parc, char **parv)
 	aNChan *chan;
 	aJoin *j = NULL;
 	anAccess *a1 = NULL, *a2 = NULL;
-	
+
 	if(parc < 3) return Debug(W_PROTO|W_WARN, "#arg invalide: KICK de %s: #arg=%d", parv[0], parc);
 
 	if(!(v = num2nickinfo(parv[2])))
@@ -301,24 +290,24 @@ int m_kick(int parc, char **parv)
 	ch = chan->regchan;
 	del_join(v, chan);
 
-	if(!ch || IsSuspend(ch)) return 0;
+	if(!ch || CSuspend(ch)) return 0;
 
-	if(!strcmp(cs.num, parv[2])) /* on sait jamais*/
+	if(!strcmp(cs.num, parv[2])) /* on ne sait jamais */
 	{
 		csjoin(ch, JOIN_FORCE);
 		return Debug(W_DESYNCH|W_WARN, "Kické de %s par %s!?", ch->chan, parv[0]);
 	}
 
-	if(v->user && (k = GetInfobyPrefix(parv[0])) && k != v /* générique*/
+	if(v->user && (k = GetInfobyPrefix(parv[0])) && k != v /* générique */
 		&& !(k->flag & (N_SERVICE|N_GOD))
 		&& ((IsAdmin(v->user) && (!k->user || k->user->level < v->user->level)) /* v admin > */
 			|| ((a1 = GetAccessIbyUserI(v->user, ch)) && AProtect(a1) && !ASuspend(a1)/* OU v a un accès valide*/
-				 && (!k->user  /* et k non logué*/
-					 || (!IsAdmin(k->user)/* si auth mais PAS admin */
+				 && (!k->user /* et k non logué */
+					 || (!IsAdmin(k->user) /* si auth mais PAS admin */
 				 		&& (!(a2 = GetAccessIbyUserI(k->user, ch)) || ASuspend(a2)/* OU n'a pas d'accès valide*/
-							|| a2->level <= a1->level)))))) /* OU v protect ET k <= v*/
+							|| a2->level <= a1->level)))))) /* OU v protect ET k <= v */
 	{
-		csmode(ch, MODE_OBVH, "-o $", k->numeric);/*pas le droit de kick > déop*/
+		csmode(ch, MODE_OBV, "-o $", k->numeric);/* pas le droit de kick > déop */
 		if((j = GetJoinIbyNC(k, chan))) DeOp(j);
 	}
 	return 0;
@@ -338,7 +327,7 @@ int m_join(int parc, char **parv)
 
 	if(*parv[1] == '0') del_alljoin(nick); /* partall */
 	else add_join(nick, parv[1], 0,
-		parc > 2 ? strtol(parv[2], NULL, 10) : CurrentTS, GetNChan(parv[1]));
+			parc > 2 ? strtol(parv[2], NULL, 10) : CurrentTS, GetNChan(parv[1]));
 	return 0;
 }
 
@@ -354,13 +343,13 @@ int m_create(int parc, char **parv)
 	if(!(nick = num2nickinfo(parv[0])))
 		return Debug(W_DESYNCH|W_WARN, "CREATE %s de %s: aNick non trouvé!", parv[1], parv[0]);
 
-	for(p = Strtok(&ptr, parv[1], ',');p;p = Strtok(&ptr, NULL, ','))
+	for(p = Strtok(&ptr, parv[1], ','); p; p = Strtok(&ptr, NULL, ','))
 		add_join(nick, p, J_OP|J_CREATE, strtol(parv[2], NULL, 10), NULL);
 	return 0;
 }
 
 /*
- *m_nick SS N nick (hop) TS ident host.com [+mode [args ...]] IPBASE64 num realname
+ * m_nick SS N nick (hop) TS ident host.com [+mode [args ...]] IPBASE64 num realname
  */
 int m_nick(int parc, char **parv)
 {
@@ -368,32 +357,31 @@ int m_nick(int parc, char **parv)
 	aNick *who = NULL;
 	anUser *user;
 
-	if(parc > 7) /*Nouveau nick*/
+	if(parc > 7) /* Nouveau nick */
 	{
 		aServer *serv = num2servinfo(parv[0]);
-					/*  		ident	 host	  base64		num		ptr to serv	real-name	timestamp		umodes*/
-		who = add_nickinfo(nick, parv[4], parv[5], parv[parc-3], parv[parc-2], 
-                        /* aServ*,      real-name ,     timestamp       ,       umodes */ 
-                        serv, parv[parc-1], atol(parv[3]), *parv[6] == '+' ? parv[6] : NULL); 
-
-		if(!who) return 0; /* sauvetage temporaire..*/
+						/*  nick, ident	, host	 , base64		,	num	*/
+		who = add_nickinfo(nick, parv[4], parv[5], parv[parc-3], parv[parc-2],
+						/* aServ*,	real-name ,	timestamp	,	umodes */
+							serv, parv[parc-1], atol(parv[3]), *parv[6] == '+' ? parv[6] : NULL);
+		if(!who) return 0; /* sauvetage temporaire.. */
 
 		if(*parv[6] == '+')
 		{
 			int i = 7;
 			if(who->flag & N_REG) ac = parv[i++];
+			/*if(who->flag & N_SPOOF) spoof = parv[i++];*/
 		}
 
 		if(ac)
 		{
 			char *ac_ts = strchr(ac, ':');
 
-                        if(ac_ts) *ac_ts++ = 0; /* ok there is a timestamp */
-
+			if(ac_ts) *ac_ts++ = 0; /* ok there is a timestamp */
 			if(!(user = getuserinfo(ac)) || user->n)
 			{
-				cswallops("ACCOUNT %s (%s) pour %s depuis %s", ac, 
-                                           user ? "Desynch" : "inconnu", who->nick, serv->serv); 
+				cswallops("ACCOUNT %s (%s) pour %s depuis %s", ac,
+					user ? "Desynch" : "inconnu", who->nick, serv->serv);
 				cs_account(who, NULL);
 				return 0;
 			}
@@ -403,44 +391,42 @@ int m_nick(int parc, char **parv)
 			if(IsAdmin(user)) adm_active_add(who);
 		}
 
-		if(GetConf(CF_WELCOMESERV) && GetConf(CF_WELCOME) && !burst && !(serv->flag & ST_BURST)) choose_welcome(who->numeric);
-		++nbuser;
-        	if(nbuser > nbmaxuser) {
-                	if(!burst && (!(nbmaxuser%10))) cswallops("Nouveau Record de Connexion : %d utilisateurs", nbuser);
-                	nbmaxuser = nbuser;
-	        }
+#ifdef USE_WELCOMESERV /* Envoi du welcome si il est actif et non nul & non burst */
+		if(GetConf(CF_WELCOME) && !burst && !(serv->flag & ST_BURST)) choose_welcome(who->numeric);
+#endif
 
 	}
 	else if(parc <= 3) /* Changement de pseudo */
 	{
-		if(!(who = num2nickinfo(parv[0]))) 
+		if(!(who = num2nickinfo(parv[0])))
 			return Debug(W_DESYNCH|W_WARN, "NICK %s > %s: aNick non trouvé!", parv[0], nick);
 
-		if(GetConf(CF_NICKSERV) && NHasKill(who)) kill_remove(who);
-		switch_nick(who, nick);		                 
+#ifdef USE_NICKSERV
+		if(NHasKill(who)) kill_remove(who);
+#endif
+		switch_nick(who, nick);
 	}
-	else return Debug(W_PROTO|W_WARN, "#arg invalide: NICK %s %s %s: arg=%d", parv[0], parv[1], parv[2], parc);
+	else return Debug(W_PROTO|W_WARN, "#arg invalide: NICK %s %s %s: arg=%d",
+					parv[0], parv[1], parv[2], parc);
 
-	if(GetConf(CF_NICKSERV)) {
-		if((who->user && (!strcasecmp(who->user->nick, nick) || checknickaliasbyuser(nick, who->user))) || !(user = getuserinfo(nick))) return 0;
+#ifdef USE_NICKSERV	/* le mec est auth sur ce nick OU nick pris n'est pas reg */
+	if((who->user && !strcasecmp(who->user->nick, nick)) || !(user = getuserinfo(nick))) return 0;
 
-		if(strcasecmp(nick,user->nick))
-			csreply(who, "\2Avertissement\2 : Le pseudo \2%s\2 est un alias de %s, si c'est le votre, identifiez vous via: \2/%s %s %s <votre pass>\2"
-				, nick, user->nick, cs.nick, RealCmd("login"), user->nick);
-		else
-			 csreply(who, GetReply(who, L_TOOKREGNICK), nick, cs.nick, RealCmd("login"), user->nick);
+	csreply(who, GetReply(who, L_TOOKREGNICK), nick, cs.nick, RealCmd("login"), nick);
 
-		if(IsProtected(user))
-		{
-			csreply(who, GetReply(who, (!GetConf(CF_NOKILL) && UPKill(user)) ? L_NICKKILLED : L_NICKCHANGED), kill_interval);
-                	add_killinfo(who, (!GetConf(CF_NOKILL) && UPKill(user)) ? TIMER_KREGNICK : TIMER_CHNICK);
-		}
+	if(IsProtected(user))
+	{
+		int needkill = (!GetConf(CF_NOKILL) && UPKill(user));
+
+		csreply(who, GetReply(who, needkill ? L_NICKKILLED : L_NICKCHANGED), cf_kill_interval);
+		add_killinfo(who, needkill ? TIMER_KREGNICK : TIMER_CHNICK);
 	}
+#endif
 	return 0;
 }
 
 /*
- * m_burst SS B # TS [mode key lim] [users] [%bans]
+ * m_burst SS B # TS [mode key lim] users %ban
  */
 int m_burst(int parc, char **parv)
 {
@@ -450,12 +436,16 @@ int m_burst(int parc, char **parv)
 	const char *chan = parv[1];
 	char *modes = NULL, *users = NULL, *flags = NULL, *num = NULL, *key = NULL, *limit = NULL;
 	int status = 0, i = 4;
-	long int ts = strtol(parv[2], NULL, 10);
+	time_t ts = strtol(parv[2], NULL, 10);
 
 	if(parc < 3) return Debug(W_PROTO|W_WARN, "#arg invalide: BURST de %s: arg=%d", parv[0], parc);
 
-	if(parc == 3) return 0;
-
+	if(parc == 3)
+#ifdef HAVE_OPLEVELS
+	; /* zannel on .12, handle it to get the right TS */
+#else
+	return 0;
+#endif
 	else if(*parv[3] == '+') /* channel has mode(s) */
 	{	/* grap modes' argument if needed */
 		for(modes = ++parv[3]; *parv[3]; ++parv[3])
@@ -463,12 +453,16 @@ int m_burst(int parc, char **parv)
 			{
 				case 'l': limit = parv[i++]; break;
 				case 'k': key = parv[i++]; break;
+#ifdef HAVE_OPLEVELS
+				case 'A': case 'U': ++i;
+#endif
 				default: break;
 			}
 		users = parv[i];
 	}
 	else if(*parv[3] != '%') users = parv[3];
-	else return 0;
+	else return 0; /* bans only */
+
 	if(!(netchan = GetNChan(chan))) /* new channel on net */
 	{
 		netchan = new_chan(chan, ts);
@@ -477,18 +471,33 @@ int m_burst(int parc, char **parv)
 	}
 	c = netchan->regchan;
 
+#ifdef HAVE_OPLEVELS
+	if(parc == 3) /* Zannel BURST? */
+	{
+		if(ts < netchan->timestamp && netchan->timestamp <= ts + 4 &&
+			(netchan->users || (c && CJoined(c))))
+		/* Only do this when WE have users, so that if we do this the BURST that we sent
+		   has parc > 3 and the other side will use the test below: */
+			ts = netchan->timestamp; /* Do not deop our side. */
+	}
+	else if(netchan->timestamp < ts && ts <= netchan->timestamp + 4 &&
+		!netchan->users && (!c || !CJoined(c)))
+	/* If one side of the net.junction does the above
+	   timestamp = netchan->timestamp, then the other side must do this: */
+		netchan->timestamp = ts;  /* Use the same TS on both sides. */
+#endif
+
 	if(!burst)
 	{
 		if(ts < netchan->timestamp) /* Get an older channel */
 		{
 			aLink *l = netchan->members;
-			netchan->modes.modes = 0; /* clearmodes */
-			netchan->modes.limit = 0;
+			netchan->modes.modes = 0U; /* clearmodes */
+			netchan->modes.limit = 0U;
 			*netchan->modes.key = 0;
 			netchan->timestamp = ts;
 			/* deopall */
-
-			for(; l; l = l->next) l->value.j->status &= ~(J_OP | J_HALFOP | J_VOICE);
+			for(; l; l = l->next) l->value.j->status &= ~(J_OP | J_VOICE);
 			/* if registered and on channel, get op back */
 			if(c && CJoined(c))
 				putserv("%s " TOKEN_MODE " %s +o %s", bot.servnum, netchan->chan, cs.num);
@@ -496,32 +505,38 @@ int m_burst(int parc, char **parv)
 		/* burst d'un salon après EB -> ajout de ses modes (sauf si limite >= à l'actuelle) */
 	}
 	else /* burst */
-	{/* envoi d'un B d'un salon reg par uplink, B-back avec defmodes, ajout des deux séries de modes*/
-		if(c && !IsSuspend(c) && !CJoined(c))
+	{/* envoi d'un B d'un salon reg par uplink, B-back avec defmodes, ajout des deux séries de modes */
+		if(c && !CSuspend(c) && !CJoined(c))
 		{
-			putserv("%s "TOKEN_BURST" %s %ld +%s %s:o", bot.servnum, c->chan,
-				ts, GetCModes(c->defmodes), cs.num);
+			putserv("%s "TOKEN_BURST" %s %T +%s %s:o", bot.servnum, c->chan, ts,
+				GetCModes(c->defmodes), cs.num);
 			netchan->modes = c->defmodes; /* c'est ma 1ère connexion, donc aucun mode mémorisé */
 			netchan->timestamp = ts;
 			do_cs_join(c, netchan, 0);
 		}
 	}
-	/* ajout des modes du salon du réseau, en appliquant les règles en cas de collision */ 
-        if(modes) string2scmode(&netchan->modes, modes, key && HasMode(netchan, C_MKEY) 
-                && strcmp(netchan->modes.key, key) <= 0 ? netchan->modes.key : key, 
-                limit && HasMode(netchan, C_MLIMIT) && atoi(limit) >= netchan->modes.limit ? NULL : limit);
-	
-	if(!users) return 0; /* zombies' channel... it can exist with extra modes. */
+	/* ajout des modes du salon du réseau, en appliquant les règles en cas de collision */
+	if(modes) string2scmode(&netchan->modes, modes, key && HasMode(netchan, C_MKEY)
+		&& strcmp(netchan->modes.key, key) <= 0 ? netchan->modes.key : key,
+		limit && HasMode(netchan, C_MLIMIT) && strtoul(limit, NULL, 10) >= netchan->modes.limit ? NULL : limit);
 
-	for(num = Strtok(&key, users, ',');num;num = Strtok(&key, NULL, ','))
+	if(!users) return 0; /* zombies' channel... it can exist with extra modes. */
+	for(num = Strtok(&key, users, ','); num; num = Strtok(&key, NULL, ','))
 	{
-		if(*(flags = &num[2*NUMSERV+1]) == ':') /* SSCCC[:[o|h|v]] recherche directe sans while*/
+		if(*(flags = &num[2*NUMSERV+1]) == ':') /* SSCCC[:[o|v]] recherche directe sans while */
 		{
 			status = 0;
-			*flags++ = '\0'; /* efface le ':' pour n'avoir que la num*/
-			if(*flags == 'o') status |= J_OP,flags++;
-			if(*flags == 'h') status |= J_HALFOP,flags++;
-			if(*flags == 'v') status |= J_VOICE,flags++;
+			*flags = '\0'; /* efface le ':' pour n'avoir que la num */
+			if(*++flags) status |= (*flags == 'v') ? J_VOICE : J_OP; /* *flags != 'v' <=> */
+			if(*++flags) status |= (*flags == 'v') ? J_VOICE : J_OP; /* *flags == ('o' || :digit:) */
+#ifdef HAVE_OPLEVELS
+			if(isdigit((unsigned char) *flags)) /* oplevel */
+			{
+				status |= J_OP; /* *op*levels */
+				if(*flags == '0' && !isdigit((unsigned char) flags[1])) status |= J_MANAGER;
+				while(isdigit((unsigned char) *++flags)); /* don't use it for now */
+			}
+#endif
 		}
 		if((nick = num2nickinfo(num))) add_join(nick, chan, status | J_BURST, ts, netchan);
 		else Debug(W_DESYNCH|W_WARN, "BURST %s sur %s de %s: aNick non trouvé!", num, parv[1], parv[0]);
@@ -536,7 +551,7 @@ int m_burst(int parc, char **parv)
 int m_quit(int parc, char **parv)
 {
 	del_nickinfo(parv[0], "QUIT");
-	return 0;	
+	return 0;
 }
 
 /*
@@ -567,7 +582,9 @@ int m_away(int parc, char **parv)
 	else
 	{
 		nick->flag &= ~N_AWAY;
+#ifdef USE_MEMOSERV
 		if(nick->user) show_notes(nick);
+#endif
 	}
 	return 0;
 }
@@ -581,25 +598,26 @@ int m_whois(int parc, char **parv)
 	int remote = 0;
 
 	if(!strcasecmp(parv[2], cs.nick)) n = num2nickinfo(cs.num);
-
+#ifdef USE_WELCOMESERV
+	else if(!strcasecmp(parv[2], ws.nick)) n = num2nickinfo(ws.num);
+#endif
 	else n = getnickbynick(parv[2]), remote = 1;
 
 	if(!n) return 0;
 
 	putserv("%s 311 %s %s %s %s * :%s", bot.servnum, parv[0], n->nick, n->ident,
-		(GetConf(CF_HAVE_CRYPTHOST) ? (remote ? IsHidden(n) ? "hidden" : n->crypt : n->host) :
-		((n->user && IsHidden(n)) ? "hidden" : n->host)), n->name);
-
+#ifdef HAVE_CRYPTHOST
+		remote ? (n->user && IsHidden(n)) ? "hidden" : n->crypt : n->host, n->name);
+#else
+		(n->user && IsHidden(n)) ? "hidden" : n->host, n->name);
+#endif
 	putserv("%s 312 %s %s %s :%s", bot.servnum, parv[0], parv[2],
 		n->serveur->serv, remote ? n->name : bot.name);
-
 	if(IsOper(n)) putserv("%s 313 %s %s :est un IRC Opérateur %s", bot.servnum, parv[0],
-		parv[2], remote ?  "tyrannique et pervers" : "- Service");
-
-	if(!remote) putserv("%s 317 %s %s %ld %ld :Secondes d'idle, secondes d'uptime",
-		 bot.servnum, parv[0], parv[2], CurrentTS - bot.uptime, bot.uptime);
-
-	putserv("%s 318 %s %s :Fin de la commande /WHOIS", bot.servnum, parv[0], parv[2]);
+						parv[2], remote ?  "tyrannique et pervers" : "- Service");
+	if(!remote) putserv("%s 317 %s %s %T %T :seconds idle, signon time",
+					bot.servnum, parv[0], parv[2], CurrentTS - bot.uptime, bot.uptime);
+	putserv("%s 318 %s %s :End of /WHOIS list.", bot.servnum, parv[0], parv[2]);
 	return 0;
 }
 
@@ -610,10 +628,11 @@ int m_topic(int parc, char **parv)
 	if(parc < 2) return Debug(W_PROTO|W_WARN, "#arg invalide: TOPIC de %s: arg=%d", parv[0], parc);
 	if(!(chan = GetNChan(parv[1])))
 		return Debug(W_DESYNCH|W_WARN, "TOPIC de %s sur %s : aNChan non trouvé!", parv[0], parv[1]);
+
+	/* topic was protected, enforce previous topic if any or restore DefTopic*/
 	if(chan->regchan && CLockTopic(chan->regchan) && !burst)
 		cstopic(chan->regchan, *chan->topic ? chan->topic : chan->regchan->deftopic);
 	else Strncpy(chan->topic, parv[parc-1], TOPICLEN); /* update DB */
-
 	return 0;
 }
 
@@ -629,45 +648,53 @@ int m_eob(int parc, char **parv)
 
 	serv->flag &= ~ST_BURST;
 	serv->flag |= ST_ONLINE;
-	if(serv == mainhub) /* mon uplink a fini son burst, j'envoie la fin du mien!*/
+	if(serv == mainhub) /* mon uplink a fini son burst, j'envoie la fin du mien! */
 	{
 		aChan *chan;
-		aNChan *netchan;
+		aNChan *netchan = GetNChan(bot.pchan);
 		int i = 0;
-	
-		/* join log channel */
-		if(!(netchan = GetNChan(bot.pchan))) netchan = new_chan(bot.pchan, CurrentTS);
-		string2scmode(&netchan->modes, "mintrs", NULL, NULL);
-		add_join(num2nickinfo(cs.num), bot.pchan, J_OP, netchan->timestamp, netchan);
-		putserv("%s "TOKEN_BURST" %s %ld +mintrs %s:o", bot.servnum, bot.pchan,
-			netchan->timestamp, cs.num);
 
-		/* Now burst registered channels which does not exist on the net (+si ones) */	
-		for(;i < CHANHASHSIZE;++i) for(chan = chan_tab[i];chan;chan = chan->next)
+		/* join log channel (with J_BURST flag, new_chan() will be called silently) */
+		add_join(num2nickinfo(cs.num), bot.pchan, J_OP|J_VOICE|J_BURST, CurrentTS, netchan);
+		/* if channel was empty, first called failed */
+		if(!netchan) netchan = GetNChan(bot.pchan);
+
+		string2scmode(&netchan->modes, "mintrs", NULL, NULL);
+#ifdef USE_WELCOMESERV
+		add_join(num2nickinfo(ws.num), bot.pchan, J_OP|J_VOICE|J_BURST, CurrentTS, netchan);
+		putserv("%s "TOKEN_BURST" %s %T +mintrs %s:ov,%s", bot.servnum, bot.pchan,
+			netchan->timestamp, cs.num, ws.num);
+#else
+		putserv("%s "TOKEN_BURST" %s %T +mintrs %s:ov", bot.servnum, bot.pchan,
+			netchan->timestamp, cs.num);
+#endif
+		/* Now burst registered channels which does not exist on the net (+si ones) */
+		for(; i < CHANHASHSIZE; ++i) for(chan = chan_tab[i]; chan; chan = chan->next)
 		{
-			if(!CJoined(chan) && HasDMode(chan, C_MINV|C_MKEY) && !IsSuspend(chan))
+			if(!CJoined(chan) && HasDMode(chan, C_MINV|C_MKEY) && !CSuspend(chan))
 			{
-				putserv("%s "TOKEN_BURST" %s %ld +%s %s:o", bot.servnum,
-                                	chan->chan, CurrentTS, GetCModes(chan->defmodes), cs.num);
+				putserv("%s " TOKEN_BURST " %s %T +%s %s:o", bot.servnum,
+					chan->chan, CurrentTS, GetCModes(chan->defmodes), cs.num);
 
 				do_cs_join(chan, (netchan = new_chan(chan->chan, CurrentTS)), JOIN_TOPIC);
 				chan->netchan = netchan, netchan->regchan = chan;
 				netchan->modes = chan->defmodes; /* channel was empty, modes are now defmodes */
 			} /* else, try to enforce deftopic on topic-less channels */
 			else if(CJoined(chan) && !*chan->netchan->topic && *chan->deftopic)
-					cstopic(chan, chan->deftopic);
+				cstopic(chan, chan->deftopic);
 		}/* end foreach chan */
+
 		putserv("%s " TOKEN_EOB, bot.servnum);
 		putserv("%s " TOKEN_EOBACK, bot.servnum);
 
-		if(bot.dataQ) {
+		if(bot.dataQ)
+		{
 			struct timeval tv;
 			double tt;
-			gettimeofday(&tv, NULL);/*un peu de stats sur le burst pour *fun* */
+			gettimeofday(&tv, NULL);/* un peu de stats sur le burst pour *fun* */
 			tt = (tv.tv_usec - burst) / 1000000.0;
-			cswallops("Connexion de SDreams %s effectuée", SPVERSION);
 			cswallops("Synchronisation de %lu bytes en %.6f s (Taux %.6f Ko/s)",
-                        	bot.dataQ, tt, (bot.dataQ / 1024.0) / tt);
+						bot.dataQ, tt, (bot.dataQ / 1024.0) / tt);
 		}
 		check_accounts();
 		burst = 0;
@@ -678,18 +705,19 @@ int m_eob(int parc, char **parv)
 int m_server(int parc, char **parv)
 {
 	if(parc < 7) return Debug(W_PROTO|W_WARN, "#arg invalide: SERVER de %s: arg=%d", parv[0], parc);
+
 	return add_server(parv[1], parv[6], parv[2], parv[5], parv[0]);
 }
 
 static int do_squit(int servnum)
 {
-	int i = 0;
+	unsigned int i = 0U;
 
-	for(;i < MAXNUM;++i)
-		if(serv_tab[i] && serv_tab[i]->hub == serv_tab[servnum])/* i est un leaf de servnum */
-			do_squit(i);/* squit récursif de ses leaf */
+	for(; i < ASIZE(serv_tab); ++i)
+		if(serv_tab[i] && serv_tab[i]->hub == serv_tab[servnum]) /* i est un leaf de servnum */
+			do_squit(i); /* squit récursif de ses leaf */
 
-	for(i = 0;i < serv_tab[servnum]->maxusers;++i)
+	for(i = 0U; i < serv_tab[servnum]->maxusers; ++i)
 	{
 		if(num_tab[servnum][i]) /* purge des clients de 'i' */
 		{
@@ -711,7 +739,7 @@ int m_squit(int parc, char **parv)
 
 	if(parc < 2) return Debug(W_PROTO|W_WARN, "#arg invalide: SQUIT de %s: arg=%d", parv[0], parc);
 
-	for(;i < MAXNUM;++i)
+	for(; i < MAXNUM; ++i)
 		if(serv_tab[i] && !strcasecmp(serv_tab[i]->serv, parv[1]))
 			return do_squit(i);
 
@@ -725,7 +753,7 @@ int m_pass(int parc, char **parv)
 	gettimeofday(&tv, NULL);
 	burst = tv.tv_usec; /* TS en µs pour les stats */
 
-	putlog(LOG_PARSES, "Connecté au serveur %s", bot.ip);
+	log_write(LOG_MAIN, 0, "Connecté au serveur %s", bot.ip);
 	bot.lasttime = tv.tv_sec;
 	bot.lastbytes = bot.dataQ;
 	return 0;
@@ -736,17 +764,17 @@ int m_ping(int parc, char **parv)
 	struct timeval tv;
 	char *theirttm;
 
-	if(parc < 4) 
-        { 
-                putserv("%s " TOKEN_PONG " %s", bot.servnum, parv[1]); 
-                return 0; 
-        } 
-        if((theirttm = strchr(parv[3], '.'))) ++theirttm; 
+	if(parc < 4)
+	{
+		putserv("%s " TOKEN_PONG " %s", bot.servnum, parv[1]);
+		return 0;
+	}
+	if((theirttm = strchr(parv[3], '.'))) ++theirttm;
 	gettimeofday(&tv, NULL);
 /* AsLL */
-	putserv("%s " TOKEN_PONG " %s %s %s %ld %ld.%ld", bot.servnum, bot.servnum,
-			parv[0], parv[3], ((tv.tv_sec - atoi(parv[3])) * 1000 + (tv.tv_usec - atoi(theirttm)) / 1000),
-			tv.tv_sec, tv.tv_usec);/* mon TS seconde.micro*/
+	putserv("%s " TOKEN_PONG " %s %s %s %d %T.%T", bot.servnum, bot.servnum, parv[0],
+		parv[3], ((tv.tv_sec - atoi(parv[3])) * 1000 + (tv.tv_usec - atoi(theirttm)) / 1000),
+		tv.tv_sec, tv.tv_usec);/* mon TS seconde.micro */
     return 0;
 }
 
@@ -760,12 +788,11 @@ static int exec_cmd(aHashCmd *cmd, aNick *nick, int parc, char **parv)
 	char *tmp = NULL, buff[512];
 	aChan *chan = NULL;
 	anAccess *acces = NULL;
-	struct track *track = NULL;
 
 	if(isignore(nick) || checkflood(nick)) return 0;
 
 	++cmd->used;
-	if(cmd->flag & CMD_DISABLE) return csreply(nick, GetReply(nick, L_CMDDISABLE));
+	if(DisableCmd(cmd)) return csreply(nick, GetReply(nick, L_CMDDISABLE));
 
 	if(parc < cmd->args || (!parc && ChanCmd(cmd)))	return syntax_cmd(nick, cmd);
 
@@ -773,21 +800,20 @@ static int exec_cmd(aHashCmd *cmd, aNick *nick, int parc, char **parv)
 	{
 		if(*parv[1] != '#' || !(chan = getchaninfo(parv[1])))
 			return csreply(nick, GetReply(nick, L_NOSUCHCHAN), parv[1]);
-		if(IsSuspend(chan) && cmd->level)
+
+		if(CSuspend(chan) && cmd->level)
 			return csreply(nick, "%s est suspendu : %s - %s", parv[1],
-				chan->suspend->raison, chan->suspend->from);
+					chan->suspend->raison, chan->suspend->from);
+
 		if(!chan->netchan && NeedMemberShipCmd(cmd))
 			return csreply(nick, GetReply(nick, L_NEEDMEMBERSHIP), parv[1]);
 	}
 	if(cmd->level)
 	{
-		if(!nick->user) return csreply(nick, "%s", pasdeperm);
+		if(!nick->user) return csreply(nick, "%s", cf_pasdeperm);
 
 		if(AdmCmd(cmd) && nick->user->level < cmd->level)
 			return csreply(nick, GetReply(nick, L_NEEDTOBEADMIN));
-
-		if(HelpCmd(cmd) && nick->user->level < cmd->level)
-                        return csreply(nick, "Vous devez être Helpeur pour utiliser cette commande.");
 
 		if(ChanCmd(cmd) && !IsAdmin(nick->user))
 		{
@@ -803,21 +829,22 @@ static int exec_cmd(aHashCmd *cmd, aNick *nick, int parc, char **parv)
 	}
 
 	if(!ChanCmd(cmd) && parc && (SecureCmd(cmd) || (parc >= 2 && Secure3Cmd(cmd)
-		&& (!strcasecmp(parv[1], "send")
-		|| !strcasecmp(parv[1], "pass")
-		|| !strcasecmp(parv[1], "newpass")))))
+		&& (!strcasecmp(parv[1], "send") || !strcasecmp(parv[1], "pass")
+			|| !strcasecmp(parv[1], "newpass")))))
 		tmp = parv[1], tmp[400] = 0; /* truncate the buffer otherwise it could overflow 'buff' */
-	else if(((ChanCmd(cmd)) || !Secure2Cmd(cmd)) && parc)
+	else if((ChanCmd(cmd) || !Secure2Cmd(cmd)) && parc)
 		tmp = parv2msg(parc, parv, 1, 400);
-	
-	if(nick->user) fastfmt(buff, "\00312\2$\2\3 $ par $@$", cmd->name, tmp, nick->nick, nick->user->nick);
-	else fastfmt(buff, "\00312\2$\2\3 $ par $", cmd->name, tmp, nick->nick);
-	
-	if(GetConf(CF_TRACKSERV) && nick->user && (track = istrack(nick->user))) csreply(track->tracker, "[\2Track\2] %s", buff);
-	putchan(buff);
 
-	putlog(LOG_CMDS, "%s", buff);
-	cmd->func(nick, chan, parc, parv);/* passage du aChan * en plus, pour économie */
+	if(nick->user) fastfmt(buff, "\2$\2 $ par $@$", cmd->name, tmp, nick->nick, nick->user->nick);
+	else fastfmt(buff, "\2$\2 $ par $", cmd->name, tmp, nick->nick);
+
+#ifdef HAVE_TRACK
+	if(nick->user && UTracked(nick->user)) track_notify(nick->user, buff);
+#endif
+
+	putchan(buff);
+	log_write(ChanCmd(cmd) ? LOG_CCMD : LOG_UCMD, 0, "%s", buff);
+	cmd->func(nick, chan, parc, parv); /* passage du aChan * en plus, pour économie */
 	return 1;
 }
 
@@ -833,14 +860,14 @@ int m_privmsg(int parc, char **parv)
 	unsigned int pparc = 0;
 	aHashCmd *cmd;
 	aNick *nptr = GetInfobyPrefix(parv[0]);
-	aChan *chan = NULL;
 
-	if(!nptr || !*parv[2]) return 0;/* la source du message n'est pas un user connu (serveur/desynch)*/
+	if(!nptr || !*parv[2]) return 0;/* unknown source or no param */
 
 	if(*parv[1] != '#') /* Message privé */
 	{
 		int secure = 0;
-                pparv[1] = NULL;
+		pparv[1] = NULL;
+
 		if((tmp = strchr(parv[1], '@'))) /* P nick@server */
 		{
 			*tmp = 0;
@@ -857,38 +884,29 @@ int m_privmsg(int parc, char **parv)
 			return 0;
 		}
 
-		if(SecureCmd(cmd) && !secure) return csreply(nptr, GetReply(nptr, L_SECURECMD), 
-			cmd->name, cs.nick, cmd->name, ptr ? ptr : ""); 
-
-		for(pparv[0] = tmp; (tmp = Strtok(&ptr, NULL, ' ')); ) pparv[++pparc] = tmp;
+#ifdef HAVE_SECURE
+		if(SecureCmd(cmd) && !secure) return csreply(nptr, GetReply(nptr, L_SECURECMD),
+			cmd->name, cs.nick,	cmd->name, ptr ? ptr : "");
+#endif
+		pparv[0] = tmp;
+		if(*tmp != '\1') for(; (tmp = Strtok(&ptr, NULL, ' ')); ) pparv[++pparc] = tmp;
+		else if(ptr) pparv[++pparc] = ptr; /* CTCP */
 
 		exec_cmd(cmd, nptr, pparc, pparv);
 	}
 	else if(*parv[2] == bot.cara && *++parv[2] && *parv[2] != ' ')
-	{       /* Message envoyé sur un salon, recherche d'une commande (quel flood..) */
-
-		/* verification si le chan n'est pas en NoPubCmd */
-		if((chan = getchaninfo(parv[1])) && CNoPubCmd(chan) && !IsAnAdmin(nptr->user))
-			return 0;
-
+	{	/* Message envoyé sur un salon, recherche d'une commande (quel flood..) */
 		pparv[0] = (tmp = Strtok(&ptr, parv[2], ' '));
 
 		if(!tmp || !(cmd = FindCommand(tmp))) return 0; /* pas d'arg ou commande inconnue */
 
-		tmp = Strtok(&ptr, NULL, ' '); /* on traite le premier arg après la commande*/
-		if((ChanCmd(cmd)) && (!tmp || *tmp != '#')) pparv[++pparc] = parv[1]; /* si ce n'est pas un salon*/
-		if(tmp) pparv[++pparc] = tmp;	/* on prend le salon où elle est tapée*/
+		tmp = Strtok(&ptr, NULL, ' ');
+		if(ChanCmd(cmd) && (!tmp || *tmp != '#')) pparv[++pparc] = parv[1]; /* next arg is a channel */
+		if(tmp) pparv[++pparc] = tmp; /* otherwise use the one command is typed in */
 
 		while((tmp = Strtok(&ptr, NULL, ' '))) pparv[++pparc] = tmp;
 
 		exec_cmd(cmd, nptr, pparc, pparv);
 	}
-	return 0;
-}
-
-int m_svshost(int parc, char **parv)
-{
-	aNick *nick = GetInfobyPrefix(parv[0]);
-	if(nick) nick->flag = parse_umode(nick->flag, "H");
 	return 0;
 }

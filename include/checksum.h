@@ -1,9 +1,12 @@
 /* include/checksum.h - md5 & md2
- * Copyright (C) 2002-2004 IrcDreams.org
+ * Copyright (C) 2002-2004 Inter System
  *
- * contact: bugs@ircdreams.org
+ * contact: Progs@Inter-System.Net
+ *          Cesar@Inter-System.Net
+ *          kouak@kouak.org
+ * site web: http://coderz.inter-system.net
  *
- * Services pour serveur IRC. Supporté sur IrcDreams
+ * Services pour serveur IRC. Supporté sur IrcProgs et IrCoderZ
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +21,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: checksum.h,v 1.5 2005/10/04 05:23:51 bugs Exp $
+ * $Id: checksum.h,v 1.3 2004/09/17 23:23:25 romexzf Exp $
  */
 
 #ifndef HAVEINC_checksum
@@ -40,7 +43,7 @@ extern void MD5Init(MD5_CTX *);
 extern void MD5Update(MD5_CTX *, unsigned char *, unsigned int);
 extern void MD5Final(UINT4 *, MD5_CTX *);
 
-//#       ifdef HAVE_CRYPTHOST
+#	ifdef HAVE_CRYPTHOST
 /* Code pour cryptage md2 */
 typedef struct {
   UINT4 state[16];                                         /* state */
@@ -52,6 +55,6 @@ typedef struct {
 extern void MD2Init(MD2_CTX *);
 extern void MD2Update(MD2_CTX *, unsigned char *, unsigned int);
 extern void MD2Final(UINT4 *, MD2_CTX *);
-//#       endif /* HAVE_CRYPTHOST */
+#	endif /* HAVE_CRYPTHOST */
 
 #endif /* HAVEINC_checksum */
