@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,10 +68,8 @@ enum conf_id {CONF_UPLINK = 0, CONF_CSBOT, CONF_MYSERV, CONF_MISC, CONF_LANG, CO
 #	ifdef WEB2CS
 			CONF_W2C,
 #	endif
-#	ifdef SQLLOG
-			CONF_SQLLOG,
-#	endif
-			CONF_IREAD};
+			CONF_IREAD
+};
 
 struct conf_item {
 	enum conf_id tabid;
@@ -108,9 +107,6 @@ static struct conf_tab {
 #endif
 #ifdef WEB2CS
 	{"web2cs", "configuration du web2cs", CONF_W2C},
-#endif
-#ifdef SQLLOG
-	{"sql_log", "configuration du serveur MySQL de log", CONF_SQLLOG}
 #endif
 };
 
@@ -302,10 +298,6 @@ struct conf_item conf_items[] = {
 	{CONF_LOG, CONF_TPRIV|CONF_READ, NULL, 0, "socket", "", cf_log_handle},
 	{CONF_LOG, CONF_TPRIV|CONF_READ, NULL, 0, "db", "", cf_log_handle},
 	{CONF_LOG, CONF_TPRIV|CONF_READ, NULL, 0, "raw", "", cf_log_handle},
-#	ifndef SQLLOG
-	{CONF_LOG, CONF_TPRIV|CONF_READ, NULL, 0, "User", "", cf_log_handle},
-	{CONF_LOG, CONF_TPRIV|CONF_READ, NULL, 0, "Channel", "", cf_log_handle},
-#	endif
 #	ifdef HAVE_VOTE
 	{CONF_LOG, CONF_TPRIV|CONF_READ, NULL, 0, "vote", "", cf_log_handle},
 #	endif
@@ -336,14 +328,6 @@ struct conf_item conf_items[] = {
 		"Pass que délivrera le php pour se connecter (non crypté)", NULL},
 #endif
 
-#ifdef SQLLOG
-	/* SQL LOG */
-	{CONF_SQLLOG, CONF_TPTR, &bot.sql_host, 0, "ip", "IP du serveur MySQL", NULL},
-	{CONF_SQLLOG, CONF_TINT|CONF_PORT, &bot.sql_port, 0, "port", "Port du serveur MySQL", NULL},
-	{CONF_SQLLOG, CONF_TARRAY, CONF_MARRAY(bot.sql_pass), "pass", "Pass du serveur MySQL", NULL},
-	{CONF_SQLLOG, CONF_TARRAY, CONF_MARRAY(bot.sql_user), "user", "Login du serveur MySQL", NULL},
-	{CONF_SQLLOG, CONF_TARRAY, CONF_MARRAY(bot.sql_db), "db", "Nom de la DB", NULL}
-#endif
 };
 
 static struct conf_tab *get_tab(const char *item)

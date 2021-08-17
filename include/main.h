@@ -41,7 +41,6 @@
 #include "lang.h"
 
 /*#define OLDADMINLIST*/
-/*#define SQLLOG*/
 /*#define HAVE_IPV6*/
 
 #ifdef WEB2CS

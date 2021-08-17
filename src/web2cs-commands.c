@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,12 +36,10 @@
 #include "cs_cmds.h"
 #include "del_info.h"
 #include "add_info.h"
-#include "sql_log.h"
 #include "crypt.h"
 #include "dnr.h"
 #include "memoserv.h"
 #include "data.h"
-#include "mylog.h"
 #include "web2cs-commands.h"
 
 static void w2c_parse_qstring(char *buf, size_t size, char **parv,
@@ -101,12 +100,7 @@ static int w2c_do_auth(WClient *cl, anUser **u_p, const char *user,
 			if(IsAdmin(u))
 			{
 				cswall("(Web) Login Admin échoué sur \2%s\2 par \2%s\2", u->nick, ip);
-#ifdef SQLLOG
- 				sql_query(SQL_QINSERTU, "('%s', %T, 'login', 'web@%s failed auth: Bad Pass')",
- 					u->nick, CurrentTS, ip);
-#else
 				log_write(LOG_UCMD, 0, "login %s failed (BadPass) par Web@%s", u->nick, ip);
-#endif
 			}
 			return w2c_exit_client(cl, "ERROR USER_BADPWD");
 		}
@@ -124,10 +118,6 @@ static int w2c_do_auth(WClient *cl, anUser **u_p, const char *user,
 		Strncpy(host + 4, ip, sizeof host - 5); /* wanna overflow me? */
 
 		str_dup(&u->lastlogin, host);
-
-#ifdef SQLLOG
-	 	sql_query(SQL_QINSERTU, "('%s', %T, 'login', '%s')", u->nick, CurrentTS, host);
-#endif
 	}
 
 	*u_p = u;
@@ -194,9 +184,6 @@ int w2c_oubli(WClient *cl, int parc, char **parv)
 
 	SetUOubli(user);
 	w2c_sendrpl(cl, "newpass %s", create_password(user->passwd));
-#ifdef SQLLOG
- 	sql_query(SQL_QINSERTU, "('%s', %T, 'oubli', 'web@%s')", user->nick, CurrentTS, parv[3]);
-#endif
 	return w2c_exit_client(cl, "OK");
 }
 
@@ -600,13 +587,7 @@ int w2c_register(WClient *cl, int parc, char **parv)
 				U_DEFAULT|U_FIRST, parv[2], 0);
 
 	user->lang = DefaultLang;
-
-#ifdef SQLLOG
-	sql_query(SQL_QINSERTU, "('%s', %T, 'register', 'web@%s')",
-		user->nick, CurrentTS, parv[4]);
-#else
 	log_write(LOG_UCMD, 0, "register %s par web@%s", user->nick, parv[4]);
-#endif
 
 	w2c_sendrpl(cl, "userid %U", user->userid);
 	return w2c_exit_client(cl, "OK");
@@ -636,12 +617,8 @@ int w2c_regchan(WClient *cl, int parc, char **parv)
 	add_access(cl->user, c, OWNERLEVEL, A_MANAGERFLAGS, OnChanTS(cl->user, chan));
 	csjoin(chan, 0); /* join if channel exists */
 
-#ifdef SQLLOG
-	sql_query(SQL_QINSERTU, "('%s', %T, 'regchan', '%s (Web)')",
-		cl->user->nick, CurrentTS, c);
-#else
 	log_write(LOG_CCMD, 0, "regchan %s par %s@Web", c, cl->user->nick);
-#endif
+
 	return 1;
 }
 

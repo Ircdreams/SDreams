@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,9 +38,6 @@
 #include "data.h"
 #ifdef HAVE_TRACK
 #include "track.h"
-#endif
-#ifdef SQLLOG
-#include "sql_log.h"
 #endif
 
 static anUser *mail_tab[USERHASHSIZE];
@@ -226,12 +224,7 @@ void del_regnick(anUser *user, int flag, const char *raison)
 #endif
 
  	if(flag & HF_LOG)
-#ifdef SQLLOG
-	 	sql_query(SQL_QINSERTU, "('%s', %T, 'purge', '%d')",
- 				user->nick, CurrentTS, CurrentTS - user->lastseen);
-#else
 		log_write(LOG_UCMD, 0, "purge %s (%d)", user->nick, CurrentTS - user->lastseen);
-#endif
 
 	hash_deluser(user);
 	hash_delmail(user);

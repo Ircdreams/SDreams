@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,9 +48,6 @@
 #ifdef HAVE_TRACK
 #include "track.h"
 #endif
-#ifdef SQLLOG
-#include "sql_log.h"
-#endif
 #include "nickserv.h"
 #include "crypt.h"
 #include "template.h"
@@ -84,10 +82,6 @@ int oubli_pass(aNick *nick, aChan *chan, int parc, char **parv)
 		return csreply(nick, "Impossible d'envoyer le mail");
 
 	csreply(nick, GetReply(nick, L_PASS_SENT), user->mail);
-#ifdef SQLLOG
- 	sql_query(SQL_QINSERTU, "('%s', %T, 'oubli', '%s!%s@%s')",
- 		user->nick, CurrentTS, nick->nick, nick->ident, nick->host);
-#endif
 
 	return 0;
 }
@@ -98,26 +92,8 @@ static int login_report_failed(anUser *user, aNick *nick, const char *raison)
 	{
 		const char *nuh = GetNUHbyNick(nick, 0);
 		cswall("Admin Login échoué sur \2%s\2 par \2%s\2", user->nick, nuh);
-#ifdef SQLLOG
- 		sql_query(SQL_QINSERTU, "('%s', %T, 'login', '%s failed auth: %s')",
- 			user->nick, CurrentTS, nuh, raison);
-#else
 		log_write(LOG_UCMD, 0, "login %s failed (%s) par %s", user->nick, raison, nuh);
-#endif
 	}
-#if defined(LOG_USER_FAUTH) && defined(SQLLOG)
-	else
-	{
-		++user->failedauth;
-		if((CurrentTS - user->last_failedauth) >= LOG_USER_FAUTH_DELAY)
-		{
-			sql_query(SQL_QINSERTU, "('%s', %T, 'login', '%s (%d) failed auth: %s')",
- 				user->nick, CurrentTS, nick->nick, user->failedauth, raison);
- 			user->failedauth = 0;
- 			user->last_failedauth = CurrentTS;
-		}
-	}
-#endif
 	return 0;
 }
 
@@ -175,10 +151,6 @@ int ns_login(aNick *nick, aChan *chan, int parc, char **parv)
 	nick->user->lastseen = CurrentTS;
 
 	csreply(nick, GetReply(nick, L_LOGINSUCCESS), user->nick);
-#ifdef SQLLOG
- 	sql_query(SQL_QINSERTU, "('%s', %T, '%s', '%s!%s@%s')", user->nick, CurrentTS,
- 		parv[0], nick->nick, nick->ident, nick->host);
-#endif
 
 	if(IsAdmin(user))
 	{

@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,9 +36,6 @@
 #include "config.h"
 #include "template.h"
 #include "timers.h"
-#ifdef SQLLOG
-#include "sql_log.h"
-#endif
 #ifdef USE_WELCOMESERV
 #include "welcome.h"
 #endif
@@ -285,14 +283,6 @@ int rehash_conf(aNick *nick, aChan *chan, int parc, char **parv)
 	int langs;
 	Lang *l;
 
-#ifdef SQLLOG
-	if(getoption("-sql", parv, parc, 1, GOPT_FLAG))
-	{
-		sql_flush(SQL_QINSERTU);
-		sql_flush(SQL_QINSERTC);
-		return csreply(nick, "SQL buffers flushed.");
-	}
-#endif
 	if(getoption("-purge", parv, parc, 1, GOPT_FLAG))
 	{
 		check_accounts();

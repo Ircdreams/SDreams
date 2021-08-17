@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,10 +34,6 @@
 #include "divers.h"
 #include "crypt.h"
 #include "userinfo.h"
-#ifdef SQLLOG
-#include "sql_log.h"
-#include <mysql.h>
-#endif
 #include "admin_user.h"
 #include "data.h"
 
@@ -410,53 +407,6 @@ int admin_user(aNick *nick, aChan *chan, int parc, char **parv)
 		}
 		else del_regnick(u, HF_LOG, NULL);
 	}
-#ifdef SQLLOG
-	else if(!strcasecmp(arg, "historique"))
-	{
-		time_t date = 0;
-		MYSQL_RES *result;
-		MYSQL_ROW row;
-		int cmd, c;
-		char tmp[250] = "SELECT * FROM "SQLUSER" WHERE user='%s' AND TS>=%T";
-
-		if(parc < 2) return csreply(nick, "Syntaxe: %s HISTORIQUE <username>"
-									" [%%XjXh] [-cmd <cmd> -chan]", parv[0]);
-
-		if(parc >= 3 && *parv[3] == '%' && (date = convert_duration(++parv[3])) <= 0)
-			return csreply(nick, GetReply(nick, L_INCORRECTDURATION));
-
-		/* Flush SQL buffer to make sure results will be accurate */
-		if((c = getoption("-chan", parv, parc, 3, GOPT_FLAG)))
-		{
-			sql_flush(SQL_QINSERTC);
-			strcpy(tmp, "SELECT * FROM "SQLCHAN" WHERE user='%s' AND TS>=%T");
-		}
-		else sql_flush(SQL_QINSERTU);
-
-		if((cmd = getoption("-cmd", parv, parc, 3, GOPT_STR)))
-			strcat(tmp, " AND cmd='%s'");
-
-		strcat(tmp, " order by TS desc LIMIT 0,100");
-
-		if(sql_query(SQL_QRAW, tmp, user, date ? CurrentTS - date : 0, cmd ? parv[cmd] : "") < 0)
-			return csreply(nick, "La requête SQL a échoué.");
-
-		if(!(result = mysql_store_result(bot.sql_id)) || !(row = mysql_fetch_row(result)))
-			return csreply(nick, "Aucune entrée trouvée.");
-
-		if(date) csreply(nick, "Commandes effectuées par %s depuis %s.", user, duration(date));
-		else csreply(nick, "Commandes effectuées par %s.", user);
-
-		for(; row; row = mysql_fetch_row(result))
-		{
-			if(c) csreply(nick, "%s: \2%s\2 [%s] sur \2%s",
-					get_time(nick, strtol(row[2], NULL, 10)), row[3], NONE(row[4]), row[1]);
-			else csreply(nick, "%s: commande \2%s\2 [%s]",
-					get_time(nick, strtol(row[1], NULL, 10)), row[2], NONE(row[3]));
-		}
-		mysql_free_result(result);
-	}
-#endif
 	else if(!strcasecmp(arg, "stats"))
 	{
 		int memn = getoption("-mem", parv, parc, 2, GOPT_FLAG);

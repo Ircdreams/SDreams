@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,7 +38,6 @@
 #include "web2cs-engine.h"
 #include "web2cs-commands.h"
 #include "socket.h"
-#include "mylog.h"
 
 /* dear global vars */
 
@@ -52,7 +52,7 @@ w2c_hallow *w2c_hallowhead = NULL;
 static WClient myWClient[MAXWEBCON + 1];
 
 /* Array indexing by sockets fds the index in myWClient array
- * Max fds in use is : 1 fd / logtype + sql + irc + listen + w2c_clients + fd in use
+ * Max fds in use is : 1 fd / logtype + irc + listen + w2c_clients + fd in use
  */
 
 #define w2c_fd(x) 		(W2C_fd_to_idx[(x)])

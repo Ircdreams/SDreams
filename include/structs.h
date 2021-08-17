@@ -23,10 +23,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef SQLLOG
-#include <mysql.h>
-#endif
-
 /*------------------- Structures robot -------------------*/
 struct robot {
   char server[HOSTLEN + 1];
@@ -45,15 +41,6 @@ struct robot {
   unsigned long lastbytes;	/*  idem */
   unsigned long dataS; /* bytes envoyées depuis le début */
   unsigned long dataQ; /* bytes reçues */
-
-#ifdef SQLLOG
-	MYSQL *sql_id;
-	char *sql_host;
-	int sql_port;
-	char sql_db[30];
-	char sql_user[30];
-	char sql_pass[30];
-#endif
 
 #ifdef WEB2CS
 	int w2c_port;
@@ -221,11 +208,6 @@ typedef struct userinfo {
 	char mail[MAILLEN + 1];
 	char *lastlogin;
 	char *cookie;
-
-#if defined(LOG_USER_FAUTH) && defined(SQLLOG)
-	time_t last_failedauth;
-	int failedauth;
-#endif
 
 	struct Lang *lang;
 	aData *suspend, *nopurge, *cantregchan;

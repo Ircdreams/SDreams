@@ -73,9 +73,6 @@
 #ifdef USE_WELCOMESERV
 #include "welcome.h"
 #endif
-#ifdef SQLLOG
-#include "sql_log.h"
-#endif
 
 int running = 1;
 time_t CurrentTS = 0;
@@ -397,10 +394,6 @@ int main(int argc, char **argv)
 	if(!fd_in_use(0)) close(0); /* closing std(in|out|err) to free up some fds */
 	if(!fd_in_use(2)) close(2); /* therefore avoiding to waste mem in web2cs */
 	if(background && !fd_in_use(1)) close(1);
-
-#ifdef SQLLOG
-	if(!sql_init(1)) exit(EXIT_FAILURE);
-#endif
 
 	pid_write();
 

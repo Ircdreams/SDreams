@@ -80,7 +80,7 @@ INCLUDES_DIR = ../include
 DEFS = -I$(srcdir)
 sdreams_SOURCES = main.c mystring.c outils.c cs_cmds.c serveur.c fichiers.c add_info.c del_info.c mylog.c \
 		 config.c lang.c mkpasswd.c showcommands.c checksum.c memoserv.c nickserv.c \
-		 sql_log.c hash.c hash_chan.c socket.c hash_cmd.c hash_user.c hash_nick.c data.c dnr.c \
+		 hash.c hash_chan.c socket.c hash_cmd.c hash_user.c hash_nick.c data.c dnr.c \
 		 divers.c aide.c admin_cmds.c admin_manage.c admin_user.c admin_chan.c \
 		 cs_register.c chanserv.c match.c welcome.c opdeop.c moduser.c chanopt.c \
 		 chaninfo.c userinfo.c debug.c ban.c template.c timers.c flood.c track.c vote.c \
@@ -296,14 +296,13 @@ admin_chan.o: admin_chan.c ../include/main.h ../include/mystring.h \
   ../include/outils.h ../include/mylog.h ../include/cs_cmds.h \
   ../include/token.h ../include/fichiers.h ../include/admin_chan.h \
   ../include/add_info.h ../include/del_info.h ../include/hash.h \
-  ../include/cs_register.h ../include/data.h ../include/sql_log.h
+  ../include/cs_register.h ../include/data.h
 admin_cmds.o: admin_cmds.c ../include/main.h ../include/mystring.h \
   ../include/../config.h ../include/lang.h ../include/structs.h \
   ../include/outils.h ../include/cs_cmds.h ../include/token.h \
   ../include/fichiers.h ../include/add_info.h ../include/aide.h \
   ../include/showcommands.h ../include/hash.h ../config.h \
-  ../include/template.h ../include/timers.h ../include/sql_log.h \
-  ../include/welcome.h
+  ../include/template.h ../include/timers.h ../include/welcome.h
 admin_manage.o: admin_manage.c ../include/main.h ../include/mystring.h \
   ../include/../config.h ../include/lang.h ../include/structs.h \
   ../include/add_info.h ../include/outils.h ../include/cs_cmds.h \
@@ -312,8 +311,8 @@ admin_user.o: admin_user.c ../include/main.h ../include/mystring.h \
   ../include/../config.h ../include/lang.h ../include/structs.h \
   ../include/outils.h ../include/hash.h ../include/cs_cmds.h \
   ../include/token.h ../include/fichiers.h ../include/divers.h \
-  ../include/crypt.h ../include/userinfo.h ../include/sql_log.h \
-  ../include/admin_user.h ../include/data.h
+  ../include/crypt.h ../include/userinfo.h ../include/admin_user.h \
+  ../include/data.h
 aide.o: aide.c ../include/main.h ../include/mystring.h \
   ../include/../config.h ../include/lang.h ../include/structs.h \
   ../include/cs_cmds.h ../include/token.h ../include/outils.h \
@@ -357,7 +356,7 @@ cs_register.o: cs_register.c ../include/main.h ../include/mystring.h \
   ../include/hash.h ../include/add_info.h ../include/fichiers.h \
   ../include/outils.h ../include/cs_cmds.h ../include/token.h ../config.h \
   ../include/crypt.h ../include/template.h ../include/data.h \
-  ../include/dnr.h ../include/sql_log.h
+  ../include/dnr.h
 data.o: data.c ../include/main.h ../include/mystring.h \
   ../include/../config.h ../include/lang.h ../include/structs.h \
   ../include/outils.h ../include/timers.h ../include/debug.h \
@@ -378,7 +377,7 @@ divers.o: divers.c ../include/main.h ../include/mystring.h \
   ../include/cs_cmds.h ../include/token.h ../include/admin_manage.h \
   ../include/flood.h ../include/showcommands.h ../include/aide.h \
   ../include/dnr.h ../include/timers.h ../include/template.h \
-  ../include/socket.h ../include/sql_log.h
+  ../include/socket.h
 dnr.o: dnr.c ../include/main.h ../include/mystring.h \
   ../include/../config.h ../include/lang.h ../include/structs.h \
   ../include/outils.h ../include/mystring.h ../include/mylog.h \
@@ -403,7 +402,7 @@ hash_chan.o: hash_chan.c ../include/main.h ../include/mystring.h \
   ../include/hash.h ../include/outils.h ../include/mylog.h \
   ../include/debug.h ../include/del_info.h ../include/cs_cmds.h \
   ../include/token.h ../include/fichiers.h ../include/timers.h \
-  ../config.h ../include/data.h ../include/sql_log.h
+  ../config.h ../include/data.h
 hash_cmd.o: hash_cmd.c ../include/main.h ../include/mystring.h \
   ../include/../config.h ../include/lang.h ../include/structs.h \
   ../include/outils.h ../include/debug.h ../include/hash.h
@@ -417,7 +416,7 @@ hash_user.o: hash_user.c ../include/main.h ../include/mystring.h \
   ../include/hash.h ../include/debug.h ../include/outils.h \
   ../include/mylog.h ../include/fichiers.h ../include/del_info.h \
   ../include/cs_cmds.h ../include/token.h ../include/timers.h \
-  ../include/data.h ../include/track.h ../include/sql_log.h
+  ../include/data.h ../include/track.h
 lang.o: lang.c ../include/main.h ../include/mystring.h \
   ../include/../config.h ../include/lang.h ../include/structs.h \
   ../include/outils.h ../include/debug.h
@@ -433,8 +432,7 @@ main.o: main.c ../include/main.h ../include/mystring.h \
   ../include/timers.h ../include/socket.h ../include/ban.h \
   ../include/dnr.h ../include/flood.h ../include/template.h \
   ../include/version.h ../include/track.h ../include/vote.h \
-  ../include/memoserv.h ../include/welcome.h ../include/web2cs.h \
-  ../include/sql_log.h
+  ../include/memoserv.h ../include/welcome.h ../include/web2cs.h
 match.o: match.c
 memoserv.o: memoserv.c ../include/main.h ../include/mystring.h \
   ../include/../config.h ../include/lang.h ../include/structs.h \
@@ -461,8 +459,8 @@ nickserv.o: nickserv.c ../include/main.h ../include/mystring.h \
   ../include/cs_cmds.h ../include/token.h ../include/add_info.h \
   ../include/del_info.h ../config.h ../include/fichiers.h \
   ../include/aide.h ../include/data.h ../include/dnr.h ../include/vote.h \
-  ../include/memoserv.h ../include/track.h ../include/sql_log.h \
-  ../include/nickserv.h ../include/crypt.h ../include/template.h
+  ../include/memoserv.h ../include/track.h ../include/nickserv.h \
+  ../include/crypt.h ../include/template.h
 opdeop.o: opdeop.c ../include/main.h ../include/mystring.h \
   ../include/../config.h ../include/lang.h ../include/structs.h \
   ../include/opdeop.h ../include/cs_cmds.h ../include/token.h \
@@ -478,7 +476,7 @@ serveur.o: serveur.c ../include/main.h ../include/mystring.h \
   ../include/cs_cmds.h ../include/token.h ../config.h \
   ../include/del_info.h ../include/debug.h ../include/mylog.h \
   ../include/aide.h ../include/timers.h ../include/memoserv.h \
-  ../include/welcome.h ../include/track.h ../include/sql_log.h
+  ../include/welcome.h ../include/track.h
 showcommands.o: showcommands.c ../include/main.h ../include/mystring.h \
   ../include/../config.h ../include/lang.h ../include/structs.h \
   ../include/outils.h ../include/cs_cmds.h ../include/token.h \
@@ -489,10 +487,6 @@ socket.o: socket.c ../include/main.h ../include/mystring.h \
   ../include/hash.h ../include/mylog.h ../include/cs_cmds.h \
   ../include/token.h ../include/add_info.h ../include/timers.h \
   ../include/web2cs.h
-sql_log.o: sql_log.c ../include/main.h ../include/mystring.h \
-  ../include/../config.h ../include/lang.h ../include/structs.h \
-  ../include/sql_log.h ../include/mylog.h ../include/cs_cmds.h \
-  ../include/token.h ../include/timers.h
 template.o: template.c ../include/main.h ../include/mystring.h \
   ../include/../config.h ../include/lang.h ../include/structs.h \
   ../include/lang.h ../include/debug.h ../config.h
@@ -519,9 +513,8 @@ web2cs-commands.o: web2cs-commands.c ../include/main.h \
   ../include/mystring.h ../include/../config.h ../include/lang.h \
   ../include/structs.h ../include/web2cs-engine.h ../include/hash.h \
   ../include/outils.h ../include/cs_cmds.h ../include/token.h \
-  ../include/del_info.h ../include/add_info.h ../include/sql_log.h \
-  ../include/crypt.h ../include/dnr.h ../include/memoserv.h \
-  ../include/data.h ../include/mylog.h
+  ../include/del_info.h ../include/add_info.h ../include/crypt.h \
+  ../include/dnr.h ../include/memoserv.h ../include/data.h ../include/mylog.h
 web2cs-engine.o: web2cs-engine.c ../include/main.h ../include/mystring.h \
   ../include/../config.h ../include/lang.h ../include/structs.h \
   ../include/web2cs.h ../include/web2cs-engine.h \

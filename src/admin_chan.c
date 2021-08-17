@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,10 +36,6 @@
 #include "hash.h"
 #include "cs_register.h"
 #include "data.h"
-#ifdef SQLLOG
-#include "sql_log.h"
-#include <mysql.h>
-#endif
 
 #define MAXMATCHES 40
 
@@ -73,23 +70,13 @@ int admin_chan(aNick *nick, aChan *chan, int parc, char **parv)
 				return csreply(nick, "Veuillez préciser une raison pour suspendre ce salon.");
 			case 0: /* deleted */
 				csreply(nick, "Le salon \2%s\2 n'est plus suspendu.", c);
-#ifdef SQLLOG
-				sql_query(SQL_QINSERTC, "('%s', '%s', %T, 'suspendchan', 'off')",
-					nick->user->nick, c, CurrentTS);
-#else
 				log_write(LOG_CCMD, 0, "suspend %s off par %s@%s",
 					c, nick->nick, nick->user->nick);
-#endif
 				break;
 			case 1: /* created */
 				if(CJoined(chan)) cspart(chan, chan->suspend->raison);
-#ifdef SQLLOG
-				sql_query(SQL_QINSERTC, "('%s', '%s', %T, 'suspendchan', '%s')",
-					nick->user->nick, c, CurrentTS, chan->suspend->raison);
-#else
 				log_write(LOG_CCMD, 0, "suspend %s on par %s@%s (%s)",
 					c, nick->nick, nick->user->nick, chan->suspend->raison);
-#endif
 			case 2: /* updated */
 				show_csuspend(nick, chan);
 		}
@@ -244,48 +231,6 @@ int admin_chan(aNick *nick, aChan *chan, int parc, char **parv)
 		DelCWarned(chan);
 		csreply(nick, "%s est le nouvel owner de %s.", newu->nick, c);
 	}
-
-#ifdef SQLLOG
-	else if(!strcasecmp(arg, "historique"))
-	{
-		time_t date = 0;
-		MYSQL_RES *result;
-		MYSQL_ROW row;
-		int cmd, user;
-		char tmp[250] = "SELECT * FROM "SQLCHAN" WHERE chan='%s' AND TS>=%T";
-
-		if(parc < 2) return csreply(nick, "Syntaxe: %s HISTORIQUE <salon> [%%XjXh]"
-										" [-cmd <cmd>] [-user <user>]", parv[0]);
-
-		if(parc >= 3 && *parv[3] == '%' && (date = convert_duration(++parv[3])) <= 0)
-			return csreply(nick, GetReply(nick, L_INCORRECTDURATION));
-
-		if((cmd = getoption("-cmd", parv, parc, 3, GOPT_STR))) strcat(tmp, " AND cmd='%s'");
-		if((user = getoption("-user", parv, parc, 3, GOPT_STR))) strcat(tmp, " AND user='%s'");
-		strcat(tmp, " order by TS desc LIMIT 0,100");
-
-		sql_flush(SQL_QINSERTC); /* Flush SQL buffer to make sure results will be accurate */
-
-		if(sql_query(SQL_QRAW, tmp, c, date ? CurrentTS - date : 0,
-			cmd ? parv[cmd] : (user ? parv[user] : ""), user ? parv[user] : "") < 0)
-				return csreply(nick, "La requête SQL a échoué.");
-
-		if(!(result = mysql_store_result(bot.sql_id)) || !(row = mysql_fetch_row(result)))
-			return csreply(nick, "Aucune entrée trouvée.");
-
-		if(date) csreply(nick, "Commandes effectuées sur \2%s\2 (Par %s) depuis %s.",
-					c, user ? parv[user] : "tout le monde", duration(date));
-		else csreply(nick, "Commandes effectuées sur \2%s\2 (Par %s).",
-				c, user ? parv[user] : "tout le monde");
-
-		for(; row; row = mysql_fetch_row(result))
-			csreply(nick, "%s: \2%s\2 [%s] par \2%s\2",
-				get_time(nick, strtol(row[2], NULL, 10)), row[3], NONE(row[4]), row[0]);
-
-		mysql_free_result(result);
-	}
-
-#endif
 	else return csreply(nick, GetReply(nick, L_UNKNOWNOPTION), arg);
 	return 1;
 }

@@ -35,9 +35,6 @@
 #include "timers.h"
 #include "config.h"
 #include "data.h"
-#ifdef SQLLOG
-#include "sql_log.h"
-#endif
 #include <ctype.h>
 
 static inline unsigned int do_hashc(const char *chan)
@@ -125,12 +122,7 @@ void del_chan(aChan *chan, int flag, const char *raison)
 	hash_delchan(chan); /* swap dans la hash */
 
 	if(flag & HF_LOG)
-#ifdef SQLLOG
-		sql_query(SQL_QINSERTC, "('%s', '%s', %T, 'purge', '%s')",
- 			chan->owner ? chan->owner->user->nick : "<none>", chan->chan, CurrentTS, raison);
-#else
 		log_write(LOG_CCMD, 0, "unreg %s [%s]", chan->chan, raison);
-#endif
 
 	cswallops("Salon %s desenregistré - %s", chan->chan, raison);
 

@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,9 +48,6 @@
 #endif
 #ifdef HAVE_TRACK
 #include "track.h"
-#endif
-#ifdef SQLLOG
-#include "sql_log.h"
 #endif
 #include <ctype.h>
 
@@ -845,21 +843,7 @@ static int exec_cmd(aHashCmd *cmd, aNick *nick, int parc, char **parv)
 #endif
 
 	putchan(buff);
-#ifdef SQLLOG
-	if(cmd->level)
-	{
-		if(ChanCmd(cmd))
-		{
-			if(tmp) tmp[254] = 0;
-			sql_query(SQL_QINSERTC, "('%s', '%s', %T, '%s', '%s')", nick->user->nick,
-				chan->chan, CurrentTS, cmd->corename, tmp);
-		}
-		else sql_query(SQL_QINSERTU, "('%s', %T, '%s', '%s')", nick->user->nick, CurrentTS,
-				cmd->corename, NONE(tmp));
-	}
-#else
 	log_write(ChanCmd(cmd) ? LOG_CCMD : LOG_UCMD, 0, "%s", buff);
-#endif
 	cmd->func(nick, chan, parc, parv); /* passage du aChan * en plus, pour économie */
 	return 1;
 }

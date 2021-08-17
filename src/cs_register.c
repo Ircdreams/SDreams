@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,9 +37,6 @@
 #include "template.h"
 #include "data.h"
 #include "dnr.h"
-#ifdef SQLLOG
-#include "sql_log.h"
-#endif
 
 /* regchan, unreg (+chancheck) + register, drop */
 
@@ -123,10 +121,6 @@ int ren_chan(aNick *nick, aChan *c, int parc, char **parv)
 	if(!IsAdmin(nick->user) && (!(j = getjoininfo(nick, newchan)) || !IsOp(j)))
 		return csntc(nick, GetReply(nick, L_NEEDTOBEOP), newchan);
 
-#ifdef SQLLOG
-	sql_query(SQL_QINSERTC, "('%s', '%s', %T, 'renchan', 'Old name: %s')",
-		nick->user->nick, newchan, CurrentTS, c->chan);
-#endif
 	if(CJoined(c)) cspart(c, newchan);
 	/* csjoin will find the new NetChan */
 	if(c->netchan) c->netchan->regchan = NULL, c->netchan = NULL;
@@ -218,11 +212,6 @@ int register_user(aNick *nick, aChan *chan, int parc, char **parv)
 
 	user = add_regnick(parv[1], MD5pass(p, NULL), CurrentTS, CurrentTS, 1, flag, parv[2], 0);
 	user->lang = DefaultLang;
-
-#ifdef SQLLOG
- 	sql_query(SQL_QINSERTU, "('%s', %T, 'register', '%s!%s@%s')",
- 		user->nick, CurrentTS, nick->nick, nick->ident, nick->host);
-#endif
 
 	if(nick->user)
 		return csreply(nick, GetReply(nick, L_ADM_USER_REGUED), user->nick, p, user->mail);

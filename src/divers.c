@@ -42,10 +42,6 @@
 #include "timers.h"
 #include "template.h"
 #include "socket.h"
-#ifdef SQLLOG
-#include <mysql.h>
-#include "sql_log.h"
-#endif
 
 int uptime(aNick *nick, aChan *chan, int parc, char **parv)
 {
@@ -134,13 +130,6 @@ void CleanUp(void)
 	free(cf_quit_msg);
 	free(cf_mailprog);
 	free(cf_pasdeperm);
-
-#ifdef SQLLOG
-	sql_flush(SQL_QINSERTU);
-	sql_flush(SQL_QINSERTC);
-	if(bot.sql_id) mysql_close(bot.sql_id);
-	free(bot.sql_host);
-#endif
 
 	socket_close();
 	purge_network(); /* nicks(+joins) + netchans + servers */

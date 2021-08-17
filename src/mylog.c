@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,11 +56,6 @@ static struct LogSys {
 	{LOG_SOCKET, 	"socket", 	0, NULL},
 	{LOG_DB, 		"db", 		0, NULL},
 	{LOG_RAW, 		"RAW", 		0, NULL},
-
-#ifndef SQLLOG
-	{LOG_UCMD, 		"User", 	0, NULL},
-	{LOG_CCMD, 		"Channel", 	0, NULL},
-#endif
 
 #ifdef HAVE_VOTE
 	{LOG_VOTE, 		"vote", 	0, NULL},
