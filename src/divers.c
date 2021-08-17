@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,9 +60,9 @@ int ctcp_ping(aNick *nick, aChan *chaninfo, int parc, char **parv)
 
 int ctcp_version(aNick *nick, aChan *chan, int parc, char **parv)
 {
-    csntc(nick, "\1VERSION Services CoderZ " SPVERSION "(CVS-" CVSVERSION ") "
-    	"http://sf.net/projects/scoderz/ (Build " __DATE__ " "__TIME__ ")\1");
-    csntc(nick, "\1VERSION Copyright (C) 2002-2008 David Cortier, Romain Bignon & Benjamin Beret\1");
+    csntc(nick, "\1VERSION Services SDreams " SPVERSION " (Rev:" REVDATE ") "
+    	"http://www.bugsounet.fr/ (Build " __DATE__ " "__TIME__ ")\1");
+    csntc(nick, "\1VERSION Copyright (C) 2021 @bugsounet\1");
 	return 1;
 }
 

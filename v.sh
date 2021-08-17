@@ -1,14 +1,7 @@
-grep -e ' \* \$Id *' src/*.c > tmp.gen
-version=`awk '{split($5, tmp, "."); version += tmp[1]*1000 + tmp[2]} END {print version}' tmp.gen`
-
-#grep -e '^CVSINFO(' include/*.h > tmp.gen
-#versionh=`awk '{split($4, tmp, "."); version += tmp[1]*1000 + tmp[2]} END {print version}' tmp.gen`
-
-rm tmp.gen
-#version=`expr $versionh + $versionc`
+version=`git log -1 --format=%cd --date=short`
 
 if [ -f "include/version.h" ]; then
-	currentv=`sed -n 's/^\#define CVSVERSION \"\(.*\)\"/\1/p' < include/version.h`
+	currentv=`sed -n 's/^\#define REVDATE \"\(.*\)\"/\1/p' < include/version.h`
 else
 	currentv=0
 fi
@@ -23,9 +16,10 @@ if [ "$version" != "$currentv" ]; then
  *                         Romain Bignon  <Progs@ir3.org>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IrcProgs et IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +36,7 @@ if [ "$version" != "$currentv" ]; then
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#define CVSVERSION "$version"
+#define REVDATE "$version"
 
 !SUB!THIS!
 

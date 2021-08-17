@@ -192,12 +192,12 @@ int main(int argc, char **argv)
 				silent = 1;
 				break;
 			case 'v':
-				puts("Services IRC Coderz " SPVERSION "(CVS-" CVSVERSION")\n"
-					"(Build " __DATE__ " "__TIME__ ")\n"
-					"© 2002-2007 David Cortier, Romain Bignon, Benjamin Beret");
+				puts("Services SDreams " SPVERSION " (Rev:" REVDATE")\n"
+					" (Build " __DATE__ " "__TIME__ ")\n"
+					"© 2021 @bugsounet");
 				return 0;
 			default:
-				printf("Syntaxe: %s [-hvn]\n", argv[0]);
+				printf("Syntax: %s [-hvn]\n", argv[0]);
 				exit(EXIT_FAILURE);
 		}
 
