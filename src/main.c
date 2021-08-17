@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +22,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: main.c,v 1.117 2007/12/08 17:07:03 romexzf Exp $
  */
 
 #include "main.h"
@@ -163,7 +163,7 @@ static void sig_reload(int c)
 
 static void pid_write(void)
 {
-	FILE *fd = fopen(SCODERZ_PID, "w");
+	FILE *fd = fopen(SDREAMS_PID, "w");
 
 	if(fd)
 	{
@@ -206,12 +206,12 @@ int main(int argc, char **argv)
 	srand(CurrentTS); 	/* randomize the seed */
 
 	/* Hack to check if another instance is currently running (FIX? lock) */
-	if((fd = fopen(SCODERZ_PID, "r")))
+	if((fd = fopen(SDREAMS_PID, "r")))
 	{
 		if(fscanf(fd, "%d", &tmp) == 1)
 		{
-			fprintf(stderr, "SCoderZ est déjà lancé sur le pid %d.\nSi ce n'est pas "
-				"le cas, supprimez le fichier '"SCODERZ_PID"' et recommencez.\n", tmp);
+			fprintf(stderr, "SDreams est déjà lancé sur le pid %d.\nSi ce n'est pas "
+				"le cas, supprimez le fichier '"SDREAMS_PID"' et recommencez.\n", tmp);
 		}
 		fclose(fd);
 		exit(EXIT_FAILURE);
@@ -344,7 +344,7 @@ int main(int argc, char **argv)
 	RegisterCmd("motd", 		450, CMD_CHAN, 1, define_motd);
 	RegisterCmd("chanopt", 		450, CMD_CHAN, 2, generic_chanopt);
 
-	if(!silent) puts("Services CoderZ " SPVERSION " © 2002-2007");
+	if(!silent) puts("Services SDreams " SPVERSION " v2 © 2021");
 
 	db_load_chans(silent); 	/* load channels first */
 	db_load_users(silent); 	/* so load_users() will manage to add accesses */
@@ -422,7 +422,7 @@ int main(int argc, char **argv)
 	log_write(LOG_MAIN, 0, "Fermeture du programme%s",
 		GetConf(CF_RESTART) ? " (Restarting)" : "");
 
-	remove(SCODERZ_PID);
+	remove(SDREAMS_PID);
 	CleanUp();
 
 	if(GetConf(CF_RESTART)) execlp(argv[0], argv[0], "-h", NULL); /* restarting.. */

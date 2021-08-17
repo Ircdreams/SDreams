@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +22,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
- * $Id: main.h,v 1.149 2008/01/05 18:34:13 romexzf Exp $
  */
 
 #include <stdio.h>
@@ -45,12 +45,12 @@
 /*#define HAVE_IPV6*/
 
 #ifdef WEB2CS
-#	define SPVERSION "1.3.3(Web)"
+#	define SPVERSION "2.0.0-DEV(Web)"
 #	ifdef USEBSD
 #		include <sys/select.h>
 #	endif
 #else
-#	define SPVERSION "1.3.3"
+#	define SPVERSION "2.0.0-DEV"
 #endif
 
 #define NNICK "AA"
@@ -92,7 +92,7 @@
 
 #define DNR_FILE DBDIR"/dnr.db"
 #define CMDS_FILE DBDIR"/cmds.db"
-#define SCODERZ_PID "scoderz.pid" /* fichier où sera stocké le n° de pid de scoderz */
+#define SDREAMS_PID "sdreams.pid" /* fichier où sera stocké le n° de pid de scoderz */
 #define PURGEDELAY 86400 /* Temps entre deux purges des users/chans */
 
 #define	DBUSERS "users.db"

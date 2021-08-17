@@ -3,9 +3,10 @@
 #                         Romain Bignon  <Progs@ir3.org>
 #                         Benjamin Beret <kouak@kouak.org>
 #
-# site web: http://sf.net/projects/scoderz/
+# * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+# site web: http://www.ircdreams.org
 #
-# Services pour serveur IRC. Supporté sur IRCoderz
+# Services pour serveur IRC. Supporté sur Ircdreams v3
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,13 +25,13 @@
 # $Id: configure.ac,v 1.16 2006/01/15 18:43:45 progs Exp $
 
 AC_PREREQ(2.59)
-AC_INIT(scoderz, 1.3, http://sourceforge.net/tracker/?group_id=61070&atid=496052)
+AC_INIT(SDreams, 2.0, http://www.bugsounet.fr)
 AM_INIT_AUTOMAKE
 
 AC_CONFIG_SRCDIR([bin/convert.c])
 AM_CONFIG_HEADER(config.h)
 
-AC_PREFIX_DEFAULT(~/services)
+AC_PREFIX_DEFAULT(~/Dreams/SDreams)
 
 # Checks for programs.
 AC_PROG_AWK
@@ -66,16 +67,16 @@ AC_CHECK_FUNCS([getpass gettimeofday inet_ntoa isascii memset select socket strc
 
 # Liens symboliques
 
-dnl --with-symlink lets us set the name of the symlink; defaults to "services"
+dnl --with-symlink lets us set the name of the symlink; defaults to "SDreams"
 AC_MSG_CHECKING([what name to give the symlink])
 AC_ARG_WITH([symlink],
 [AC_HELP_STRING([--with-symlink=name],[Name to give the symlink; if name is "no", no symlink will be created])],
 [unet_cv_with_symlink=$with_symlink],
 [AC_CACHE_VAL(with_symlink,
-[with_symlink="services"])])
+[with_symlink="SDreams"])])
 
 if test x"$with_symlink" = xyes; then
-    with_symlink="services"
+    with_symlink="SDreams"
 fi
 
 AC_MSG_RESULT([$with_symlink])
@@ -131,7 +132,7 @@ fi
 
 #  MD5TRANSITION
 AC_ARG_ENABLE(	md5trans,
-		[AC_HELP_STRING([--enable-md5trans],[to activate if you use scoderz before 11/09/04 and that it is your first update])],
+		[AC_HELP_STRING([--enable-md5trans],[to activate if you use SDreams before 11/09/04 and that it is your first update])],
 		[
 			if test "x${enableval}" != "xno"; then
 				MD5TRANSITION=1
@@ -255,7 +256,7 @@ fi
 
 #  HAVE_CRYPTHOST
 AC_ARG_ENABLE(	crypthosts,
-		[AC_HELP_STRING([--disable-crypthosts],[disable if you don't use ircoderz])],
+		[AC_HELP_STRING([--disable-crypthosts],[disable if you don't use Ircdreams v3])],
 		[
 			if test "x${enableval}" = "xno"; then
 				HAVE_CRYPTHOST=0
@@ -391,7 +392,7 @@ AC_DEFINE_UNQUOTED(LOG_ERREURS, "${LOG_ERREURS}", [Errors log file's name])
 
 #  FICHIER_CONF
 AC_ARG_WITH(	confname,
-		[AC_HELP_STRING([--with-confname],[configuration file's name [scoderz.conf]])],
+		[AC_HELP_STRING([--with-confname],[configuration file's name [sdreams.conf]])],
 		[
 			if test "x$withval" = "xno" || test "x$withval" = "xyes"; then
 				AC_MSG_ERROR([You have to give a file name])
@@ -399,7 +400,7 @@ AC_ARG_WITH(	confname,
 				FICHIER_CONF=${withval}
 			fi
 		],
-		[FICHIER_CONF="scoderz.conf" ]
+		[FICHIER_CONF="sdreams.conf" ]
 	)
 AC_DEFINE_UNQUOTED(FICHIER_CONF, "${FICHIER_CONF}", [Configuration file's name])
 
@@ -491,7 +492,7 @@ echo "System : ${rev}"
 if test "x${PUREIRCU}" = "x1"; then
 	echo "Use of ircu2.10.12"
 elif test "x${HAVE_CRYPTHOST}" = "x1"; then
-	echo "Use of ircoderz"
+	echo "Use of Ircdreams v3"
 else
 	echo "Use of ircu2.10.11"
 fi

@@ -4,9 +4,10 @@
 #                         Romain Bignon  <Progs@coderz.info>
 #                         Benjamin Beret <kouak@kouak.org>
 #
-#  site web: http://sf.net/projects/scoderz/
-# 
-# Services pour serveur IRC. Supporté sur IRCoderz
+# SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+# site web: http://www.ircdreams.org
+#
+# Services pour serveur IRC. Supporté sur Ircdreams v3
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +23,6 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
-# $Id: Makefile.in,v 1.23 2007/01/02 19:44:30 romexzf Exp $
 
 
 SHELL = @SHELL@
@@ -71,14 +71,14 @@ MAKEINFO = @MAKEINFO@
 PACKAGE = @PACKAGE@
 VERSION = @VERSION@
 
-scoderz_PROGRAMS = services
-bin_PROGRAMS = $(scoderz_PROGRAMS)
+sdreams_PROGRAMS = SDreams
+bin_PROGRAMS = $(sdreams_PROGRAMS)
 convertdb_PROGRAMS = convertdb
 
 INCLUDES = -I../include
 INCLUDES_DIR = ../include
 DEFS = -I$(srcdir)
-scoderz_SOURCES = main.c mystring.c outils.c cs_cmds.c serveur.c fichiers.c add_info.c del_info.c mylog.c \
+sdreams_SOURCES = main.c mystring.c outils.c cs_cmds.c serveur.c fichiers.c add_info.c del_info.c mylog.c \
 		 config.c lang.c mkpasswd.c showcommands.c checksum.c memoserv.c nickserv.c \
 		 sql_log.c hash.c hash_chan.c socket.c hash_cmd.c hash_user.c hash_nick.c data.c dnr.c \
 		 divers.c aide.c admin_cmds.c admin_manage.c admin_user.c admin_chan.c \
@@ -98,9 +98,9 @@ CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 CFLAGS = @CFLAGS@
-scoderz_OBJECTS = ${scoderz_SOURCES:%.c=%.o}
-scoderz_LDADD = $(LDADD)
-scoderz_LDFLAGS =
+sdreams_OBJECTS = ${sdreams_SOURCES:%.c=%.o}
+sdreams_LDADD = $(LDADD)
+sdreams_LDFLAGS =
 convertdb_OBJECTS = ${convertdb_SOURCES:%.c=%.o}
 convertdb_LDADD = $(LDADD)
 convertdb_LDFLAGS =
@@ -114,8 +114,8 @@ DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
 
 TAR = tar
 GZIP_ENV = --best
-SOURCES = $(scoderz_SOURCES)
-OBJECTS = $(scoderz_OBJECTS)
+SOURCES = $(sdreams_SOURCES)
+OBJECTS = $(sdreams_OBJECTS)
 
 .SUFFIXES:
 .SUFFIXES: .S .c .o .s
@@ -131,13 +131,13 @@ install-with-symlink: $(PROGRAMS)
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(bindir) $(dbdir) $(prefix)/logs
 
-	@echo `date +%Y%m%d%H%M` > /tmp/scoderz.tag;
-	@echo "Installing new services as ${prefix}/scoderz.`cat /tmp/scoderz.tag` :"
-	${INSTALL_PROGRAM} $(scoderz_PROGRAMS) ${prefix}/scoderz.`cat /tmp/scoderz.tag`
+	@echo `date +%Y%m%d%H%M` > /tmp/sdreams.tag;
+	@echo "Installing new SDreams service as ${prefix}/sdreams.`cat /tmp/sdreams.tag` :"
+	${INSTALL_PROGRAM} $(sdreams_PROGRAMS) ${prefix}/sdreams.`cat /tmp/sdreams.tag`
 	@( cd ${prefix}; \
 	  ${RM} -f ${SYMLINK}; \
-	  ${LN_S} scoderz.`cat /tmp/scoderz.tag` ${SYMLINK}; )
-	@${RM} /tmp/scoderz.tag
+	  ${LN_S} sdreams.`cat /tmp/sdreams.tag` ${SYMLINK}; )
+	@${RM} /tmp/sdreams.tag
 
 	-cp -r ../aide $(DESTDIR)$(prefix)
 	-cp -r ../lang $(DESTDIR)$(prefix)
@@ -173,9 +173,9 @@ convertdb: $(convertdb_OBJECTS)
 	$(LINK) $(convertdb_LDFLAGS) $(convertdb_OBJECTS) $(convertdb_LDADD) $(LIBS)
 	ln -s ../src/convertdb ../bin/convertdb
 
-services: $(scoderz_OBJECTS)
-	@rm -f services
-	$(LINK) $(scoderz_LDFLAGS) $(scoderz_OBJECTS) $(scoderz_LDADD) $(LIBS)
+SDreams: $(sdreams_OBJECTS)
+	@rm -f SDreams
+	$(LINK) $(sdreams_LDFLAGS) $(sdreams_OBJECTS) $(sdreams_LDADD) $(LIBS)
 
 tags: TAGS
 
@@ -284,7 +284,7 @@ maintainer-clean:  distclean
 tags distdir check all install uninstall install-strip installdirs \
 mostlyclean clean distclean maintainer-clean
 
-# ${scoderz_OBJECTS}: ../config.h
+# ${sdreams_OBJECTS}: ../config.h
 
 add_info.o: add_info.c ../include/main.h ../include/mystring.h \
   ../include/../config.h ../include/lang.h ../include/structs.h \
