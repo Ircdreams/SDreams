@@ -1,0 +1,30 @@
+#!/bin/sh
+# Ce script permet de sauvegarder la base de donnée, les fichiers logs et la configuration
+#
+# $Id: save,v 1.2 2004/03/07 15:13:48 romexzf Exp $
+#
+ts=`date '+%d%m%y_%H%M%S'`
+
+if test ! "$1" ; then
+  cd ..;
+else
+  if [ -d "$1" ]; then
+    cd $1;
+  else
+    echo "Le répertoire $1 n'existe pas";
+    exit 0;
+  fi
+fi
+
+if [ ! -d database ] || [ ! -f scoderz.conf ]; then
+  if test "$1" ; then echo "Erreur: le répertoire $1 n'est pas la racine de SCoderZ"; fi
+  echo "Syntax: bin [repetoire racine de scoderz]";
+else
+  if [ ! -d sauvegardes ]; then mkdir sauvegardes; fi
+  tar cfz sauvegardes/save_$ts.tgz database scoderz.conf
+  echo "*"
+  echo "Base de donnée, fichiers de logage et configuration sauvegardés dans le fichier save_$ts.tgz, situé dans le répertoire sauvegardes/"
+  echo "Pour restaurer la sauvegarde, tapez :"
+  echo " \$ tar xvfz sauvegardes/save_$ts.tgz"
+  echo "*"
+fi

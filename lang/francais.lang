@@ -1,0 +1,188 @@
+0 %s n'est pas un UserName enregistré.
+1 %s n'est pas un salon enregistré.
+2 %s n'est pas connecté.
+3 Informations sur %s :
+4 Vous êtes actuellement identifié sous l'username %s.
+5 Vous avez déjà utilisé la commande %s.
+6 La longueur de l'UserName est limitée à %d caractères.
+7 La longueur du mail est limitée à %d caractères.
+8 Le nom d'un salon doit commencer par un #
+9 %s contient des caractères invalides.
+10 Ce pseudo est actuellement utilisé par quelqu'un d'autre.
+11 Veuillez préciser un mail valide.
+12 Ce mail est déjà utilisé.
+13 Avertissement : Vous venez de prendre un pseudo illégal
+14 Vous avez enregistré l'UserName %s avec le pass %s et le mail %s.
+15 Votre mot de passe a été envoyé à %s.
+16 Mot de pass incorrect pour %s.
+17 Login réussi pour %s, vous avez désormais accès à tous vos salons, mémos et au contrôle de votre pseudo
+18 Vous êtes identifié en tant qu'Administrateur niveau %d
+19 Veuillez préciser un mot de pass d'au moins 7 caractères.
+20 Message du Jour : %s
+21  Accès à %s
+22  Propositions d'accès sur %s
+23  Aucun Accès.
+24  Aucune proposition d'accès.
+25  Mail : %s (Enregistré le %s)
+26  Accès Administrateur. (%d)
+27  Options : %s
+28 %s est déjà enregistré.
+29 Commande désactivée.
+30 Pour confirmer cette action, vous devez spécifier 'CONFIRME' comme deuxième argument.
+31 Quelqu'un est actuellement logué sous cet username.
+32 %s vient de tenter de se loguer sous votre username avec le bon pass. Vous pouvez en changer avec la commande '%s PASS'.
+33 Changement effectué.
+34 Option inconnue : %s
+35 Avertissement : Le pseudo %s est enregistré, si c'est le votre, identifiez vous via : /%s %s %s <votre pass>
+36 Le nick %s est désormais disponible.
+37  Dernier login il y a %s. (%s)
+38 Liste des Langages disponibles : (Défaut en premier)
+39 Je vous parlerai désormais en français !
+40 %s n'est pas un langage disponible.
+41 Le compte sera supprimé si vous ne vous loguez pas avant %s.
+42 Vous devez être Op sur %s pour l'enregistrer.
+43 Le salon %s est maintenant enregistré et vous appartient.
+44 Le salon %s a bien été désenregistré.
+45 Vous êtes déjà l'owner de %s.
+46 Vous devez préciser un thème d'au moins 12 caractères.
+47 Vous devez être le propriétaire du salon pour le supprimer.
+48 Veuillez préciser un level valide.
+49 %s n'est pas sur %s.
+50 Vous ne pouvez pas donner un niveau supérieur au votre.
+51 Le mail de l'username %s n'est pas %s.
+52 %s est déjà votre mail enregistré.
+53 %s n'a pas d'access sur %s.
+54 Vous n'avez pas accès à %s.
+55 %s a un accès de niveau supérieur au votre.
+56 La valeur doit être ON ou OFF
+57 L'Option %s a bien été activée pour %s.
+58 L'Option %s a bien été desactivée pour %s.
+59 Aucun ban correspondant sur %s.
+60 Ban %s sur %s supprimé.
+61 Votre niveau est insuffisant pour retirer %s (%d)
+62 La commande %s n'existe pas.
+63 Le LOCKTOPIC est actif sur %s.
+64 Veuillez préciser une infoline ou le mot clé 'none' pour la supprimer.
+65 Les modes par défaut de %s sont maintenant : %s.
+66 Le message de bienvenue de %s est maintenant : %s.
+67 Le Message du jour de %s est maintenant : %s.
+68 Le topic par défaut sur %s est maintenant : %s.
+69 Le thème de %s est maintenant : %s.
+70 L'url de %s est maintenant : %s.
+71 Le banlevel de %s est maintenant à %d
+72 Le changemodeslevel de %s est maintenant à %d
+73 Le bantime pour %s est maintenant de %lu secondes (%s)
+74 Le type de ban par défaut de %s est maintenant : %s. (%d)
+75 L'Autolimite est activée sur %s (Min: %u Inc: %u).
+76 Suppression effectuée pour %s.
+77 %s n'est actuellement logué sur aucun UserName.
+78 Le niveau de %s a été changé en %d sur %s.
+79 Infoline pour %s changée en %s
+80 Aucune info correspondante n'est disponible.
+81 Durée incorrecte, le format est %%<XjXhXm> X étant le nombre respectif d'unités.
+82 Le BanLevel est à %d sur %s.
+83 Le NOBANS est actif sur %s
+84 Un total de %d ban%s a été supprimé sur %s.
+85 Il y a un total de %d ban%s sur %s.
+86 %s est déjà couvert par %s (%d).
+87 Propriétaire    : %s (Fondé le %s)
+88 Thème           : %s
+89 Modes par défaut: %s
+90 Topic par défaut: %s
+91 Motd            : %s
+92 URL du salon    : %s
+93 Banlevel       : %d    Bantype       : %s
+94 ChModesLevel: %d    Bantime       : %s
+95 Welcome         : %s
+96 Topic actuel    : %s
+97 Modes actuels   : %s
+98 Options         : %s
+99 Mask du ban: %s Niveau: %d BanID: %d
+100 Ajouté par %s (%s)
+101 Depuis %s, expire %s
+102 %s est l'owner du salon.
+103 Un Total de %d entrée%s trouvée%s
+104 Le ChModesLevel est à %d.
+105 Vous n'êtes pas autorisé à changer le mode '%c'
+106 Vous avez déjà proposé un accès à %s.
+107 %s a déjà un accès sur %s.
+108 %s refuse systématiquement les propositions d'accès.
+109 %s a maintenant un accès de niveau %d sur %s.
+110 Vous avez bien proposé à %s un access sur %s. Il pourra accepter ou refuser cet accès.
+111 %s vous a donné un accès de niveau %d sur %s.
+112 %s vous a proposé un access de %d sur %s.
+113 Pour accepter tapez : /%s %s ACCEPT %s, pour refuser tapez : /%s %s REFUSE %s
+114 %s est déjà sur %s.
+115 %s est banni de %s, je ne peux l'y inviter.
+116 Pour cause d'abus, il n'est plus possible d'inviter d'autres users que vous.
+117 La longueur d'un salon est limitée à %d caractères.
+118 Vous ne pouvez engistrer %s pour la raison suivante : %s
+119 Votre nick est déjà %s.
+120 %s a utilisé recover : vous n'êtes plus identifié.
+121 Vous n'avez pas de proposition d'accès sur %s.
+122 Vous avez maintenant un access sur %s.
+123 La proposition d'accès pour %s a bien été refusée.
+124 Vous êtes l'owner de %s. Pour supprimer cet accès vous devez desenregistrer le salon.
+125 Veuillez changer de pseudo ou vous serez déconnecté dans %d secondes.
+126 Veuillez changer de pseudo ou votre pseudo sera automatiquement changé dans %d secondes.
+127 Votre accès est suspendu sur %s.
+128 Votre niveau sur %s est trop bas pour utiliser cette commande (Vous: %d, Commande: %d)
+129 Les propositions d'accès seront systématiquement refusées (Vos propositions actuelles ont été refusées).
+130 Les propositions d'accès seront automatiquement acceptées (Vos propositions actuelles ont été acceptées).
+131 Vous pourrez accepter ou refuser un accès avec /%s %s ACCEPT|REFUSE #salon
+132 Commandes User
+133 Commandes Administrateur
+134 Commandes Salon
+135 Pour de l'aide sur une commande tapez /%s %s <commande>
+136 Vous pouvez demander plus d'informations sur %s
+137 Liste des Accès correspondants sur %s :
+138 Username: %s Niveau: %d
+139 Dernière visite : %s
+140 Dernière visite : actuellement sur le salon
+141 Il y a %d memos au total (Tapez /%s %s SUPPR ALL pour les supprimer)
+142 Il y a %d nouveaux memos au total.
+143 Fin du memo n°%d (Tapez /%s %s SUPPR %d pour le supprimer)
+144 Vous n'avez aucun memo.
+145 Vous n'avez aucun nouveau memo.
+146 Le memo n°%d n'a pas été trouvé.
+147 %d memos ont été supprimés.
+148 Le memo n°%d a bien été supprimé
+149 Vous ne pouvez pas vous envoyer de memo à vous même.
+150 %s n'accepte aucun memo.
+151 La longueur des memos est limitée à %d caractères.
+152 Vous avez déjà envoyé suffisament de mémos à %s. (MAX: %d)
+153 Votre memo a bien été envoyé à %s.
+154 Mémo de %s@%s : %s
+155 Bienvenue sur %s - %s
+156 Vous devez être Administrateur des Services pour utiliser cette commande.
+157 Vous avez %d memo%s non lu(s), tapez /%s %s LIRE <ALL|N° du memo> pour le%s lire.
+158 Aucun Administrateur des Services n'est actuellement disponible.
+159 Administrateurs des Services actuellement disponibles :
+160 Tapez /%s %s %s pour plus d'informations.
+161 Dernier Login de %s il y a %s (%s)
+162 Les services sont en ligne depuis %s
+163 Aide sur la commande %s >> %s (%s Niveau %d)
+164 Aide sur la commande %s (%s Niveau %d)
+165 Veuillez ne pas me flooder ! (Vous êtes désormais ignoré)
+166 [%d/%d] Trop de réponses trouvées, précisez votre recherche.
+167 Dimanche
+168 Lundi
+169 Mardi
+170 Mercredi
+171 Jeudi
+172 Vendredi
+173 Samedi
+174 Toute personne prenant votre pseudo verra son pseudo changé après %d secondes
+175 Toute personne prenant votre pseudo sera killée après %d secondes
+176 Votre pseudo n'est plus protégé.
+177 La commande %s demande des informations privées. Veuillez utiliser /%s %s %s.
+178 Vous devez fournir votre nouveau pass deux fois afin d'éviter les fautes de frappe.
+179 Les deux pass fournis ne correspondent pas, vérifiez l'absence de faute de frappe.
+180  En cours de validation, enregistrement il y a %s.
+181 Le salon %s est actuellement vide.
+182 Vous avez déjà reçu %d mémos de %s, veuillez en supprimer pour en recevoir de nouveaux.
+183 Le salon sera purgé le %s pour absence de l'owner, contactez un administrateur
+184 L'UserName %s ETAIT suspendu par %s
+185  Ne peut pas enregistrer de salon jusqu'au %s.
+186 Vous venez de vous déloguer de l'UserName %s.
+187 Bienvenue sur les services CoderZ. La liste des commandes est disponible via /%s %s

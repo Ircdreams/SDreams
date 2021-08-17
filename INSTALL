@@ -1,0 +1,210 @@
+
+			-- [ -> SCODERZ <- ] --
+					version 1.3.2
+		--< INSTALL >--
+
+Dernière mise à jour :
+$Id: INSTALL,v 1.18 2007/03/15 13:41:52 romexzf Exp $
+
+Bienvenue dans le fichier d'aide à l'installation du projet SCoderZ.
+Il est conseillé de lire le fichier README avant d'effectuer les opérations de ce fichier.
+
+Sommaire :
+1) téléchargement
+2) ./configure
+3) make
+4) scoderz.conf
+5) link
+6) lancement
+
+1) téléchargement
+=================
+Tapez ça dans votre shell :
+$ cvs -d:pserver:anonymous@scoderz.cvs.sourceforge.net:/cvsroot/scoderz login
+Appuyez sur -Entrée- lors de la demande de pass
+$ cvs -d:pserver:anonymous@scoderz.cvs.sourceforge.net:/cvsroot/scoderz co scoderz
+
+Vous pouvez aussi (et il est même conseillé) télécharger une version stable sur
+sourceforge: http://sourceforge.net/project/showfiles.php?group_id=61070&package_id=57375
+
+Vous pouvez maintenant vous placer dans le dossier scoderz avec :
+$ cd scoderz
+
+2) ./configure
+==============
+Comme tout programme linuxien qui se respecte, l'installation de scoderz nécessite
+la démarche habituelle du ./configure;make;make install.
+À ceci près que, n'étant installé que sur un compte unique du système, il est nécessaire
+d'indiquer manuellement le chemin de destination. Pour ce faire, tapez :
+$ ./configure --prefix=<path>
+Par exemple
+$ ./configure --prefix=/home/user/services/
+Il est à noter qu'il y a un certain nombres d'options paramétrables par cette commande.
+Vous pouvez les voir avec :
+$ ./configure --help
+En voici une liste pas forcément à jour :
+  --prefix=PREFIX         install architecture-independent files in PREFIX
+                          [/home/rom1/services]
+
+  --enable-ircu           if you use ircu2.10.12
+  --enable-oplevels       if you want oplevels
+  --enable-md5trans       to activate if you use scoderz before 11/09/04 and
+                          that it is your first update
+  --disable-nickserv      disable nickserv module
+  --disable-memoserv      disable memoserv module
+  --disable-welcomeserv   disable welcomeserv module
+  --disable-votes         disable votes module
+  --enable-ipv6           enable ipv6 support
+  --enable-sqllog         enable sql logs
+  --enable-web2cs         enable web2cs module (see website/WEB2CS)
+  --disable-crypthosts    disable if you don't use ircoderz
+  --disable-track         disable tracks
+  --enable-debug          enable debug
+  --enable-warnings       enable warnings during compilation
+  --enable-adminreg       admins can use REGISTER to record usernames
+  --disable-secure        commands which requires private information are
+                          typed only in form /<ROBOT>
+  --enable-oldadminlist   ADMIN command show all admins (deprecated)
+
+  --with-symlink=name     Name to give the symlink; if name is "no", no
+                          symlink will be created
+  --with-mysqlclient-prefix=PFX
+                          Prefix where mysqlclient is installed
+  --with-mysqlclient-include=DIR
+                          Directory pointing to mysqlclient include files
+  --with-mysqlclient-lib=LIB
+                          Directory pointing to mysqlclient library (Note:
+                          -include and -lib do override paths found with
+                          -prefix)
+  --with-dbdir            name of database directory in path [database]
+  --with-parseslog        parseslog file's name [logs/parses.log]
+  --with-fauthlog         failed auth log file's name [logs/failed_auth.log]
+  --with-chanslog         channels commands log file's name [logs/chans.log]
+  --with-cmdslog          commands log file's name [logs/cmds.log]
+  --with-errorslog        errors log file's name [logs/erreurs.log]
+  --with-confname         configuration file's name [scoderz.conf]
+  --with-maxmemos         maximum memo numbers which one can send to the same
+                          person [5]
+  --with-memolen          maximum length of memos [250]
+
+Je précise que seules ces options là sont à prendre en compte (--prefix, les "Optional Features" et les
+"Optional Packages"). Il est notament totalement inutile d'utiliser les bindir, libdir ou autres *dir
+décrit dans "Fine tuning of the installation directories".
+
+Il est juste à noter que pour paramétrer un "with" il faut mettre un "=" puis la valeur assignée,
+par exemple :
+$ ./configure --with-parseslog="parsing.log" --with-maxmemos=5
+
+Attention: suivant l'ircd que vous utilisez, vous devez indiquer les paramètres suivants:
+-> --enable-ircu		:si vous utilisez ircu2.10.11.12
+-> Si vous utilisez ircoderz vous n'avez rien à indiquer
+Si vous utilisez les oplevels (feature OPLEVELS activée sur l'ircd), il est nécessaire d'activer
+l'option suivante :
+> --enable-oplevels
+
+Vous pouvez alors taper votre commande complète.
+Rassurez-vous, lors d'une éventuelle mise à jour de scoderz (si vous avez la version CVS), il ne sera
+pas requis de redonner ces paramètres ni de taper ./configure. Il suffira de passer à l'étape
+"make" (compilation).
+
+Si vous avez un quelconque problème, n'hesitez pas à nous contacter.
+
+3) make
+=======
+Une fois la configuration du script effectuée, vous devez compiler SCoderZ. Pour se faire, tapez:
+$ make
+En cas d'erreurs de compilation, veuillez vérifier que vous avez un système compatible avec SCoderZ,
+que vous avez pris une version STABLE d'scoderz (voir "1. téléchargement") et que possédez bien
+les programmes requis (gcc, les libs, etc). Si tout ceci est correct, vous pouvez nous contacter pour
+signaler la présence d'erreurs de compilation. Nous serons ravi de passer toute notre nuit pour
+vous satisfaire.
+Après quoi vous pouvez taper :
+$ make install
+
+4) scoderz.conf
+===============
+La compilation terminée, vous devez paramétrer le fichier de configuration, nommé par défaut scoderz.conf.
+Veuillez vous diriger dans le répertoire où scoderz a été installé
+Comme vous l'aurez constaté, il n'existe pas encore, mais un fichier exemple.conf, lui, est présent. Veuillez
+le renommer en le nom que vous avez paramétré dans make config (par défaut scoderz.conf) avec:
+$ cp exemple.conf <conf>
+par exemple, par default :
+$ cp exemple.conf scoderz.conf
+
+Maintenant vous pouvez le configurer. Si vous avez besoin d'aide, n'hésitez pas à nous contacter.
+
+6) link
+=======
+Vous devez configurer sur votre/vos serveur(s) l'acceptation de la connexion d'scoderz. Pour se faire, il faut
+utiliser les paramètres que vous avez mis dans l'scoderz.conf. Prenons par exemple que vous avez mis
+ceci :
+
+uplink {
+	ip = 127.0.0.1
+	port = 4400
+	pass = mypassword
+}
+myserver {
+	server = services.ircube.org
+	..
+}
+
+Vous devez mettre dans l'ircd.conf du serveur qui recevra la connexion, c'est à dire le hub de scoderz :
+	IRCoderz1:
+		C:<ip sur laquelle se trouve scoderz>:prout:services.ircube.org::50
+		U:services.ircube.org::*
+	IRCoderz2:
+		Connect {
+			name = "services.ircube.org";
+			host = "<ip sur laquelle se trouve scoderz>";
+			password = "prout";
+			class = "LeafServer";
+		};
+		UWorld {
+			name = "services.ircube.org";
+		};
+
+
+ATTENTION ! Si les mots de pass sont paramétrés comme cryptés dans l'ircd.conf, vous devez utiliser
+l'outil mkpasswd pour crypter les pass. Vous devrez mettre le pass crypté dans l'ircd.conf.
+
+Par exemple:
+$ mkpasswd
+Password: test
+7yX/8r1if.PzI
+
+En outre, <ip sur laquelle se trouve scoderz par rapport au serveur> doit bien entendu être remplacé par
+l'ip sur laquelle se trouve scoderz par rapport au serveur.
+
+Maintenant, sur TOUS les autres serveurs du réseau auquel fait partie le hub sur lequel vous allez
+connecter scoderz, vous devez mettre cette ligne:
+	Ircoderz1 :
+		U:services.ircube.org::*
+	Ircoderz2 :
+		UWorld {
+			name = "services.ircube.org";
+		};
+
+
+Pour finir, vérifiez que le nombre que vous avez donné au paramètre NUMERIC n'est utilisé dans AUCUNE
+des M:Lines (block "General" dans ircoderz2) de tous les serveurs du réseau.
+Tapez /rehash sur tous les serveurs du réseau.
+
+7) lancement
+============
+Théoriquement, maintenant c'est bon, vous allez enfin pouvoir lancer votre service.
+Pour ce faire, tapez:
+$ ./services
+
+Sur votre réseau, tapez :
+/<robot> register <login> <email> <email> <pass>
+Par exemple:
+/z register Progs progs@headfucking.net progs@headfucking.net pupuce
+
+Vous vous retrouvez administrateur du service niveau 4. Les users pourront s'enregistrer, vous pourrez
+en nommer Admin avec la commande ADMINLVL.
+Vous pouvez maintenant lire le guide d'utilisation, dans le fichier UTILISATION.
+
+Les programmeurs des services SCoderZ vous souhaitent une bonne utilisation de leur programme.
+
+Progs

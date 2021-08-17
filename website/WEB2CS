@@ -1,0 +1,157 @@
+
+			-- [ -> SCODERZ <- ] --
+					version 1.3.2
+		--< WEB2CS >--
+
+Le principe est simple: parler à scoderz depuis un site web (en php de préférence).
+Ce fichier à pour but justement de vous donner la méthode à suivre pour créer votre/vos fichiers
+php qui se connecteront à scoderz(web2cs) et qui enverra ou recevra des données.
+
+ATTENTION: Ceci n'est absolument pas un cours sur le php. D'ailleur ceci ne recensera que de la
+theorie pur et simple, vous fera connaître le protocole scoderz(web2cs) et vous indiquera comment
+installer ce dernier.
+Pas un seul code php ne sera donné (ne connaissans moi même pas le php :p).
+Vous pourriez d'ailleur, à partir des informations que regroupent ce fichier, créer un client
+spécial en C ou en perl, qui sait :)
+
+************************************
+******* /!\ ATTENTION /!\ **********
+************************************
+* (oui c'est histoire d'être plus  *
+*     voyant que l'autre ATTENTION)*
+************************************
+************************************
+* CE FICHIER N'EST ABSOLUMENT PAS  *
+* À JOUR, VEUILLEZ NE PAS VOUS     *
+* INSPIRER DE CE CONTENU TANT QUE  *
+* Mr Cesar N'AURRA PAS REFAIS UNE  *
+* DOCUMENTATION COMPORTANT LES     *
+* NOUVELLES SPÉCIFICATIONS DU      *
+* NOUVEAU PROTOCOLE.               *
+* (oui 2 fois nouveau, c'est dire) *
+************************************
+************************************
+* POUR EN SAVOIR PLUS SUR LE       *
+* PROTOCOLE DU WEB2CS, ALLEZ SUR   *
+* #CoderZ@IRCube EMMERDER Cesar    *
+* POUR QU'IL REFASSE CETTE         *
+* DOCUMENTATION.                   *
+************************************
+************************************
+
+
+AVANT TOUTE CHOSE:
+
+	Vous devez avoir lu INSTALL, README et UTILISATION, ainsi que l'avoir déjà lancé et utilisé
+	de préférence (tout du moin je ne vous demandrais pas d'enregistrer votre account, etc).
+	Il est aussi à rappeler que, lorsque l'on vous montrera des syntaxs, les mots entre
+	<> sont des arguments obligatoires et que les mots entre [] sont des arguments
+	facultatifs. Leur contenu explique le mot ou les mots que vous devrez placer.
+
+Sommaire:
+1. Installation
+2. Utilisation de libw2c.inc.php
+
+1. Installation
+===============
+	Vous devez avant toute chose activer le module WEB2CS dans le make config à la question:
+	USE_WEB2CS          : Voulez vous utiliser le module WEB2CS ? [Y/n]
+
+	Après ça vous devez compiler les sources avec make.
+	Maintenant rajoutez les lignes suivantes au scoderz.conf:
+	  web2cs {
+	  	port = <port>		(le port du serveur web2cs)
+	  	allow_host = <ip>	(l'ip du php qui se connectera)
+	  	pass = <pass>		(le pass que donnera le php)
+	  }
+	Par exemple:
+	  web2cs {
+	  	port = 1234
+	  	allow_host = 127.0.0.1
+	  	pass = pupuce
+	  }
+
+	Veuillez maintenant (re)lancer scoderz. Vous pouvez vérifier que le port défini est bien
+	écouté avec (en ssh sur la machine de scoderz):
+	$ nmap -p <port paramétré> 127.0.0.1
+	Par exemple:
+	$ nmap -p 1234 127.0.0.1
+	(note: à partir de maintenant nous allons imaginer que vous avez paramétrer comme port 1234
+	pour éviter des lignes de plus)
+
+2. Utilisation de libw2c.inc.php
+===========================
+	libw2c.inc.php est une librairie en php à inclure dans vos scripts php pour l'utilisation du web2cs.
+	Pour l'inclure dans votre php placez libw2c.inc.php dans le répertoire de celui ci et rajoutez
+	dedan, en tête de page, la ligne suivante :
+		include("libw2c.inc.php");
+
+	Vous devez maintenant éditer le fichier libw2c.inc.php et modifier les lignes suivantes :
+		define("SERVEUR", "192.168.0.10");
+		define("PORT", 6969);
+		define("PASSWD", "pupuce");
+	Vous mettez comme valeur l'ip sur laquelle se trouve le web2cs (127.0.0.1 si c'est sur la même machine)
+	et le port que vous avez paramétré au web2cs (web2cs/port dans l'scoderz.conf).
+	Vous devez aussi mettre le mot de pass paramétrer dans la conf (web2cs/pass)
+
+	Maintenant vous pouvez utiliser dans votre script php les fonctions de la librairie, à savoir:
+
+		function w2c_getconnection($nick, $pass)
+		Elle permet d'établir une connexion sur le serveur web2cs avec le login et le pass défini en
+		argument. Elle renvoie -1 en cas d'echec, 0 si la connexion est déjà active et 1 si la connexion
+		s'est établie sans problème.
+
+		function w2c_closeconnection()
+		Cette fonction clos la connexion avec le serveur web2cs.
+
+		function w2c_getmyaccess()
+		La fonction retourne un tableau qui contient les informations sur l'access du mec identifié.
+
+		function w2c_getchaninfo($chan)
+		Obtient les informations sur le salon spécifié comme argument.
+
+		function w2c_getaccess($chan, $nick, $aop, $avoice, $suspend, $protect)
+		Cette fonction retourne dans un tableau les access ainsi que leurs informations, sur un
+		salon spécifié. On donne en argument le pseudo recherché (ou le mask) s'il y en a (sinon NULL),
+		on met 1 ou 0 aux variables $aop $avoice $suspend et $protect qui spécifient respectivement si
+		les access retournés ont les options autoop, autovoice, suspend ou protect.
+
+		function w2c_isaccesslevel($string)
+		Renvoi 1 si la chaine donné en argument est un niveau d'access salon correct (de 1 à 500). Si
+		il est précédé de < > ou = mais que le niveau d'access salon est correct la fonction retourne 1.
+
+		function w2c_isvalidchan($string)
+		Renvoi 1 si la chaine donné en argument est un nom de salon correct.
+
+		function strip_irc_chars($string)
+		La fonction permet de modifier la chaine donné en argument en supprimant tous les caractères
+		spéciaux mirc (gras, couleur, souligné, etc).
+
+		function w2c_isvalidemail($string)
+		Renvoi 1 si la chaine donné en argument est un mail correct.
+
+		function w2c_isvalidusername($string)
+		Renvoi 1 si la chaine donné en argument est un username correct.
+
+		function w2c_register($pseudo, $email, $pass)
+		Permet d'enregistrer un username sur scoderz. Il n'envoi pas le mail lui même, vous devez donc,
+		si vous souhaitez envoyer un mail, utiliser une fonction à vous en php.
+
+		function w2c_send_memo($rcpt, $text)
+		La fonction envoi à $rcpt un memo qui contient $text.
+
+		function w2c_read_memo($q)
+		Renvoi un tableau qui contient les memos. $q est le n° du memo cherché; si il est égal à 0, la
+		fonction retournera tous les memos.
+
+		function w2c_suppr_memo($q)
+		Supprime un memo ou tous les memos. $q est le n° du memo cherché; si il est égal à 0, la
+		fonction supprimera tous les memos.
+
+		function w2c_generatepass()
+		Cette fonction permet de créer un pass aléatoirement sous forme alphabétique. Vous pourrez
+		l'utiliser pour envoyer un pass aléatoire par mail.
+
+		function w2c_char2html($string)
+		La fonction retourne $string avec les caractères de gras, de soulignement et de couleur
+		transformé en balises html.

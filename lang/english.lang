@@ -1,0 +1,188 @@
+0 %s is not a registered username.
+1 %s is not a registered channel.
+2 %s is not online.
+3 Informations about %s:
+4 You are authed as %s.
+5 You can't use %s twice.
+6 Username length is restricted to %d chars.
+7 Mail length is restricted to %d chars.
+8 A channel name MUST begin with a #
+9 %s contains invalid chars.
+10 This nickname is owned by someone else.
+11 This email is not valid.
+12 There is already an account using this email.
+13 Warning: You are now using a forbidden nickname!
+14 You have registered username %s with password %s and email %s.
+15 Your password as just been sent to %s.
+16 Incorrect password for %s.
+17 Password accepted for %s, you can now manage your channels, your memos and your account.
+18 You are now authed as Admin level %d.
+19 Password can't be shorter than 7 chars.
+20 Message of the day: %s
+21  Access to %s
+22  Access proposals to %s
+23  No access.
+24  No proposal.
+25  Mail: %s (Registered on %s)
+26  Admin access (%d)
+27  Options: %s
+28 %s is already registered.
+29 Command disabled.
+30 Are you really sure to perform that ? Specify 'CONFIRME' as second argument if so.
+31 Someone is actually logged in with this username.
+32 %s just tryed to log in with your account with the correct password. Use '%s PASS' to change it.
+33 Change done.
+34 Unknown option: %s
+35 Warning: Nickname %s is registered, if it's yours, please log in via: /%s %s %s <your password>
+36 Nickname %s is now available.
+37  Last login %s ago. (%s)
+38 Available languages: (first is default one)
+39 I will now send my replies in english!
+40 %s is not an available language.
+41 This account will be destroyed unless you log in within the next %s.
+42 You must be op in %s to register it.
+43 Channel %s is now registered and belongs to you.
+44 Channel %s has been unregistered.
+45 You are already the owner of %s.
+46 Channel description can't be shorter than 12 chars.
+47 You can't unregister a channel unless you are its owner!
+48 This level is not valid.
+49 %s is not in %s.
+50 Level must be lower than yours.
+51 Username %s's mail is not %s.
+52 %s is already your email.
+53 %s does not have an access to %s.
+54 You don't have access to %s.
+55 The level of %s's access is greater than yours.
+56 Argument must be ON or OFF.
+57 Option %s has been enabled for %s.
+58 Option %s has been disabled for %s.
+59 No matching ban on %s.
+60 Ban %s on %s removed.
+61 Your level is too low to remove %s (%d)
+62 %s is not a valid command.
+63 LOCKTOPIC is enabled on %s.
+64 Please provide an infoline or keyword 'none' to remove it.
+65 Default modes on %s are now: %s.
+66 Welcome message on %s is now: %s.
+67 Message of the day on %s is now: %s.
+68 Default topic on %s is now: %s.
+69 Description of %s is now: %s.
+70 URL of %s is now: %s.
+71 Banlevel on %s is now %d
+72 Changemodeslevel on %s is now %d
+73 Bantime on %s is now %lu seconds (%s)
+74 Default ban type on %s is now: %s. (%d)
+75 Autolimit is enabled on %s (Min: %u Inc: %u).
+76 Removing performed for %s.
+77 %s is not authed.
+78 %s's level is now %d on %s.
+79 %s's infoline is now: %s
+80 List is empty.
+81 Incorrect duration, valid format is %%<XjXhXm> X is the number of corresponding units.
+82 Banlevel is %d on %s.
+83 NOBANS is enabled on %s.
+84 A total of %d ban%s removed on %s.
+85 A total of %d ban%s on %s.
+86 %s is already covered by %s (%d).
+87 Owner           : %s (Founded on %s)
+88 Description     : %s
+89 Default modes   : %s
+90 Default topic   : %s
+91 Motd            : %s
+92 Chan URL        : %s
+93 Banlevel        : %d    Bantype       : %s
+94 ChModesLevel    : %d    Bantime       : %s
+95 Welcome         : %s
+96 Actual topic    : %s
+97 Actual modes    : %s
+98 Options         : %s
+99 Ban mask %s Level: %d BanID: %d
+100 Added by %s (%s)
+101 Set on %s, expire on %s
+102 %s is the chan's owner.
+103 A total of %d matche%s found.
+104 ChangeModesLevel is at %d.
+105 You can't change the chan mode '%c'
+106 You have already offered access to %s.
+107 %s already has access on %s.
+108 %s is refusing all access propositions automatically.
+109 %s has now an access of level %d on %s.
+110 You proposed an access to %s on %s. He will be notified and asked to accept or refuse it.
+111 %s just gave you an access of level %d on %s.
+112 %s just proposed you an access of level %d on %s.
+113 You can accept it with /%s %s ACCEPT %s, or refuse with: /%s %s REFUSE %s
+114 %s is already on %s.
+115 %s is banned from %s, I cannot invite him.
+116 Due to abuse, it is not possible any more to invite others users than you.
+117 Channel's length is limited to %d characters.
+118 You can't register %s for the following reason: %s
+119 Your nick is already %s.
+120 %s just used recover, You are not identified anymore.
+121 You don't have an access proposition for %s.
+122 You have now an access on %s.
+123 Access proposition for %s has been refused.
+124 You are %s's owner, you can't drop this access without unregistering the channel.
+125 Please change your nickname or you will be disconnected within %d seconds.
+126 Please change your nickname within %d seconds or I will change it.
+127 Your access on %s is suspended.
+128 Your access level on %s is too low to perform this command. (You: %d Command: %d)
+129 All access proposition will now be discarded. (Current ones have been deleted)
+130 All access proposition will now be automatically accepted. (Current ones have been accepted)
+131 You will now be asked to choose wether you want to accept or refuse an access with /%s %s ACCEPT|REFUSE #channel.
+132 User Commands
+133 Channel Administration Commands
+134 Channel Commands
+135 Type /%s %s <command> to get more help about a command.
+136 You can get further help on %s
+137 Matching Access on %s:
+138 Username: %s Level: %d
+139 Last seen: %s
+140 Last seen: currently on channel
+141 A total of %d memos (Type /%s %s ERASE ALL to delete them)
+142 A total of %d memos.
+143 End of memo n°%d (Type /%s %s ERASE %d to delete it)
+144 You don't have any memo.
+145 You don't have any new memo.
+146 You don't have a memo n°%d.
+147 %d memos have been deleted.
+148 Your memo n°%d has been deleted.
+149 You can't send memo to yourself.
+150 %s doesn't accept any memo.
+151 Memos are limited to %d characters long.
+152 You can't send anymore memo to %s (limited to %d)
+153 Memo sent to %s.
+154 Memo from %s@%s: %s
+155 Welcome on %s - %s
+156 You need to be a Services Administrator to use this command.
+157 You have %d un-read memo%s. Use /%s %s READ <ALL|memo #index> to read them.
+158 No Channel Service Administrator currently available.
+159 Currently available Channel Services Administrators are:
+160 Type /%s %s %s for further help.
+161 Last login of %s %s ago (%s)
+162 Services are Up for %s.
+163 Help about command %s >> %s (%s Level %d)
+164 Help about command %s (%s Level %d)
+165 Please DO NOT flood me! You are now ignored.
+166 [%d/%d] Too many matches found, please precise your query.
+167 Sunday
+168 Monday
+169 Thursday
+170 Wednesday
+171 Tuesday
+172 Friday
+173 Saturday
+174 Anyone taking your nick will be renamed within %d seconds.
+175 Anyone taking your nick will be killed within %d seconds.
+176 Your nickname is no longer protected.
+177 The %s command requires personal informations. Please use /%s %s %s.
+178 Please provide your new pass twice to avoid typos.
+179 The two provided passwords mismatch. Please check for typo.
+180  Waiting for confirmation, registering %s ago.
+181 Channel %s is currently empty.
+182 You already have %d memos from %s stored, please delete some of them to be able to receive some more.
+183 Manager being away for too long, this channel will be purged on %s, contact an administrator
+184 Username %s WAS suspended by %s
+185  Can't register a channel until %s.
+186 You just log out from username %s.
+187 Welcome on CoderZ Services, you can get commands' listing by typing /%s %s

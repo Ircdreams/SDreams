@@ -1,0 +1,76 @@
+diff -ruN scoderz/include/structs.h scoderz-reflex/include/structs.h
+--- scoderz/include/structs.h	2008-01-05 19:34:13.000000000 +0100
++++ scoderz-reflex/include/structs.h	2008-02-04 23:46:24.000000000 +0100
+@@ -297,19 +297,20 @@
+ 	char url[URLLEN + 1];
+ 	char *motd;
+ 	int flag;
+-#define C_SETWELCOME	0x0001
++#define C_SETWELCOME		0x0001
+ #define C_JOINED		0x0002
+ #define C_STRICTOP		0x0004
+ #define C_LOCKTOPIC		0x0008
+ #define C_NOBANS		0x0010
+ #define C_WARNED		0x0020
+ #define C_NOOPS			0x0040
+-#define C_AUTOINVITE 	0x0080
+-#define C_ALREADYRENAME 0x0100
++#define C_AUTOINVITE 		0x0080
++#define C_ALREADYRENAME 	0x0100
+ #define C_FLIMIT 		0x0200
+ #define C_NOINFO 		0x0400
+ #define C_NOVOICES 		0x0800
+ #define C_SUSPEND 		0x1000
++#define C_AVOICE 		0x2000
+ 
+ 	int banlevel;
+ 	int cml;
+diff -ruN scoderz/src/add_info.c scoderz-reflex/src/add_info.c
+--- scoderz/src/add_info.c	2007-12-16 21:48:15.000000000 +0100
++++ scoderz-reflex/src/add_info.c	2008-02-04 23:51:19.000000000 +0100
+@@ -223,6 +223,12 @@
+ 	if(CSetWelcome(c) && *c->welcome) /* send welcome if needed */
+ 		csreply(nick, GetReply(nick, L_WELCOMEJOIN), c->chan, c->welcome);
+ 
++	if(c->flag & C_AVOICE && !CNoVoices(c))
++	{
++		csmode(c, MODE_OBV, "+v $", nick->numeric);
++		DoVoice(join);
++	}
++
+ 	if(!a) /* he has no access, and it's outside a burst */
+ 	{	/* if he had created this channel because I wasn't in, he doesn't deserve its +o */
+ 		if(status & J_OP) csmode(c, MODE_OBV, "-o $", nick->numeric);
+diff -ruN scoderz/src/chaninfo.c scoderz-reflex/src/chaninfo.c
+--- scoderz/src/chaninfo.c	2008-01-04 14:21:34.000000000 +0100
++++ scoderz-reflex/src/chaninfo.c	2008-02-04 23:47:55.000000000 +0100
+@@ -35,7 +35,7 @@
+ 
+ static char *GetChanOptions(aChan *chan)
+ {
+-	static char coptions[10+6+9+7+9+8+11+7+7+8+14+20+1];
++	static char coptions[10+6+9+7+9+8+11+7+7+8+9+14+20+1];
+ 	int i = 0;
+ 	coptions[0] = 0;
+ 
+@@ -49,6 +49,7 @@
+ 	if(CWarned(chan)) strcpy(coptions + i, " warned"), i += 7;
+ 	if(CNoInfo(chan)) strcpy(coptions + i, " noinfo"), i += 7;
+ 	if(chan->flag & C_ALREADYRENAME) strcpy(coptions + i, " renommé"), i += 8;
++	if(chan->flag & C_AVOICE) strcpy(coptions + i, " autovoice"), i += 9;
+ 	if(CFLimit(chan)) mysnprintf(coptions + i, sizeof coptions - i, " auto-limit(%u,%u)",
+ 						chan->limit_inc, chan->limit_min);
+ 	if(coptions[0] == 0) strcpy(coptions, " Aucune");
+diff -ruN scoderz/src/chanopt.c scoderz-reflex/src/chanopt.c
+--- scoderz/src/chanopt.c	2007-11-17 17:57:16.000000000 +0100
++++ scoderz-reflex/src/chanopt.c	2008-02-04 23:48:38.000000000 +0100
+@@ -182,6 +182,9 @@
+ 	else if(!strcasecmp(cmd, "noinfo"))
+ 		switch_option(nick, parc < 3 ? NULL : parv[3], cmd, c, &chan->flag, C_NOINFO);
+ 
++        else if(!strcasecmp(cmd, "autovoice"))
++                switch_option(nick, parc < 3 ? NULL : parv[3], cmd, c, &chan->flag, C_AVOICE);
++
+ 	else if(!strcasecmp(cmd, "chmodeslevel"))
+ 	{
+ 		int l = ChanLevelbyUserI(nick->user, chan);

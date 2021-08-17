@@ -1,0 +1,536 @@
+# src/Makefile.in
+
+# Copyright (C) 2002-2007 David Cortier  <Cesar@ircube.org>
+#                         Romain Bignon  <Progs@coderz.info>
+#                         Benjamin Beret <kouak@kouak.org>
+#
+#  site web: http://sf.net/projects/scoderz/
+# 
+# Services pour serveur IRC. Supporté sur IRCoderz
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# $Id: Makefile.in,v 1.23 2007/01/02 19:44:30 romexzf Exp $
+
+
+SHELL = @SHELL@
+
+srcdir = @srcdir@
+top_srcdir = @top_srcdir@
+VPATH = @srcdir@
+prefix = @prefix@
+exec_prefix = @prefix@
+
+bindir = @prefix@
+
+DESTDIR =
+
+INSTALL_RULE = @INSTALL_RULE@
+SYMLINK = @SYMLINK@
+
+top_builddir = ..
+
+ACLOCAL = @ACLOCAL@
+AUTOCONF = @AUTOCONF@
+AUTOMAKE = @AUTOMAKE@
+AUTOHEADER = @AUTOHEADER@
+
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+
+NORMAL_INSTALL = :
+PRE_INSTALL = :
+POST_INSTALL = :
+NORMAL_UNINSTALL = :
+PRE_UNINSTALL = :
+POST_UNINSTALL = :
+host_alias = @host_alias@
+host_triplet = @host@
+AWK = @AWK@
+LN_S = @LN_S@
+RM = @RMPROG@
+CC = @CC@
+HAVE_LIB = @HAVE_LIB@
+LIB = @LIB@
+LTLIB = @LTLIB@
+MAKEINFO = @MAKEINFO@
+PACKAGE = @PACKAGE@
+VERSION = @VERSION@
+
+scoderz_PROGRAMS = services
+bin_PROGRAMS = $(scoderz_PROGRAMS)
+convertdb_PROGRAMS = convertdb
+
+INCLUDES = -I../include
+INCLUDES_DIR = ../include
+DEFS = -I$(srcdir)
+scoderz_SOURCES = main.c mystring.c outils.c cs_cmds.c serveur.c fichiers.c add_info.c del_info.c mylog.c \
+		 config.c lang.c mkpasswd.c showcommands.c checksum.c memoserv.c nickserv.c \
+		 sql_log.c hash.c hash_chan.c socket.c hash_cmd.c hash_user.c hash_nick.c data.c dnr.c \
+		 divers.c aide.c admin_cmds.c admin_manage.c admin_user.c admin_chan.c \
+		 cs_register.c chanserv.c match.c welcome.c opdeop.c moduser.c chanopt.c \
+		 chaninfo.c userinfo.c debug.c ban.c template.c timers.c flood.c track.c vote.c \
+ 		 web2cs-engine.c web2cs-commands.c
+convertdb_SOURCES = convertdb.c mystring.c
+
+mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
+CONFIG_HEADER = ../config.h
+CONFIG_CLEAN_FILES =
+PROGRAMS = $(bin_PROGRAMS) $(convertdb_PROGRAMS)
+
+dbdir = ${prefix}/`sed -n 's/^\#define DBDIR \"\(.*\)\"/\1/p' < ${CONFIG_HEADER} `
+
+CPPFLAGS = @CPPFLAGS@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+CFLAGS = @CFLAGS@
+scoderz_OBJECTS = ${scoderz_SOURCES:%.c=%.o}
+scoderz_LDADD = $(LDADD)
+scoderz_LDFLAGS =
+convertdb_OBJECTS = ${convertdb_SOURCES:%.c=%.o}
+convertdb_LDADD = $(LDADD)
+convertdb_LDFLAGS =
+COMPILE = $(CC) $(CPPFLAGS) $(CFLAGS) $(DEFS) $(INCLUDES)
+CCLD = $(CC)
+LINK = $(CCLD) $(CFLAGS) $(LDFLAGS) -o $@
+DIST_COMMON =  Makefile.in
+
+
+DISTFILES = $(DIST_COMMON) $(SOURCES) $(HEADERS) $(TEXINFOS) $(EXTRA_DIST)
+
+TAR = tar
+GZIP_ENV = --best
+SOURCES = $(scoderz_SOURCES)
+OBJECTS = $(scoderz_OBJECTS)
+
+.SUFFIXES:
+.SUFFIXES: .S .c .o .s
+#$(srcdir)/Makefile.in: $(top_srcdir)/configure.ac $(ACLOCAL_M4)
+#	cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile
+
+Makefile: $(srcdir)/Makefile.in  $(top_builddir)/config.status $(BUILT_SOURCES)
+	cd $(top_builddir) \
+	  && CONFIG_FILES=$(subdir)/$@ CONFIG_HEADERS= $(SHELL) ./config.status
+
+
+install-with-symlink: $(PROGRAMS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(bindir) $(dbdir) $(prefix)/logs
+
+	@echo `date +%Y%m%d%H%M` > /tmp/scoderz.tag;
+	@echo "Installing new services as ${prefix}/scoderz.`cat /tmp/scoderz.tag` :"
+	${INSTALL_PROGRAM} $(scoderz_PROGRAMS) ${prefix}/scoderz.`cat /tmp/scoderz.tag`
+	@( cd ${prefix}; \
+	  ${RM} -f ${SYMLINK}; \
+	  ${LN_S} scoderz.`cat /tmp/scoderz.tag` ${SYMLINK}; )
+	@${RM} /tmp/scoderz.tag
+
+	-cp -r ../aide $(DESTDIR)$(prefix)
+	-cp -r ../lang $(DESTDIR)$(prefix)
+	-${INSTALL_PROGRAM} -m 600 ../exemple.conf ${bindir}
+
+install-no-symlink: $(PROGRAMS)
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(bindir) $(dbdir) $(prefix)/logs
+	@list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    echo "  $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/$$p"; \
+	     $(INSTALL_PROGRAM) $$p $(DESTDIR)$(bindir)/$$p; \
+	  else :; fi; \
+	done
+	-cp -r ../aide $(DESTDIR)$(prefix)
+	-cp -r ../lang $(DESTDIR)$(prefix)
+	-${INSTALL_PROGRAM} -m 600 ../exemple.conf ${bindir}
+
+uninstall-binPROGRAMS:
+	@$(NORMAL_UNINSTALL)
+	list='$(bin_PROGRAMS)'; for p in $$list; do \
+	  rm -f $(DESTDIR)$(bindir)/$$p; \
+	done
+
+.s.o:
+	$(COMPILE) -c $<
+
+.S.o:
+	$(COMPILE) -c $<
+
+convertdb: $(convertdb_OBJECTS)
+	@rm -f convertdb ../bin/convertdb
+	$(LINK) $(convertdb_LDFLAGS) $(convertdb_OBJECTS) $(convertdb_LDADD) $(LIBS)
+	ln -s ../src/convertdb ../bin/convertdb
+
+services: $(scoderz_OBJECTS)
+	@rm -f services
+	$(LINK) $(scoderz_LDFLAGS) $(scoderz_OBJECTS) $(scoderz_LDADD) $(LIBS)
+
+tags: TAGS
+
+ID: $(HEADERS) $(SOURCES) $(LISP)
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	here=`pwd` && cd $(srcdir) \
+	  && mkid -f$$here/ID $$unique $(LISP)
+
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) $(LISP)
+	tags=; \
+	here=`pwd`; \
+	list='$(SOURCES) $(HEADERS)'; \
+	unique=`for i in $$list; do echo $$i; done | \
+	  awk '    { files[$$0] = 1; } \
+	       END { for (i in files) print i; }'`; \
+	test -z "$(ETAGS_ARGS)$$unique$(LISP)$$tags" \
+	  || (cd $(srcdir) && etags -o $$here/TAGS $(ETAGS_ARGS) $$tags  $$unique $(LISP))
+
+distdir = $(top_builddir)/$(PACKAGE)-$(VERSION)/$(subdir)
+
+subdir = src
+
+distdir: $(DISTFILES)
+	here=`cd $(top_builddir) && pwd`; \
+	top_distdir=`cd $(top_distdir) && pwd`; \
+	distdir=`cd $(distdir) && pwd`; \
+	cd $(top_srcdir) \
+	  && $(AUTOMAKE) --include-deps --build-dir=$$here --srcdir-name=$(top_srcdir) --output-dir=$$top_distdir --gnu src/Makefile
+	@for file in $(DISTFILES); do \
+	  d=$(srcdir); \
+	  if test -d $$d/$$file; then \
+	    cp -pr $$d/$$file $(distdir)/$$file; \
+	  else \
+	    test -f $(distdir)/$$file \
+	    || ln $$d/$$file $(distdir)/$$file 2> /dev/null \
+	    || cp -p $$d/$$file $(distdir)/$$file || :; \
+	  fi; \
+	done
+
+DEPS_MAGIC := $(shell mkdir .deps > /dev/null 2>&1 || :)
+
+%.o: %.c
+	@echo '$(COMPILE) -c $<'; \
+	$(COMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-cp .deps/$(*F).pp .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm .deps/$(*F).pp
+
+%.lo: %.c
+	@echo '$(LTCOMPILE) -c $<'; \
+	$(LTCOMPILE) -Wp,-MD,.deps/$(*F).pp -c $<
+	@-sed -e 's/^\([^:]*\)\.o[ 	]*:/\1.lo \1.o :/' \
+	  < .deps/$(*F).pp > .deps/$(*F).P; \
+	tr ' ' '\012' < .deps/$(*F).pp \
+	  | sed -e 's/^\\$$//' -e '/^$$/ d' -e '/:$$/ d' -e 's/$$/ :/' \
+	    >> .deps/$(*F).P; \
+	rm -f .deps/$(*F).pp
+
+check: all
+
+install-exec: ${INSTALL_RULE}
+
+install: all
+	@$(MAKE) $(AM_MAKEFLAGS) install-exec
+
+uninstall: uninstall-binPROGRAMS
+
+all: Makefile $(PROGRAMS)
+	@if ! test -f ../bin/$(convertdb_PROGRAMS); then \
+		ln -s ../src/convertdb ../bin/convertdb; \
+	fi;
+
+install-strip:
+	$(MAKE) $(AM_MAKEFLAGS) AM_INSTALL_PROGRAM_FLAGS=-s install
+installdirs:
+	$(mkinstalldirs)  $(DESTDIR)$(bindir)
+
+
+mostlyclean:
+	-rm -f *.o core *.core
+	-rm -f ../include/version.h
+
+
+clean:	mostlyclean
+	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
+
+distclean:	clean
+	-rm -f *.tab.c
+	-rm -f TAGS ID
+	-rm -rf .deps
+	-rm -f Makefile $(CONFIG_CLEAN_FILES)
+	-rm -f config.cache config.log stamp-h stamp-h[0-9]*
+	-rm -f .#* *~
+	-rm -f ../include/#* ../include/*~
+
+maintainer-clean:  distclean
+	@echo "This command is intended for maintainers to use;"
+	@echo "it deletes files that may require special tools to rebuild."
+
+.PHONY: install-with-symlink install-no-symlink uninstall-binPROGRAMS \
+tags distdir check all install uninstall install-strip installdirs \
+mostlyclean clean distclean maintainer-clean
+
+# ${scoderz_OBJECTS}: ../config.h
+
+add_info.o: add_info.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/debug.h ../include/outils.h ../config.h ../include/hash.h \
+  ../include/ban.h ../include/add_info.h ../include/cs_cmds.h \
+  ../include/token.h ../include/serveur.h ../include/timers.h
+admin_chan.o: admin_chan.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/mylog.h ../include/cs_cmds.h \
+  ../include/token.h ../include/fichiers.h ../include/admin_chan.h \
+  ../include/add_info.h ../include/del_info.h ../include/hash.h \
+  ../include/cs_register.h ../include/data.h ../include/sql_log.h
+admin_cmds.o: admin_cmds.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/cs_cmds.h ../include/token.h \
+  ../include/fichiers.h ../include/add_info.h ../include/aide.h \
+  ../include/showcommands.h ../include/hash.h ../config.h \
+  ../include/template.h ../include/timers.h ../include/sql_log.h \
+  ../include/welcome.h
+admin_manage.o: admin_manage.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/add_info.h ../include/outils.h ../include/cs_cmds.h \
+  ../include/token.h ../include/hash.h ../include/track.h
+admin_user.o: admin_user.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/hash.h ../include/cs_cmds.h \
+  ../include/token.h ../include/fichiers.h ../include/divers.h \
+  ../include/crypt.h ../include/userinfo.h ../include/sql_log.h \
+  ../include/admin_user.h ../include/data.h
+aide.o: aide.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/cs_cmds.h ../include/token.h ../include/outils.h \
+  ../include/debug.h ../include/mylog.h ../include/hash.h \
+  ../include/showcommands.h
+ban.o: ban.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/ban.h ../include/outils.h ../include/hash.h \
+  ../include/add_info.h ../include/del_info.h ../include/cs_cmds.h \
+  ../include/token.h ../config.h
+chaninfo.o: chaninfo.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/ban.h ../include/admin_chan.h \
+  ../include/cs_cmds.h ../include/token.h ../include/hash.h \
+  ../include/data.h
+chanopt.o: chanopt.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/cs_cmds.h ../include/token.h \
+  ../include/ban.h ../include/hash.h
+chanserv.o: chanserv.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/hash.h ../include/cs_cmds.h ../include/token.h \
+  ../include/outils.h ../include/chanserv.h ../config.h ../include/ban.h \
+  ../include/add_info.h ../include/del_info.h ../include/fichiers.h
+checksum.o: checksum.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/checksum.h
+config.o: config.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../config.h ../include/outils.h ../include/mylog.h ../include/web2cs.h
+convertdb.o: convertdb.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/hash.h ../include/fichiers.h
+cs_cmds.o: cs_cmds.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/cs_cmds.h ../include/token.h ../include/admin_manage.h \
+  ../include/outils.h ../include/mylog.h ../include/hash.h \
+  ../include/timers.h
+cs_register.o: cs_register.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/hash.h ../include/add_info.h ../include/fichiers.h \
+  ../include/outils.h ../include/cs_cmds.h ../include/token.h ../config.h \
+  ../include/crypt.h ../include/template.h ../include/data.h \
+  ../include/dnr.h ../include/sql_log.h
+data.o: data.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/timers.h ../include/debug.h \
+  ../include/cs_cmds.h ../include/token.h
+debug.o: debug.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/debug.h ../include/cs_cmds.h ../include/token.h \
+  ../include/outils.h
+del_info.o: del_info.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/del_info.h ../include/hash.h \
+  ../include/timers.h ../include/debug.h
+diff.o: diff.c
+divers.o: divers.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/version.h ../include/divers.h ../config.h \
+  ../include/outils.h ../include/hash.h ../include/mylog.h \
+  ../include/cs_cmds.h ../include/token.h ../include/admin_manage.h \
+  ../include/flood.h ../include/showcommands.h ../include/aide.h \
+  ../include/dnr.h ../include/timers.h ../include/template.h \
+  ../include/socket.h ../include/sql_log.h
+dnr.o: dnr.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/mystring.h ../include/mylog.h \
+  ../include/cs_cmds.h ../include/token.h ../include/debug.h \
+  ../include/dnr.h
+fichiers.o: fichiers.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/fichiers.h ../include/outils.h ../config.h ../include/hash.h \
+  ../include/debug.h ../include/dnr.h ../include/mylog.h \
+  ../include/cs_cmds.h ../include/token.h ../include/add_info.h \
+  ../include/data.h ../include/vote.h ../include/welcome.h
+flood.o: flood.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/cs_cmds.h ../include/token.h ../config.h ../include/timers.h \
+  ../include/hash.h ../include/outils.h ../include/flood.h \
+  ../include/debug.h
+hash.o: hash.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/hash.h
+hash_chan.o: hash_chan.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/hash.h ../include/outils.h ../include/mylog.h \
+  ../include/debug.h ../include/del_info.h ../include/cs_cmds.h \
+  ../include/token.h ../include/fichiers.h ../include/timers.h \
+  ../config.h ../include/data.h ../include/sql_log.h
+hash_cmd.o: hash_cmd.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/debug.h ../include/hash.h
+hash_nick.o: hash_nick.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/admin_manage.h ../include/hash.h \
+  ../include/del_info.h ../include/debug.h ../include/cs_cmds.h \
+  ../include/token.h ../include/track.h ../include/checksum.h
+hash_user.o: hash_user.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/hash.h ../include/debug.h ../include/outils.h \
+  ../include/mylog.h ../include/fichiers.h ../include/del_info.h \
+  ../include/cs_cmds.h ../include/token.h ../include/timers.h \
+  ../include/data.h ../include/track.h ../include/sql_log.h
+lang.o: lang.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/debug.h
+main.o: main.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../config.h ../include/mylog.h ../include/hash.h ../include/outils.h \
+  ../include/serveur.h ../include/fichiers.h ../include/chanserv.h \
+  ../include/admin_user.h ../include/nickserv.h ../include/admin_cmds.h \
+  ../include/admin_chan.h ../include/admin_manage.h ../include/divers.h \
+  ../include/moduser.h ../include/chanopt.h ../include/opdeop.h \
+  ../include/chaninfo.h ../include/showcommands.h ../include/aide.h \
+  ../include/cs_register.h ../include/cs_cmds.h ../include/token.h \
+  ../include/timers.h ../include/socket.h ../include/ban.h \
+  ../include/dnr.h ../include/flood.h ../include/template.h \
+  ../include/version.h ../include/track.h ../include/vote.h \
+  ../include/memoserv.h ../include/welcome.h ../include/web2cs.h \
+  ../include/sql_log.h
+match.o: match.c
+memoserv.o: memoserv.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/hash.h ../include/outils.h ../include/cs_cmds.h \
+  ../include/token.h ../include/add_info.h ../include/memoserv.h
+mkpasswd.o: mkpasswd.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/crypt.h ../include/checksum.h ../include/debug.h
+moduser.o: moduser.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/cs_cmds.h ../include/token.h \
+  ../include/hash.h
+mylog.o: mylog.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../config.h ../include/outils.h ../include/debug.h ../include/mylog.h \
+  ../include/cs_cmds.h ../include/token.h ../include/mystring.h
+mystring.o: mystring.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/debug.h
+nickserv.o: nickserv.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/hash.h ../include/userinfo.h ../include/admin_manage.h \
+  ../include/chanserv.h ../include/outils.h ../include/mylog.h \
+  ../include/cs_cmds.h ../include/token.h ../include/add_info.h \
+  ../include/del_info.h ../config.h ../include/fichiers.h \
+  ../include/aide.h ../include/data.h ../include/dnr.h ../include/vote.h \
+  ../include/memoserv.h ../include/track.h ../include/sql_log.h \
+  ../include/nickserv.h ../include/crypt.h ../include/template.h
+opdeop.o: opdeop.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/opdeop.h ../include/cs_cmds.h ../include/token.h \
+  ../include/hash.h
+outils.o: outils.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/cs_cmds.h ../include/token.h ../include/admin_manage.h \
+  ../include/hash.h ../include/outils.h
+serveur.o: serveur.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/serveur.h ../include/add_info.h \
+  ../include/admin_manage.h ../include/hash.h ../include/flood.h \
+  ../include/cs_cmds.h ../include/token.h ../config.h \
+  ../include/del_info.h ../include/debug.h ../include/mylog.h \
+  ../include/aide.h ../include/timers.h ../include/memoserv.h \
+  ../include/welcome.h ../include/track.h ../include/sql_log.h
+showcommands.o: showcommands.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/cs_cmds.h ../include/token.h \
+  ../include/showcommands.h ../include/hash.h
+socket.o: socket.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/serveur.h ../include/socket.h \
+  ../include/hash.h ../include/mylog.h ../include/cs_cmds.h \
+  ../include/token.h ../include/add_info.h ../include/timers.h \
+  ../include/web2cs.h
+sql_log.o: sql_log.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/sql_log.h ../include/mylog.h ../include/cs_cmds.h \
+  ../include/token.h ../include/timers.h
+template.o: template.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/lang.h ../include/debug.h ../config.h
+timers.o: timers.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../config.h ../include/outils.h ../include/hash.h ../include/del_info.h \
+  ../include/fichiers.h ../include/cs_cmds.h ../include/token.h \
+  ../include/debug.h ../include/timers.h ../include/mylog.h
+track.o: track.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/timers.h ../include/track.h ../include/cs_cmds.h \
+  ../include/token.h ../include/hash.h ../include/outils.h \
+  ../include/debug.h
+userinfo.o: userinfo.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/outils.h ../include/cs_cmds.h ../include/token.h \
+  ../include/data.h ../include/vote.h
+vote.o: vote.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/vote.h ../include/cs_cmds.h ../include/token.h \
+  ../include/fichiers.h ../include/mylog.h ../include/hash.h \
+  ../include/outils.h ../include/timers.h
+web2cs-commands.o: web2cs-commands.c ../include/main.h \
+  ../include/mystring.h ../include/../config.h ../include/lang.h \
+  ../include/structs.h ../include/web2cs-engine.h ../include/hash.h \
+  ../include/outils.h ../include/cs_cmds.h ../include/token.h \
+  ../include/del_info.h ../include/add_info.h ../include/sql_log.h \
+  ../include/crypt.h ../include/dnr.h ../include/memoserv.h \
+  ../include/data.h ../include/mylog.h
+web2cs-engine.o: web2cs-engine.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/web2cs.h ../include/web2cs-engine.h \
+  ../include/web2cs-commands.h ../include/socket.h ../include/mylog.h
+welcome.o: welcome.c ../include/main.h ../include/mystring.h \
+  ../include/../config.h ../include/lang.h ../include/structs.h \
+  ../include/cs_cmds.h ../include/token.h ../include/debug.h \
+  ../include/mylog.h ../config.h ../include/outils.h ../include/welcome.h
+
+# Tell versions [3.59,3.63) of GNU make to not export all variables.
+# Otherwise a system limit (for SysV at least) may be exceeded.
+.NOEXPORT:

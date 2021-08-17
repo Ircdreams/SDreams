@@ -1,0 +1,119 @@
+ $Id: README,v 1.3 2003/12/13 00:32:41 romexzf Exp $
+			-- [ -> SCODERZ <- ] --
+					version 1.1.8
+		--< BIN DIR >--
+
+Ce repertoire contient des scripts et outils vous permettant de mieux gérer SCoderZ au niveau du shell.
+
+Sommaire:
+1) save
+2) crontab
+3) sqlpurge
+4) check
+5) conclusion
+
+1) save
+=======
+	Ce script vous permet de faire des sauvegardes de votre base de données, de vos fichiers logs
+	et de votre configuration actuelle. Le script va créer un fichier nommé
+	save_<n°jour|n°mois|n°année>_<heure|minute|seconde>.tgz.
+	Par exemple :
+	'save_120303_203615.tgz'  pour le 12 mars 2003 à 20:36:15
+
+	Pour executer le script:
+	$ ./save
+
+	Le fichier save_*.tgz se retrouvera dans le répertoire sauvegardes.
+	Pour restaurer une configuration, tapez dans cette racine:
+	$ tar xfz sauvegardes/save_<njour|nmois|nannée>_<heure|minutes|secondes>.tgz
+	Par exemple:
+	$ tar xfz sauvegardes/save_120303_203615.tgz
+
+	Si vous voulez faire des sauvegardes automatiques, vous pouvez vous servire de crontab. Tapez:
+	$ crontab -e
+	ATTENTION: crontab peut avoir un autre nom. Si le shell vous renvoit que le programme n'existe pas
+	consultez votre administrateur.
+
+	Cela lancera l'éditeur vi. Tapez 'i' pour éditer et entrez ceci:
+	<minutes> <heures> <jour> <mois> <année> <chemin vers scoderz>/bin/save <chemin vers scoderz>
+
+	Par exemple:
+	* 0-24 * * * /home/rom1/scoderz/bin/save /home/rom1/scoderz
+	  Pour sauvegarder toutes les heures.
+	* * * * * /home/rom1/scoderz/bin/save /home/rom1/scoderz
+	  Pour sauvegarder toutes les minutes.
+	* 2 * * * /home/rom1/scoderz/bin/save /home/rom1/scoderz
+	  Pour sauvegarder tous les jours à 2 heures du matin
+	* * 1-31 * * /home/rom1/scoderz/bin/save /home/rom1/scoderz
+	  Pour sauvegarder tous les jours
+
+2) crontab
+==========
+	Une crontab est une table qui est executée à des moments définis. Nous allons nous en servir
+	ici pour relancer SCoderZ au cas où il planterait.
+	Vous devez d'abord taper :
+	$ crontab -e
+	ATTENTION: crontab peut avoir un autre nom. Si le shell vous renvoit que le programme n'existe pas
+	consultez votre administrateur.
+
+	Cela lancera l'éditeur vi. Tapez i pour éditer et entrez ceci:
+	<minutes> <heures> <jour> <mois> <année> <chemin vers scoderz>/bin/crontab <chemin vers scoderz>
+
+	Par exemple:
+	* 0-24 * * * /home/rom1/scoderz/bin/crontab /home/rom1/scoderz
+	  Pour vérifier le script toutes les heures.
+	0-59 * * * * /home/rom1/scoderz/bin/crontab /home/rom1/scoderz
+	  Pour vérifier le script toutes les minutes.
+	* 2 * * * /home/rom1/scoderz/bin/crontab /home/rom1/scoderz
+	  Pour vérifier tous les jours à 2 heures du matin
+	* * 1-31 * * /home/rom1/scoderz/bin/crontab /home/rom1/scoderz
+	  Pour vérifier tous les jours
+
+	Maintenant lorsque votre SCoderZ plantera, il se relancera automatiquement quand la crontab lancera
+	le script qui vérifie que SCoderZ est effectivement lancé.
+
+	NOTE: Lors d'un DIE, la crontab ne relancera pas automatiquement. Ceci ne marche que lors d'un
+	plantage (pour ne pas avoir à redie à chaque foi qu'il se relance par crontab ou à desactiver
+	la crontab)
+
+3) sqlpurge
+===========
+	Ce petit programme (compilable par 'make' ou 'make sqlpurge') vous permet de lister
+	et/ou supprimer les entrées du LOG SQL correspondant à des salons/usernames supprimés.
+	
+	Syntaxe:
+	./sqlpurge -h localhost -d ircdb -u irc [-p 3306] [-f /home/someuser/scoderz/database/chans.db] [-r]
+	
+	-h	host du serveur MySQL
+	-d 	Base de donnée MySQL
+	-u 	Username MySQL
+	-p 	Port du serveur MySQL (Optionnel: 3306 par défaut)
+	-f 	Path vers la base de données SCoderZ (Optionnel: ./database/chans.db par défaut)
+	-r 	Execute en plus les query MySQL pour supprimer les vieilles entrées trouvées
+
+	Le mot de pass de la DB MySQL vous sera demandé.
+
+4) check
+========
+	Ce petit programme (compilable par 'make' ou 'make check') vous permet de lister
+	et/ou supprimer les fichiers de la base de données correspondant à des salons/usernames supprimés.
+	(ne devrait pas arriver)
+	
+	Syntaxe:
+	./check [-f /home/someuser/scoderz/database/] [-r]
+	
+	-f 	Path vers la base de données SCoderZ (Optionnel: ./database/ par défaut)
+	-r 	Supprime les vieux fichiers trouvés (Optionnel)
+	
+5) conclusion
+=============
+	Si vous avez des problèmes ou des questions par rapport à ces petits scripts n'hesitez pas.
+
+	-Progs <Progs@Inter-System.Net>, programmeur de CoderZ (Inter System)
+						 et chef du projet ircoderz
+	&
+	-Cesar <Cesar@irc.jeux.fr>, chef de projet SCoderZ
+
+	ou #CoderZ sur irc.jeux.fr
+
+	

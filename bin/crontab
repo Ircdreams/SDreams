@@ -1,0 +1,24 @@
+#!/bin/sh
+# Ce script permet le relancement de scoderz lors d'un plantage. Si c'est un die, il ne relance pas
+#
+# $Id: crontab,v 1.1 2003/03/13 16:36:51 progs Exp $
+#
+
+if test ! "$1" ; then
+  cd ..;
+else
+  if [ -d "$1" ]; then
+    cd $1;
+  else
+    echo "Le répertoire $1 n'exite pas";
+    exit 0;
+  fi
+fi
+
+if [ -f scoderz.pid ] && ! ps -p `cat scoderz.pid` >/dev/null 2>&1
+then
+    if [ -f logs/err.log ]; then echo `date` - Redemarrage de SCoderZ par crontab >> logs/err.log; fi
+    rm scoderz.pid
+    sleep 5
+    ./services
+fi
