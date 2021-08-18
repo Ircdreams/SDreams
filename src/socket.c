@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@coderz.info>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -238,13 +239,6 @@ void init_bot(void)
 		cs.nick, LTS, cs.ident, cs.host, cs.mode, cs.num, cs.name);
 	add_nickinfo(cs.nick, cs.ident, cs.host, "B]AAAB", cs.num,
 		num2servinfo(bot.servnum), cs.name, LTS, cs.mode);
-
-#ifdef USE_WELCOMESERV
-	putserv("%s "TOKEN_NICK" %s 1 %T %s %s %s B]AAAB %s :%s", bot.servnum,
-		ws.nick, LTS, ws.ident, ws.host, ws.mode, ws.num, ws.name);
-	add_nickinfo(ws.nick, ws.ident, ws.host, "B]AAAB", ws.num,
-		num2servinfo(bot.servnum), ws.name, LTS, ws.mode);
-#endif
 }
 
 int run_bot(void)

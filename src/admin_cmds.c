@@ -53,9 +53,6 @@ int die(aNick *nick, aChan *chan, int parc, char **parv)
 	running = 0;
 
 	putserv("%s " TOKEN_QUIT " :%s", cs.num, r);
-#ifdef USE_WELCOMESERV
-	putserv("%s " TOKEN_QUIT " :%s", ws.num, r);
-#endif
 	putserv("%s " TOKEN_SQUIT " %s 0 :%s", bot.servnum, bot.server, r);
 	return 1;
 }
@@ -78,9 +75,6 @@ int restart_bot(aNick *nick, aChan *chan, int parc, char **parv)
 	ConfFlag |= CF_RESTART;
 
 	putserv("%s " TOKEN_QUIT " :%s [\2Restarting\2]", cs.num, r);
-#ifdef USE_WELCOMESERV
-	putserv("%s " TOKEN_QUIT " :%s [\2Restarting\2]", ws.num, r);
-#endif
 	putserv("%s "TOKEN_SQUIT" %s 0 :%s [\2RESTART\2]", bot.servnum, bot.server, r);
 	return 1;
 }

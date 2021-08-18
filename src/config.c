@@ -62,9 +62,6 @@ char cf_defraison[RAISONLEN + 1];
 #define conf_error2(fmt, a, b) printf("conf:%d tab %s, " fmt "\n", line, curtab->item, (a), (b))
 
 enum conf_id {CONF_UPLINK = 0, CONF_CSBOT, CONF_MYSERV, CONF_MISC, CONF_LANG, CONF_LOG,
-#	ifdef USE_WELCOMESERV
-			CONF_WSBOT,
-#	endif
 #	ifdef WEB2CS
 			CONF_W2C,
 #	endif
@@ -102,9 +99,6 @@ static struct conf_tab {
 	{"misc_conf", "configuration des diverses options (On The Fly!) des Services", CONF_MISC},
 	{"lang", "configuration du multilangage", CONF_LANG},
 	{"log", "configuration du système de log", CONF_LOG},
-#ifdef USE_WELCOMESERV
-	{"wsbot", "configuration des infos du Welcome Service", CONF_WSBOT},
-#endif
 #ifdef WEB2CS
 	{"web2cs", "configuration du web2cs", CONF_W2C},
 #endif
@@ -194,9 +188,6 @@ static int cf_validnum(struct conf_item *i, char *buf)
 	bot.servnum[2] = '\0';
 
     snprintf(cs.num, sizeof cs.num, "%s"NNICK"A", bot.servnum);
-#ifdef USE_WELCOMESERV
-    snprintf(ws.num, sizeof ws.num, "%s"NNICK"B", bot.servnum);
-#endif
 	return 1;
 }
 
@@ -306,18 +297,6 @@ struct conf_item conf_items[] = {
 	{CONF_LOG, CONF_TPRIV|CONF_READ, NULL, 0, "W2C_cmd", "", cf_log_handle},
 	{CONF_LOG, CONF_TPRIV|CONF_READ, NULL, 0, "W2C_raw", "", cf_log_handle},
 #	endif
-
-#ifdef USE_WELCOMESERV
-	/* Welcome Bot */
-	{CONF_WSBOT, CONF_TARRAY, CONF_MARRAY(ws.nick), "nick", "Pseudo du WS", cf_validnick},
-	{CONF_WSBOT, CONF_TARRAY, CONF_MARRAY(ws.ident), "ident", "Ident du WS", NULL},
-	{CONF_WSBOT, CONF_TARRAY, CONF_MARRAY(ws.host), "host", "Host du WS", NULL},
-	{CONF_WSBOT, CONF_TARRAY, CONF_MARRAY(ws.name), "realname", "Real Name du WS", NULL},
-	{CONF_WSBOT, CONF_TARRAY, CONF_MARRAY(ws.mode), "modes", "UserModes que doit porter"
-										"le WS à la connexion (+dk normalement)", NULL},
-	{CONF_WSBOT, CONF_TINT|CONF_TFLAG, &ConfFlag, CF_PRIVWELCOME, "privmsg",
-		"Permet de choisir si le welcome est envoyé en PRIVMSG (1) ou en NOTICE (0)", NULL},
-#endif
 
 #ifdef WEB2CS
 	/* Web2CS */

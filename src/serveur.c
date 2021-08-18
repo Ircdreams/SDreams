@@ -598,9 +598,6 @@ int m_whois(int parc, char **parv)
 	int remote = 0;
 
 	if(!strcasecmp(parv[2], cs.nick)) n = num2nickinfo(cs.num);
-#ifdef USE_WELCOMESERV
-	else if(!strcasecmp(parv[2], ws.nick)) n = num2nickinfo(ws.num);
-#endif
 	else n = getnickbynick(parv[2]), remote = 1;
 
 	if(!n) return 0;
@@ -655,19 +652,14 @@ int m_eob(int parc, char **parv)
 		int i = 0;
 
 		/* join log channel (with J_BURST flag, new_chan() will be called silently) */
-		add_join(num2nickinfo(cs.num), bot.pchan, J_OP|J_VOICE|J_BURST, CurrentTS, netchan);
+		add_join(num2nickinfo(cs.num), bot.pchan, J_OP|J_BURST, CurrentTS, netchan);
 		/* if channel was empty, first called failed */
 		if(!netchan) netchan = GetNChan(bot.pchan);
 
 		string2scmode(&netchan->modes, "mintrs", NULL, NULL);
-#ifdef USE_WELCOMESERV
-		add_join(num2nickinfo(ws.num), bot.pchan, J_OP|J_VOICE|J_BURST, CurrentTS, netchan);
-		putserv("%s "TOKEN_BURST" %s %T +mintrs %s:ov,%s", bot.servnum, bot.pchan,
-			netchan->timestamp, cs.num, ws.num);
-#else
-		putserv("%s "TOKEN_BURST" %s %T +mintrs %s:ov", bot.servnum, bot.pchan,
+		putserv("%s "TOKEN_BURST" %s %T +mintrs %s:o", bot.servnum, bot.pchan,
 			netchan->timestamp, cs.num);
-#endif
+
 		/* Now burst registered channels which does not exist on the net (+si ones) */
 		for(; i < CHANHASHSIZE; ++i) for(chan = chan_tab[i]; chan; chan = chan->next)
 		{

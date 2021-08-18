@@ -4,9 +4,10 @@
  *                         Romain Bignon  <Progs@ir3.org>
  *                         Benjamin Beret <kouak@kouak.org>
  *
- * site web: http://sf.net/projects/scoderz/
+ * SDreams v2 (C) 2021 -- Ext by @bugsounet <bugsounet@bugsounet.fr>
+ * site web: http://www.ircdreams.org
  *
- * Services pour serveur IRC. Supporté sur IRCoderz
+ * Services pour serveur IRC. Supporté sur Ircdreams v3
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,7 +77,7 @@ int global_welcome(aNick *nick, aChan *chan, int parc, char **parv)
 		if(parc < 2) return csreply(nick, "Syntaxe: %s ADD <message>", parv[0]);
 
 		if((w = gwelcome_add(parv2msg(parc, parv, 2, 250))))
-			csreply(nick, "\2[Message de bienvenue #%d]\2 - %s", w->id, w->msg);
+			csreply(nick, "\2[Welcome #%d]\2 - %s", w->id, w->msg);
 	}
 	else if(!strcasecmp(cmd, "DEL"))
 	{
@@ -129,8 +130,7 @@ void choose_welcome(const char *num)
 	if(!tmp) tmp = welcomehead;
 
 	++tmp->view;
-	putserv("%s %s %s :\2[Message de bienvenue #%d]\2 - %s", ws.num,
-		GetConf(CF_PRIVWELCOME) ? TOKEN_PRIVMSG : TOKEN_NOTICE, num, tmp->id, tmp->msg);
+	putserv("%s %s %s :\2[Welcome #%d]\2 - %s", cs.num, TOKEN_NOTICE, num, tmp->id, tmp->msg);
 
 	tmp = tmp->next;
 }
